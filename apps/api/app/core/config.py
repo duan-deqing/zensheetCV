@@ -1,13 +1,14 @@
+import secrets
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     APP_NAME: str = "Stylan Resume API"
     APP_VERSION: str = "0.1.0"
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./app.db"
-    SECRET_KEY: str = "change-me-in-production"
+    SECRET_KEY: str = secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     OPENAI_API_KEY: str = ""

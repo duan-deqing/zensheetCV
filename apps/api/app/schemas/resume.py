@@ -1,31 +1,26 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Any
-
+from typing import Any, Literal
 
 class ThemeConfigSchema(BaseModel):
     primaryColor: str = "#2563EB"
     fontFamily: str = "'Inter', 'Noto Sans SC', sans-serif"
-    fontSize: str = "base"
-    spacing: str = "normal"
-
+    fontSize: Literal['sm', 'base', 'lg'] = "base"
+    spacing: Literal['compact', 'normal', 'relaxed'] = "normal"
 
 class ResumeBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     markdown: str = ""
 
-
 class ResumeCreate(ResumeBase):
     template_id: str = "classic"
     theme_config: dict[str, Any] = {}
-
 
 class ResumeUpdate(BaseModel):
     title: str | None = Field(None, min_length=1, max_length=200)
     markdown: str | None = None
     template_id: str | None = None
     theme_config: dict[str, Any] | None = None
-
 
 class ResumeSchema(ResumeBase):
     id: str
@@ -34,10 +29,8 @@ class ResumeSchema(ResumeBase):
     theme_config: dict[str, Any]
     created_at: datetime
     updated_at: datetime
-
     class Config:
         from_attributes = True
-
 
 class ResumeListSchema(BaseModel):
     items: list[ResumeSchema]

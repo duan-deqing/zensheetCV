@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { apiClient } from '@/api/client';
 
 interface AIResult {
   text: string;
@@ -13,7 +14,6 @@ export function useAI() {
     setResult({ text: '', isStreaming: true });
     const controller = new AbortController();
     abortRef.current = controller;
-
     try {
       const token = localStorage.getItem('access_token');
       const response = await fetch(url, {
@@ -22,11 +22,9 @@ export function useAI() {
         body: JSON.stringify(body),
         signal: controller.signal,
       });
-
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulated = '';
-
       if (reader) {
         while (true) {
           const { done, value } = await reader.read();
@@ -56,13 +54,7 @@ export function useAI() {
   const analyzeKeywords = useCallback(async (jd: string, resume: string) => {
     setResult({ text: '', isStreaming: true });
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch('/api/v1/ai/keywords', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ jd, resume }),
-      });
-      const data = await response.json();
+      const { data } = await apiClient.post('/api/v1/ai/keywords', { jd, resume });
       const text = `**已匹配关键词：** ${data.matched?.join(', ') || '无'}\n\n**缺失关键词：** ${data.missing?.join(', ') || '无'}\n\n**改进建议：**\n${data.suggestions?.map((s: string) => `- ${s}`).join('\n') || '无'}`;
       setResult({ text, isStreaming: false });
     } catch { setResult({ text: '分析失败，请重试', isStreaming: false }); }
