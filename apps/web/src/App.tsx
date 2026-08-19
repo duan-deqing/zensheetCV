@@ -8,6 +8,7 @@ import { AuthProvider } from '@/store/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { Navbar } from '@/components/Navbar';
 import { HomePage } from '@/pages/HomePage';
 
 const EditorPage = lazy(() => import('@/pages/EditorPage'));
@@ -23,6 +24,7 @@ function App() {
             <EditorProvider>
               <ResumeProvider>
                 <PreviewProvider>
+                  <Navbar />
                   <Suspense fallback={<LoadingSpinner />}>
                     <Routes>
                       <Route path="/" element={<HomePage />} />
