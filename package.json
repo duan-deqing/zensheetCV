@@ -1,0 +1,25 @@
+{
+  "name": "stylan-resume",
+  "version": "0.1.0",
+  "private": true,
+  "description": "在线简历编辑器 - Markdown 编辑、模板定制、PDF 导出",
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm --workspace apps/web run dev",
+    "dev:api": "cd apps/api && poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "dev": "concurrently \"npm:dev:web\" \"npm:dev:api\"",
+    "build:web": "npm --workspace apps/web run build",
+    "test:web": "npm --workspace apps/web run test",
+    "test:api": "cd apps/api && poetry run pytest",
+    "lint:web": "npm --workspace apps/web run lint"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
