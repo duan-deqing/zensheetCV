@@ -34,20 +34,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (data: LoginRequest) => {
     try {
       const res = await apiClient.post('/auth/login', data);
+      if (!res.data || typeof res.data !== 'object') {
+        console.error('Login: invalid response', res.data);
+        return false;
+      }
       const { access_token, user: userData } = res.data;
-      localStorage.setItem('access_token', access_token);
-      setUser(userData);
+      if (typeof access_token === 'string') {
+        localStorage.setItem('access_token', access_token);
+      }
+      if (userData && typeof userData === 'object') {
+        setUser(userData as User);
+      }
       return true;
-    } catch {
+    } catch (err: any) {
+      console.error('Login error:', err?.message || err);
       return false;
     }
   }, []);
 
   const register = useCallback(async (data: UserCreate) => {
     try {
-      await apiClient.post('/auth/register', data);
+      const res = await apiClient.post('/auth/register', data);
+      console.log('Register response:', res?.data);
       return true;
-    } catch {
+    } catch (err: any) {
+      console.error('Register error:', err?.message || err);
+      console.error('Register error response:', err?.response?.data);
       return false;
     }
   }, []);
