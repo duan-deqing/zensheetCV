@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useEditor } from '@/store/EditorContext';
+import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useResume } from './useResume';
 
@@ -7,6 +7,7 @@ const AUTOSAVE_DELAY = 2000;
 
 export function useAutoSave() {
   const { markdown, isDirty } = useEditor();
+  const dispatch = useEditorDispatch();
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -19,7 +20,10 @@ export function useAutoSave() {
     }
 
     timerRef.current = setTimeout(async () => {
-      await updateResume(currentResume.id, { markdown });
+      const result = await updateResume(currentResume.id, { markdown });
+      if (result) {
+        dispatch({ type: 'MARK_CLEAN' });
+      }
     }, AUTOSAVE_DELAY);
 
     return () => {
@@ -27,5 +31,5 @@ export function useAutoSave() {
         clearTimeout(timerRef.current);
       }
     };
-  }, [markdown, isDirty, currentResume, updateResume]);
+  }, [markdown, isDirty, currentResume, updateResume, dispatch]);
 }

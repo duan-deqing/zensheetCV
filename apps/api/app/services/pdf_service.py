@@ -1,4 +1,5 @@
 import os
+import re
 import uuid
 from pathlib import Path
 
@@ -41,7 +42,17 @@ class PDFService:
 
     @staticmethod
     def get_pdf_path(file_id: str) -> Path | None:
+        # Sanitize file_id: only allow UUID format (hex + dashes)
+        if not re.match(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', file_id, re.IGNORECASE):
+            return None
         pdf_path = PDF_DIR / f"{file_id}.pdf"
+        # Ensure the resolved path is within PDF_DIR
+        try:
+            resolved = pdf_path.resolve()
+            if not str(resolved).startswith(str(PDF_DIR.resolve())):
+                return None
+        except (OSError, ValueError):
+            return None
         if pdf_path.exists():
             return pdf_path
         return None

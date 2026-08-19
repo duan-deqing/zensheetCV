@@ -1,12 +1,16 @@
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 
 export function Toolbar() {
-  const { markdown: doc } = useEditor();
+  const { markdown: doc, cursorPosition } = useEditor();
   const dispatch = useEditorDispatch();
 
   const insertText = (before: string, after: string = '') => {
-    const newText = doc + '\n' + before + after;
-    dispatch({ type: 'SET_MARKDOWN', payload: newText });
+    const lines = doc.split('\n');
+    const line = lines[cursorPosition.line - 1] || '';
+    const beforeText = line.slice(0, cursorPosition.ch);
+    const afterText = line.slice(cursorPosition.ch);
+    lines[cursorPosition.line - 1] = beforeText + before + after + afterText;
+    dispatch({ type: 'SET_MARKDOWN', payload: lines.join('\n') });
   };
 
   const buttons = [
