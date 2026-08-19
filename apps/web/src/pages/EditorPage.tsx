@@ -2,6 +2,7 @@ import { MarkdownEditor } from '@/editor/MarkdownEditor';
 import { ResumePreview } from '@/preview/ResumePreview';
 import { ResumeList } from '@/components/ResumeList';
 import { TopBar } from '@/components/TopBar';
+import { AIPanel } from '@/components/AIPanel';
 import { Toast } from '@/components/Toast';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
@@ -23,6 +24,7 @@ export function EditorPage() {
             <ResumePreview />
           </div>
         </div>
+        <AIPanel />
       </div>
       <Toast />
     </div>
