@@ -23,7 +23,7 @@
 | **PDF** | Playwright + Jinja2 |
 | **AI** | OpenAI GPT-4o-mini |
 | **认证** | JWT (python-jose) + bcrypt |
-| **部署** | Docker + Docker Compose |
+| **包管理** | pnpm (前端) + Poetry (后端) |
 | **CI** | GitHub Actions |
 
 ## 快速开始
@@ -31,6 +31,7 @@
 ### 前置要求
 
 - Node.js ≥ 18
+- pnpm ≥ 9.0
 - Python ≥ 3.11
 - Poetry ≥ 1.8
 
@@ -38,7 +39,7 @@
 
 ```bash
 # 安装前端依赖 (monorepo root)
-npm install
+pnpm install
 
 # 安装后端依赖
 cd apps/api && poetry install
@@ -48,11 +49,11 @@ cd apps/api && poetry install
 
 ```bash
 # 同时启动前后端 (从项目根目录)
-npm run dev
+pnpm run dev
 
 # 或分别启动
-npm run dev:web      # 前端: http://localhost:5173
-npm run dev:api      # 后端: http://localhost:8000
+pnpm run dev:web      # 前端: http://localhost:5173
+pnpm run dev:api      # 后端: http://localhost:8000
 ```
 
 ### API 文档
@@ -62,38 +63,12 @@ ReDoc: <http://localhost:8000/redoc>
 
 ---
 
-## 部署
-
-### Docker Compose (推荐)
-
-```bash
-# 1. 复制并编辑环境变量
-cp .env.example .env
-# 编辑 .env 配置你的 SECRET_KEY 和 OPENAI_API_KEY
-
-# 2. 构建并启动
-docker compose up --build
-
-# 服务地址
-# 前端: http://localhost:3000
-# 后端: http://localhost:8000
-```
-
-**容器说明:**
-
-| 服务 | 端口 | 说明 |
-|------|------|------|
-| `frontend` | 3000 | Vite 生产构建，Nginx 静态托管 |
-| `backend` | 8000 | FastAPI + Uvicorn |
-
-后端挂载卷 `db_data` 持久化 SQLite 数据库，并配置了健康检查 (`/health`)。
-
-### 手动部署
+## 手动部署
 
 **前端构建:**
 
 ```bash
-npm run build:web
+pnpm run build:web
 # 产物输出到 apps/web/dist，可托管到任意静态文件服务器
 ```
 
@@ -149,7 +124,7 @@ npm run test:api
 npm run lint:web
 ```
 
-CI 流水线 (`.github/workflows/ci.yml`) 在每次 push / PR 时自动运行前端构建、后端测试 (含覆盖率) 以及 Docker 镜像构建验证。
+CI 流水线 (`.github/workflows/ci.yml`) 在每次 push / PR 时自动运行前端构建、后端测试 (含覆盖率)。
 
 ---
 
@@ -293,8 +268,7 @@ stylan_resume/
 │       └── specs/                 # 设计规格
 │
 ├── .github/workflows/ci.yml       # CI 配置
-├── .env.example                   # 环境变量模板
-├── docker-compose.yml             # Docker 编排
+├── pnpm-workspace.yaml            # pnpm workspace 配置
 ├── package.json                   # Monorepo 根配置
 └── README.md
 ```
