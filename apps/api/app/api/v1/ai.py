@@ -1,11 +1,11 @@
 import json
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db
-from app.schemas.ai import *
+from app.schemas.ai import AIPolishRequest, AIKeywordsRequest, AIGenerateRequest
 from app.services.ai_service import AIService
 from app.services.auth_service import AuthService
 

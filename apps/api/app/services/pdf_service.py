@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import uuid
 from pathlib import Path
 from typing import Optional
@@ -56,3 +57,14 @@ class PDFService:
         if pdf_path.exists():
             return pdf_path
         return None
+
+    @staticmethod
+    def cleanup_old_pdfs(max_age_hours: int = 24) -> int:
+        """Remove PDF files older than max_age_hours. Returns count of removed files."""
+        now = time.time()
+        removed = 0
+        for pdf_file in PDF_DIR.glob("*.pdf"):
+            if now - pdf_file.stat().st_mtime > max_age_hours * 3600:
+                pdf_file.unlink()
+                removed += 1
+        return removed

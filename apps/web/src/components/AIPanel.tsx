@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAI } from '@/hooks/useAI';
+import { useEditor } from '@/store/EditorContext';
 
 export function AIPanel() {
   const [activeTab, setActiveTab] = useState<'polish' | 'keywords' | 'generate'>('polish');
@@ -7,6 +8,7 @@ export function AIPanel() {
   const [jdInput, setJdInput] = useState('');
   const [generatePoints, setGeneratePoints] = useState('');
   const { result, polish, analyzeKeywords, generateContent, stop, reset } = useAI();
+  const { markdown } = useEditor();
 
   return (
     <div className="w-80 h-full bg-white border-l border-gray-200 flex flex-col">
@@ -44,7 +46,7 @@ export function AIPanel() {
         {activeTab === 'keywords' && (
           <>
             <textarea value={jdInput} onChange={(e) => setJdInput(e.target.value)} placeholder="粘贴目标职位描述(JD)..." className="w-full h-24 text-xs p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none" />
-            <button onClick={() => analyzeKeywords(jdInput, '')} disabled={!jdInput.trim() || result.isStreaming} className="btn-primary text-xs py-2 disabled:opacity-50">
+            <button onClick={() => analyzeKeywords(jdInput, markdown)} disabled={!jdInput.trim() || result.isStreaming} className="btn-primary text-xs py-2 disabled:opacity-50">
               {result.isStreaming ? '分析中...' : '分析关键词'}
             </button>
           </>

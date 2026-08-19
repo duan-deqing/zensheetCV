@@ -2,17 +2,22 @@ import { useEffect } from 'react';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useResume } from '@/hooks/useResume';
 import { useUI } from '@/store/UIContext';
+import { useEditorDispatch } from '@/store/EditorContext';
 
 export function ResumeList() {
   const { resumes, currentResume, setCurrentResume, isLoading } = useResumeStore();
   const { fetchResumes } = useResume();
   const { sidebarOpen } = useUI();
+  const editorDispatch = useEditorDispatch();
 
-  useEffect(() => {
-    fetchResumes();
-  }, [fetchResumes]);
+  useEffect(() => { fetchResumes(); }, [fetchResumes]);
 
   if (!sidebarOpen) return null;
+
+  const handleSelectResume = (resume: any) => {
+    setCurrentResume(resume);
+    editorDispatch({ type: 'RESET', payload: resume.markdown });
+  };
 
   return (
     <div className="w-64 h-full bg-white border-r border-gray-200 flex flex-col">
@@ -31,7 +36,7 @@ export function ResumeList() {
             {resumes.map((resume) => (
               <button
                 key={resume.id}
-                onClick={() => setCurrentResume(resume)}
+                onClick={() => handleSelectResume(resume)}
                 className={`text-left px-3 py-2.5 rounded-lg transition-colors ${
                   currentResume?.id === resume.id
                     ? 'bg-primary-50 border border-primary-200'
@@ -48,9 +53,7 @@ export function ResumeList() {
         )}
       </div>
       <div className="p-3 border-t border-gray-200">
-        <button className="w-full btn-secondary text-xs py-2">
-          + 新建简历
-        </button>
+        <button className="w-full btn-secondary text-xs py-2">+ 新建简历</button>
       </div>
     </div>
   );

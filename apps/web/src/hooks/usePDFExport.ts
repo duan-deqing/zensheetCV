@@ -23,8 +23,8 @@ export function usePDFExport() {
         css,
       });
 
-      const response = await fetch(data.download_url);
-      const blob = await response.blob();
+      const response = await apiClient.get(data.download_url, { responseType: 'blob' });
+      const blob = response.data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

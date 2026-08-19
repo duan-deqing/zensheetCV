@@ -56,8 +56,11 @@ JD：{jd}
             response_format={"type": "json_object"},
         )
 
-        content = response.choices[0].message.content
-        return json.loads(content)
+        try:
+            content = response.choices[0].message.content
+            return json.loads(content)
+        except (json.JSONDecodeError, KeyError, IndexError) as e:
+            return {"matched": [], "missing": [], "suggestions": [f"解析 AI 响应失败: {str(e)}"]}
 
     async def generate_content(self, points: list[str], context: str) -> AsyncIterator[str]:
         if not self.client:

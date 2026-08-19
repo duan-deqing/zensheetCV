@@ -17,6 +17,6 @@ class ResumeModel(Base):
     template_id: Mapped[str] = mapped_column(String(50), nullable=False, default="classic")
     theme_config: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, index=True)
 
     user: Mapped["UserModel"] = relationship("UserModel", back_populates="resumes")
