@@ -1,11 +1,25 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.deps import get_db
 from app.schemas import ResumeSchema, ResumeCreate, ResumeUpdate, ResumeListSchema
 from app.services.resume_service import ResumeService
+from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
+security = HTTPBearer()
+
+
+async def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: AsyncSession = Depends(get_db),
+) -> str:
+    service = AuthService(db)
+    user = await service.get_current_user(credentials.credentials)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return user.id
 
 
 @router.get("", response_model=ResumeListSchema)
@@ -13,7 +27,7 @@ async def list_resumes(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
-    user_id: str = "temp-user-id",
+    user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
     items, total = await service.list_by_user(user_id, skip, limit)
@@ -24,7 +38,7 @@ async def list_resumes(
 async def create_resume(
     data: ResumeCreate,
     db: AsyncSession = Depends(get_db),
-    user_id: str = "temp-user-id",
+    user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
     resume = await service.create(user_id, data)
@@ -35,7 +49,7 @@ async def create_resume(
 async def get_resume(
     resume_id: str,
     db: AsyncSession = Depends(get_db),
-    user_id: str = "temp-user-id",
+    user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
     resume = await service.get_by_id(resume_id, user_id)
@@ -49,7 +63,7 @@ async def update_resume(
     resume_id: str,
     data: ResumeUpdate,
     db: AsyncSession = Depends(get_db),
-    user_id: str = "temp-user-id",
+    user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
     resume = await service.get_by_id(resume_id, user_id)
@@ -63,7 +77,7 @@ async def update_resume(
 async def delete_resume(
     resume_id: str,
     db: AsyncSession = Depends(get_db),
-    user_id: str = "temp-user-id",
+    user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
     resume = await service.get_by_id(resume_id, user_id)
