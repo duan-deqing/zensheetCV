@@ -1,4 +1,7 @@
 import { classicTemplate } from './classic';
+import { modernTemplate } from './modern';
+import { elegantTemplate } from './elegant';
+import { techTemplate } from './tech';
 
 export interface TemplateDefinition {
   id: string;
@@ -15,7 +18,12 @@ export interface TemplateDefinition {
   };
 }
 
-export const builtinTemplates: TemplateDefinition[] = [classicTemplate];
+export const builtinTemplates: TemplateDefinition[] = [
+  classicTemplate,
+  modernTemplate,
+  elegantTemplate,
+  techTemplate,
+];
 
 export function getTemplateById(id: string): TemplateDefinition {
   return builtinTemplates.find((t) => t.id === id) || classicTemplate;
