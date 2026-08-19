@@ -1,0 +1,15 @@
+node_modules
+.git
+.gitignore
+.github
+*.md
+.env
+.env.local
+.superpowers
+dist
+__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+*.db
+*.sqlite
