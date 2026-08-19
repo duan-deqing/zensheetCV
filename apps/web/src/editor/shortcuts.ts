@@ -1,7 +1,10 @@
-// Keyboard shortcuts configuration
-// To be implemented in Phase 2
-export const editorShortcuts = {
-  'Ctrl-s': 'save',
-  'Ctrl-b': 'bold',
-  'Ctrl-i': 'italic',
+export interface ShortcutMap {
+  [key: string]: () => void;
+}
+
+export const editorShortcuts: ShortcutMap = {
+  'Ctrl-b': () => {},
+  'Ctrl-i': () => {},
+  'Ctrl-s': () => {},
+  'Ctrl-k': () => {},
 };
