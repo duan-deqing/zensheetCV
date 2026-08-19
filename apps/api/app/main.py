@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
-from app.api.v1 import resumes, templates
+from app.api.v1 import resumes, templates, pdf
 
 
 @asynccontextmanager
@@ -35,6 +35,7 @@ app.add_middleware(
 
 app.include_router(resumes.router, prefix="/api/v1")
 app.include_router(templates.router, prefix="/api/v1")
+app.include_router(pdf.router, prefix="/api/v1")
 
 
 @app.get("/health")
