@@ -13,7 +13,7 @@ type EditorAction =
   | { type: 'RESET'; payload: string };
 
 const initialState: EditorState = {
-  markdown: '# 张三\n\n## 工作经历\n\n### ABC公司 | 前端工程师\n\n- 负责前端架构设计与开发\n- 优化性能，首屏加载提升50%\n\n## 项目经验\n\n### 在线简历编辑器\n\n- 独立开发 React + TypeScript 前端\n- 实现 Markdown 实时预览\n\n## 教育背景\n\n### XX大学 | 计算机科学 | 本科\n',
+  markdown: '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n',
   cursorPosition: { line: 1, ch: 0 },
   isDirty: false,
 };
