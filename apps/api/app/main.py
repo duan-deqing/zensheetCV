@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
-from app.api.v1 import resumes, templates, pdf, auth
+from app.api.v1 import resumes, templates, pdf, auth, ai
 
 
 @asynccontextmanager
@@ -37,6 +37,7 @@ app.include_router(auth.router, prefix="/api/v1")
 app.include_router(resumes.router, prefix="/api/v1")
 app.include_router(templates.router, prefix="/api/v1")
 app.include_router(pdf.router, prefix="/api/v1")
+app.include_router(ai.router, prefix="/api/v1")
 
 
 @app.get("/health")
