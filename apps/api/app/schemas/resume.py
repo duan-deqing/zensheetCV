@@ -5,8 +5,8 @@ from typing import Any, Literal
 class ThemeConfigSchema(BaseModel):
     primaryColor: str = "#2563EB"
     fontFamily: str = "'Inter', 'Noto Sans SC', sans-serif"
-    fontSize: Literal['sm', 'base', 'lg'] = "base"
-    spacing: Literal['compact', 'normal', 'relaxed'] = "normal"
+    fontSize: Literal['xs', 'sm', 'base', 'lg', 'xl'] = "base"
+    spacing: Literal['tight', 'compact', 'normal', 'relaxed', 'loose'] = "normal"
 
 class ResumeBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)

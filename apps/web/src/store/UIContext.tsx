@@ -9,9 +9,12 @@ interface ToastMessage {
 interface UIContextType {
   sidebarOpen: boolean;
   themePanelOpen: boolean;
+  aiPanelOpen: boolean;
   toasts: ToastMessage[];
   toggleSidebar: () => void;
   toggleThemePanel: () => void;
+  toggleAIPanel: () => void;
+  setAIPanelOpen: (open: boolean) => void;
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
 }
@@ -21,11 +24,13 @@ const UIContext = createContext<UIContextType | null>(null);
 export function UIProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [themePanelOpen, setThemePanelOpen] = useState(false);
+  const [aiPanelOpen, setAIPanelOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const toggleSidebar = useCallback(() => setSidebarOpen((p) => !p), []);
   const toggleThemePanel = useCallback(() => setThemePanelOpen((p) => !p), []);
+  const toggleAIPanel = useCallback(() => setAIPanelOpen((p) => !p), []);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -52,7 +57,20 @@ export function UIProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <UIContext.Provider value={{ sidebarOpen, themePanelOpen, toasts, toggleSidebar, toggleThemePanel, addToast, removeToast }}>
+    <UIContext.Provider
+      value={{
+        sidebarOpen,
+        themePanelOpen,
+        aiPanelOpen,
+        toasts,
+        toggleSidebar,
+        toggleThemePanel,
+        toggleAIPanel,
+        setAIPanelOpen,
+        addToast,
+        removeToast,
+      }}
+    >
       {children}
     </UIContext.Provider>
   );

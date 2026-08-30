@@ -11,6 +11,9 @@ export function useAutoSave() {
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // 保存期间若用户继续输入，不应误标为已保存
+  const markdownRef = useRef(markdown);
+  markdownRef.current = markdown;
 
   useEffect(() => {
     if (!isDirty || !currentResume) return;
@@ -20,8 +23,13 @@ export function useAutoSave() {
     }
 
     timerRef.current = setTimeout(async () => {
-      const result = await updateResume(currentResume.id, { markdown });
-      if (result) {
+      const savedMarkdown = markdown;
+      const result = await updateResume(currentResume.id, {
+        markdown,
+        template_id: currentResume.template_id,
+        theme_config: currentResume.theme_config,
+      });
+      if (result && markdownRef.current === savedMarkdown) {
         dispatch({ type: 'MARK_CLEAN' });
       }
     }, AUTOSAVE_DELAY);

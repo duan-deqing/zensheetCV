@@ -2,19 +2,16 @@ import { createContext, useContext, useReducer, ReactNode, Dispatch } from 'reac
 
 interface EditorState {
   markdown: string;
-  cursorPosition: { line: number; ch: number };
   isDirty: boolean;
 }
 
 type EditorAction =
   | { type: 'SET_MARKDOWN'; payload: string }
-  | { type: 'SET_CURSOR'; payload: { line: number; ch: number } }
   | { type: 'MARK_CLEAN' }
   | { type: 'RESET'; payload: string };
 
 const initialState: EditorState = {
   markdown: '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n',
-  cursorPosition: { line: 1, ch: 0 },
   isDirty: false,
 };
 
@@ -22,8 +19,6 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'SET_MARKDOWN':
       return { ...state, markdown: action.payload, isDirty: true };
-    case 'SET_CURSOR':
-      return { ...state, cursorPosition: action.payload };
     case 'MARK_CLEAN':
       return { ...state, isDirty: false };
     case 'RESET':

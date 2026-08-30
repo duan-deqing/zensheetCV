@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { EditorProvider } from '@/store/EditorContext';
 import { ResumeProvider } from '@/store/ResumeContext';
@@ -11,14 +11,15 @@ import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Navbar } from '@/components/Navbar';
 import { HomePage } from '@/pages/HomePage';
 
-const EditorPage = lazy(() => import('@/pages/EditorPage'));
-const LoginPage = lazy(() => import('@/pages/LoginPage'));
-const RegisterPage = lazy(() => import('@/pages/RegisterPage'));
+const EditorPage = lazy(() => import('@/pages/EditorPage').then((m) => ({ default: m.EditorPage })));
+const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('@/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
+const ResumesPage = lazy(() => import('@/pages/ResumesPage').then((m) => ({ default: m.ResumesPage })));
 
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
+      <HashRouter>
         <AuthProvider>
           <UIProvider>
             <EditorProvider>
@@ -30,7 +31,8 @@ function App() {
                       <Route path="/" element={<HomePage />} />
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/register" element={<RegisterPage />} />
-                      <Route path="/editor" element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
+                      <Route path="/resumes" element={<ProtectedRoute><ResumesPage /></ProtectedRoute>} />
+                      <Route path="/editor" element={<Navigate to="/resumes" replace />} />
                       <Route path="/editor/:id" element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
                     </Routes>
                   </Suspense>
@@ -39,7 +41,7 @@ function App() {
             </EditorProvider>
           </UIProvider>
         </AuthProvider>
-      </BrowserRouter>
+      </HashRouter>
     </ErrorBoundary>
   );
 }

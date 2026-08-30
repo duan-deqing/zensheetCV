@@ -1,8 +1,11 @@
+export type FontSizeOption = 'xs' | 'sm' | 'base' | 'lg' | 'xl';
+export type SpacingOption = 'tight' | 'compact' | 'normal' | 'relaxed' | 'loose';
+
 export interface ThemeConfig {
   primaryColor: string;
   fontFamily: string;
-  fontSize: 'sm' | 'base' | 'lg';
-  spacing: 'compact' | 'normal' | 'relaxed';
+  fontSize: FontSizeOption;
+  spacing: SpacingOption;
 }
 
 export const defaultTheme: ThemeConfig = {

@@ -1,35 +1,35 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.deps import get_db
+from app.core.deps import get_current_user_id
 from app.schemas.ai import AIPolishRequest, AIKeywordsRequest, AIGenerateRequest
 from app.services.ai_service import AIService
-from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/ai", tags=["ai"])
-security = HTTPBearer()
 
-async def get_current_user_id(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncSession = Depends(get_db),
-) -> str:
-    service = AuthService(db)
-    user = await service.get_current_user(credentials.credentials)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    return user.id
+
+def sse_event(payload: dict) -> str:
+    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+async def sse_stream(stream):
+    try:
+        async for delta in stream:
+            yield sse_event({"delta": delta})
+        yield sse_event({"done": True})
+    except Exception as e:
+        yield sse_event({"error": f"AI 服务异常: {str(e)}"})
+
 
 @router.post("/polish")
 async def polish_text(data: AIPolishRequest, user_id: str = Depends(get_current_user_id)):
     service = AIService()
-    async def generate():
-        async for delta in service.polish(data.text, data.context):
-            yield f"data: {json.dumps({'delta': delta}, ensure_ascii=False)}\n\n"
-        yield f"data: {json.dumps({'done': True}, ensure_ascii=False)}\n\n"
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        sse_stream(service.polish(data.text, data.context)),
+        media_type="text/event-stream",
+    )
+
 
 @router.post("/keywords")
 async def analyze_keywords(data: AIKeywordsRequest, user_id: str = Depends(get_current_user_id)):
@@ -37,11 +37,11 @@ async def analyze_keywords(data: AIKeywordsRequest, user_id: str = Depends(get_c
     result = await service.analyze_keywords(data.jd, data.resume)
     return result
 
+
 @router.post("/generate")
 async def generate_content(data: AIGenerateRequest, user_id: str = Depends(get_current_user_id)):
     service = AIService()
-    async def generate():
-        async for delta in service.generate_content(data.points, data.context):
-            yield f"data: {json.dumps({'delta': delta}, ensure_ascii=False)}\n\n"
-        yield f"data: {json.dumps({'done': True}, ensure_ascii=False)}\n\n"
-    return StreamingResponse(generate(), media_type="text/event-stream")
+    return StreamingResponse(
+        sse_stream(service.generate_content(data.points, data.context)),
+        media_type="text/event-stream",
+    )

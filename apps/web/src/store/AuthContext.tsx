@@ -54,12 +54,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (data: UserCreate) => {
     try {
-      const res = await apiClient.post('/auth/register', data);
-      console.log('Register response:', res?.data);
+      await apiClient.post('/auth/register', data);
       return true;
     } catch (err: any) {
-      console.error('Register error:', err?.message || err);
-      console.error('Register error response:', err?.response?.data);
+      console.error('Register error:', err?.response?.data || err?.message || err);
       return false;
     }
   }, []);

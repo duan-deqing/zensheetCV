@@ -9,6 +9,8 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+vite.config.js
+vite.config.d.ts
 
 # Environment
 .env
@@ -53,6 +55,9 @@ playwright/.cache/
 
 # SDD workspace
 .superpowers/sdd/
+
+# Firecrawl scrape artifacts
+.firecrawl/
 
 # Data directory
 data/

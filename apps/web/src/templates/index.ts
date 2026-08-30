@@ -2,6 +2,7 @@ import { classicTemplate } from './classic';
 import { modernTemplate } from './modern';
 import { elegantTemplate } from './elegant';
 import { techTemplate } from './tech';
+import type { FontSizeOption, SpacingOption, Template } from '@stylan/shared-types';
 
 export interface TemplateDefinition {
   id: string;
@@ -13,8 +14,8 @@ export interface TemplateDefinition {
   defaultTheme: {
     primaryColor: string;
     fontFamily: string;
-    fontSize: string;
-    spacing: string;
+    fontSize: FontSizeOption;
+    spacing: SpacingOption;
   };
 }
 
@@ -32,4 +33,18 @@ export function getTemplateById(id: string): TemplateDefinition {
 export function getTemplateCss(templateId: string): string {
   const template = getTemplateById(templateId);
   return template.css;
+}
+
+/** 将本地模板定义转换为与后端 API 一致的 Template 结构 */
+export function toApiTemplate(template: TemplateDefinition): Template {
+  return {
+    id: template.id,
+    name: template.name,
+    description: template.description,
+    thumbnail: template.thumbnail,
+    css_styles: template.css,
+    block_mapping: template.blockMapping,
+    is_builtin: true,
+    default_theme: template.defaultTheme,
+  };
 }

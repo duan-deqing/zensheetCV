@@ -1,12 +1,26 @@
 import pytest
 
 
+async def _register_and_login(client, email: str) -> dict:
+    await client.post("/api/v1/auth/register", json={
+        "name": "Test User",
+        "email": email,
+        "password": "password123",
+    })
+    login = await client.post("/api/v1/auth/login", json={
+        "email": email,
+        "password": "password123",
+    })
+    return {"Authorization": f"Bearer {login.json()['access_token']}"}
+
+
 @pytest.mark.asyncio
 async def test_create_resume(client):
+    headers = await _register_and_login(client, "create-resume@example.com")
     response = await client.post("/api/v1/resumes", json={
         "title": "测试简历",
         "markdown": "# 测试\n\n## 经历\n",
-    })
+    }, headers=headers)
     assert response.status_code == 201
     data = response.json()
     assert data["title"] == "测试简历"
@@ -15,11 +29,18 @@ async def test_create_resume(client):
 
 @pytest.mark.asyncio
 async def test_list_resumes(client):
-    response = await client.get("/api/v1/resumes")
+    headers = await _register_and_login(client, "list-resumes@example.com")
+    response = await client.get("/api/v1/resumes", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
     assert "total" in data
+
+
+@pytest.mark.asyncio
+async def test_resumes_require_auth(client):
+    response = await client.get("/api/v1/resumes")
+    assert response.status_code in (401, 403)
 
 
 @pytest.mark.asyncio

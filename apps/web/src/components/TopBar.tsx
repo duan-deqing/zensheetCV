@@ -1,42 +1,299 @@
-import { useUI } from '@/store/UIContext';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/store/AuthContext';
+import { useResumeStore } from '@/store/ResumeContext';
+import { useEditor, useEditorDispatch } from '@/store/EditorContext';
+import { useResume } from '@/hooks/useResume';
 import { SaveButton } from '@/components/SaveButton';
-import { ThemeConfigPanel } from '@/components/ThemeConfigPanel';
+import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
+import { usePDFExport } from '@/hooks/usePDFExport';
 
-export function TopBar() {
-  const { toggleThemePanel, themePanelOpen } = useUI();
-  const { user, logout } = useAuth();
+/** 文档图标，颜色跟随 currentColor */
+function FileIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <path d="M14 2v6h6" />
+    </svg>
+  );
+}
+
+/** 文件菜单：导入 / 导出 Markdown，弹层与全站下拉风格一致，结果气泡显示在按钮上方 */
+function FileMenu() {
+  const { markdown } = useEditor();
+  const { currentResume } = useResumeStore();
+  const dispatch = useEditorDispatch();
+  const { status, exiting, show } = useButtonStatus();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 点击外部 / Escape 关闭
+  useEffect(() => {
+    if (!open) return;
+    const handleDown = (e: MouseEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('mousedown', handleDown);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleDown);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [open]);
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 允许重复导入同一文件
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (!text.trim()) {
+        show('error', '文件内容为空');
+        return;
+      }
+      // 载入编辑器并标记未保存，由自动保存持久化
+      dispatch({ type: 'SET_MARKDOWN', payload: text });
+      show('success', '导入成功');
+    } catch {
+      show('error', '文件读取失败');
+    }
+  };
+
+  const handleExport = () => {
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(currentResume?.title || '简历').replace(/[\\/:*?"<>|]/g, '_')}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    show('success', 'Markdown 导出成功');
+  };
 
   return (
-    <header className="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-4 relative">
-      <div className="flex items-center gap-3">
-        <h1 className="text-lg font-bold text-gray-900">Stylan Resume</h1>
-      </div>
-      <div className="flex items-center gap-2">
-        <SaveButton />
-        <button
-          onClick={toggleThemePanel}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-            themePanelOpen
-              ? 'bg-primary-100 text-primary-700'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
+    <div ref={rootRef} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen((p) => !p)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+      >
+        <FileIcon />
+        文件
+      </button>
+      <ButtonStatus status={status} exiting={exiting} />
+      {open && (
+        <div
+          role="menu"
+          className="dropdown-pop absolute left-0 top-full mt-1.5 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30"
         >
-          🎨 主题
-        </button>
-        <button className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-          📄 导出 PDF
+          <style>{`
+            @keyframes dropdownIn {
+              from { opacity: 0; transform: translateY(-4px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            .dropdown-pop { animation: dropdownIn 0.15s ease-out both; }
+            @media (prefers-reduced-motion: reduce) {
+              .dropdown-pop { animation: none; }
+            }
+          `}</style>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              inputRef.current?.click();
+            }}
+            className="w-full text-left text-[13px] px-3 py-2 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+          >
+            导入 Markdown
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setOpen(false);
+              handleExport();
+            }}
+            className="w-full text-left text-[13px] px-3 py-2 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
+          >
+            导出 Markdown
+          </button>
+        </div>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".md,.markdown,.txt"
+        className="hidden"
+        onChange={handleImportFile}
+      />
+    </div>
+  );
+}
+
+/** 铅笔图标，颜色跟随 currentColor */
+function PencilIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3 h-3"
+      aria-hidden="true"
+    >
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+    </svg>
+  );
+}
+
+/** 估算文本显示宽度：中文等全角字符约 1em，英文/数字约 0.55em */
+function textWidth(s: string) {
+  return [...s].reduce((w, c) => w + (c.charCodeAt(0) > 0x2e80 ? 1 : 0.55), 0);
+}
+
+/** 可编辑简历标题：点击进入行内编辑，Enter/失焦保存，Esc 取消 */
+function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', text: string) => void }) {
+  const { currentResume } = useResumeStore();
+  const { updateResume } = useResume();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [editing]);
+
+  if (!currentResume) {
+    return <h1 className="text-sm font-semibold text-gray-900 truncate">编辑简历</h1>;
+  }
+
+  const commit = async () => {
+    setEditing(false);
+    const next = draft.trim();
+    if (!next || next === currentResume.title) {
+      if (!next) onNotify('error', '名称不能为空');
+      return;
+    }
+    const result = await updateResume(currentResume.id, { title: next });
+    onNotify(result ? 'success' : 'error', result ? '重命名成功' : '重命名失败');
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit();
+          if (e.key === 'Escape') setEditing(false);
+        }}
+        className="text-sm font-semibold text-gray-900 bg-white border-b border-primary-400 outline-none px-0.5 py-0"
+        style={{ width: `${Math.min(Math.max(textWidth(draft) + 0.5, 10), 20)}em` }}
+        maxLength={60}
+        aria-label="简历名称"
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setDraft(currentResume.title);
+        setEditing(true);
+      }}
+      title="点击修改名称"
+      className="group flex items-center gap-1.5 min-w-0 text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+    >
+      <span className="truncate">{currentResume.title}</span>
+      <PencilIcon />
+    </button>
+  );
+}
+
+export function TopBar() {
+  const { user, logout } = useAuth();
+  const { exportPDF, isExporting } = usePDFExport();
+  const { status, exiting, show } = useButtonStatus();
+
+  const handleExportPDF = async () => {
+    const el = document.querySelector('.resume-preview');
+    if (!el) {
+      show('error', '未找到预览内容');
+      return;
+    }
+    // 预览容器 innerHTML 已包含模板与主题的 <style> 标签，css 传空即可
+    const ok = await exportPDF(el.innerHTML, '');
+    show(ok ? 'success' : 'error', ok ? 'PDF 导出成功' : 'PDF 导出失败');
+  };
+
+  return (
+    <header className="shrink-0 px-3 pt-3">
+      {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住 */}
+      <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-6">
+        <div className="flex items-center gap-3 min-w-0">
+          <Link
+            to="/resumes"
+            className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
+            title="返回简历列表"
+          >
+            <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
+            <span>我的简历</span>
+          </Link>
+          <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
+          <EditableTitle onNotify={show} />
+          <FileMenu />
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <span className="relative inline-flex">
+            <SaveButton />
+            {/* 导出结果气泡与保存结果共用同一区域：保存按钮左侧 */}
+            <ButtonStatus status={status} exiting={exiting} placement="left" />
+          </span>
+          <button
+          onClick={handleExportPDF}
+          disabled={isExporting}
+          className="px-3.5 h-8 inline-flex items-center text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+        >
+          {isExporting ? '导出中...' : '导出 PDF'}
         </button>
         {user && (
-          <div className="flex items-center gap-2 ml-2 pl-2 border-l border-gray-200">
-            <span className="text-xs text-gray-600">{user.name}</span>
-            <button onClick={logout} className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
-              退出
-            </button>
-          </div>
-        )}
+            <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
+              <span className="text-[13px] text-gray-600">{user.name}</span>
+              <button
+                onClick={logout}
+                className="text-[13px] text-gray-500 hover:text-primary-600 transition-colors"
+              >
+                退出
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      <ThemeConfigPanel />
     </header>
   );
 }

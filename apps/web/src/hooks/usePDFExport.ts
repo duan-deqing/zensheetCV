@@ -23,7 +23,9 @@ export function usePDFExport() {
         css,
       });
 
-      const response = await apiClient.get(data.download_url, { responseType: 'blob' });
+      // download_url 为 /api/v1/pdf/download/...，apiClient 的 baseURL 已含 /api/v1，需去掉前缀
+      const downloadPath = String(data.download_url).replace(/^\/api\/v1/, '');
+      const response = await apiClient.get(downloadPath, { responseType: 'blob' });
       const blob = response.data;
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -33,8 +35,10 @@ export function usePDFExport() {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
+      return true;
     } catch (err: any) {
       setError(err.message || 'PDF export failed');
+      return false;
     } finally {
       setIsExporting(false);
     }

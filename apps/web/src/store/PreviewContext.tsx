@@ -6,11 +6,14 @@ interface PreviewContextType {
   currentTemplate: Template | null;
   templates: Template[];
   themeConfig: ThemeConfig;
+  /** 简历数据是否已加载并同步到预览，未就绪前渲染骨架屏避免默认主题闪变 */
+  themeReady: boolean;
   scale: number;
   isFullscreen: boolean;
   setCurrentTemplate: (template: Template) => void;
   setTemplates: (templates: Template[]) => void;
   setThemeConfig: (config: ThemeConfig) => void;
+  setThemeReady: (ready: boolean) => void;
   setScale: (scale: number) => void;
   toggleFullscreen: () => void;
 }
@@ -21,6 +24,7 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>(defaultTheme);
+  const [themeReady, setThemeReady] = useState(false);
   const [scale, setScale] = useState(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -32,11 +36,13 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
         currentTemplate,
         templates,
         themeConfig,
+        themeReady,
         scale,
         isFullscreen,
         setCurrentTemplate,
         setTemplates,
         setThemeConfig,
+        setThemeReady,
         setScale,
         toggleFullscreen,
       }}

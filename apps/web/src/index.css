@@ -56,3 +56,89 @@
     @apply bg-gray-300 rounded-full;
   }
 }
+
+/* 入场动画：fade-up，尊重系统减弱动效设置 */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}
+
+/* 按钮结果气泡：pop 入场，尊重系统减弱动效设置 */
+@keyframes status-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.status-pop {
+  animation: status-pop 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 左侧弹出变体：从按钮一侧滑入 */
+@keyframes status-pop-left {
+  from {
+    opacity: 0;
+    transform: translateX(6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.status-pop-left {
+  animation: status-pop-left 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 缩回淡出：入场动效的逆向，向按钮方向收回并缩小 */
+@keyframes status-pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.92);
+  }
+}
+
+.status-pop-out {
+  animation: status-pop-out 0.18s ease-in both;
+}
+
+@keyframes status-pop-left-out {
+  to {
+    opacity: 0;
+    transform: translateX(6px) scale(0.92);
+  }
+}
+
+.status-pop-left-out {
+  animation: status-pop-left-out 0.18s ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-pop,
+  .status-pop-left,
+  .status-pop-out,
+  .status-pop-left-out {
+    animation: none;
+  }
+}

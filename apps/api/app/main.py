@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.db.base import Base
 from app.db.session import engine
 from app.api.v1 import resumes, templates, pdf, auth, ai
+from app.services.pdf_service import PDFService
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -17,6 +18,7 @@ limiter = Limiter(key_func=get_remote_address)
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    PDFService.cleanup_old_pdfs()
     yield
     await engine.dispose()
 

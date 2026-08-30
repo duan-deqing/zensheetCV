@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import type { Resume, ThemeConfig } from '@stylan/shared-types';
 
 interface ResumeContextType {
@@ -22,26 +23,26 @@ export function ResumeProvider({ children }: { children: ReactNode }) {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // ResumeProvider 位于 EditorProvider 内部，可联动编辑器脏标记以触发自动保存
+  const { markdown } = useEditor();
+  const editorDispatch = useEditorDispatch();
 
+  // 均使用函数式更新：连续调用（如切换模板时同时写入默认主题）时
+  // 基于最新 state 合并，避免闭包中的旧快照互相覆盖字段
   const updateMarkdown = (markdown: string) => {
-    if (currentResume) {
-      setCurrentResume({ ...currentResume, markdown });
-    }
+    setCurrentResume((prev) => (prev ? { ...prev, markdown } : prev));
   };
 
   const updateTemplate = (templateId: string) => {
-    if (currentResume) {
-      setCurrentResume({ ...currentResume, template_id: templateId });
-    }
+    setCurrentResume((prev) => (prev ? { ...prev, template_id: templateId } : prev));
+    editorDispatch({ type: 'SET_MARKDOWN', payload: markdown });
   };
 
   const updateTheme = (theme: Partial<ThemeConfig>) => {
-    if (currentResume) {
-      setCurrentResume({
-        ...currentResume,
-        theme_config: { ...currentResume.theme_config, ...theme },
-      });
-    }
+    setCurrentResume((prev) =>
+      prev ? { ...prev, theme_config: { ...prev.theme_config, ...theme } } : prev,
+    );
+    editorDispatch({ type: 'SET_MARKDOWN', payload: markdown });
   };
 
   return (
