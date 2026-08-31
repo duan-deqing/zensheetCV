@@ -13,12 +13,12 @@ export const modernTemplate: TemplateDefinition = {
     p: 'description',
     hr: 'divider',
   },
+  pageBackground: 'linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%)',
   css: `
     .resume-preview {
       font-family: 'Inter', 'Noto Sans SC', sans-serif;
       color: #1F2937;
       line-height: calc(1.6 * var(--resume-sp, 1));
-      padding: 2.5rem;
       background: linear-gradient(135deg, #FFFFFF 0%, #F0F7FF 100%);
     }
     .resume-preview h1 {
@@ -54,6 +54,24 @@ export const modernTemplate: TemplateDefinition = {
       background: var(--resume-primary, #2563EB);
     }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #4B5563; }
+    .resume-preview code {
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 0.8125em;
+      padding: 0.125em 0.45em;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 4px;
+      color: var(--resume-primary, #2563EB);
+      white-space: nowrap;
+    }
+    .resume-preview pre code {
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      color: inherit;
+      white-space: pre-wrap;
+    }
   `,
   defaultTheme: {
     primaryColor: '#2563EB',

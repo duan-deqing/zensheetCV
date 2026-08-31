@@ -1,14 +1,18 @@
 import { Link } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import type { CSSProperties } from 'react';
 import { useAuth } from '@/store/AuthContext';
 import { getTemplateCss } from '@/templates';
+import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
+import { resumeIconsCss } from '@/preview/previewShared';
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
    （react-markdown + 各模板真实 CSS），非静态截图 */
 const SAMPLE_MARKDOWN = `# 林晚舟
 
 产品经理 · 5 年经验 · 上海
+
+icon:phone 138-0000-0000 · icon:email lin@mail.com · icon:github linwanzhou
 
 ## 工作经历
 
@@ -51,14 +55,28 @@ function MiniResume({
     /\.resume-preview/g,
     `.rp-${templateId}`,
   );
+  const iconMap = getIconMap();
+  const components = {
+    [RESUME_ICON_TAG]: ({ name }: { name?: string }) => {
+      const svg = name ? iconMap[name] : undefined;
+      if (!svg) return null;
+      return <span className="resume-icon" dangerouslySetInnerHTML={{ __html: svg }} />;
+    },
+  } as Components; // 自定义元素名不在 JSX.IntrinsicElements 中，需断言
   return (
     <div className={className}>
       <style>{scoped}</style>
+      <style>{resumeIconsCss(`.rp-${templateId}`)}</style>
       <div
         className={`rp-${templateId}`}
         style={{ '--resume-primary': TEMPLATE_ACCENTS[templateId] } as CSSProperties}
       >
-        <ReactMarkdown>{SAMPLE_MARKDOWN}</ReactMarkdown>
+        <ReactMarkdown
+          remarkPlugins={[remarkResumeIcons(iconMap)]}
+          components={components}
+        >
+          {SAMPLE_MARKDOWN}
+        </ReactMarkdown>
       </div>
     </div>
   );

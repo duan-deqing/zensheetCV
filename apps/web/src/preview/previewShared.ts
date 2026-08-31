@@ -1,4 +1,4 @@
-import type { FontSizeOption, SpacingOption } from '@stylan/shared-types';
+import type { FontSizeOption, MarginOption, SpacingOption } from '@stylan/shared-types';
 
 /** 字号/间距档位 → CSS 缩放系数，模板内通过 calc(var() * 基准值) 生效 */
 export const FONT_SCALE: Record<FontSizeOption, number> = {
@@ -6,6 +6,16 @@ export const FONT_SCALE: Record<FontSizeOption, number> = {
 };
 export const SPACING_SCALE: Record<SpacingOption, number> = {
   tight: 0.8, compact: 0.9, normal: 1, relaxed: 1.15, loose: 1.3,
+};
+
+/** 页边距档位 → mm（预览内边距与 PDF 导出 Playwright margin 共用同一映射） */
+export const MARGIN_MM: Record<MarginOption, number> = {
+  none: 0, narrow: 8, normal: 12, wide: 20,
+};
+
+/** 内容边距档位 → mm（内容到页面边界的距离，叠加在页边距上） */
+export const CONTENT_PADDING_MM: Record<MarginOption, number> = {
+  none: 0, narrow: 5, normal: 10, wide: 15,
 };
 
 /** :::left / :::mid / :::right 三栏布局样式。
@@ -23,4 +33,18 @@ export const resumeColsCss = (scope = '') => `
   ${scope} .resume-col-left { text-align: left; }
   ${scope} .resume-col-mid { text-align: center; }
   ${scope} .resume-col-right { text-align: right; }
+`;
+
+/** `icon:名称` 图标样式：尺寸随字号（1em），颜色跟随文字（currentColor） */
+export const resumeIconsCss = (scope = '') => `
+  ${scope} .resume-icon {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: -0.125em;
+  }
+  ${scope} .resume-icon svg {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+  }
 `;

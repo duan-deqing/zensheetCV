@@ -13,12 +13,12 @@ export const classicTemplate: TemplateDefinition = {
     p: 'description',
     hr: 'divider',
   },
+  pageBackground: '#FFFFFF',
   css: `
     .resume-preview {
       font-family: 'Inter', 'Noto Sans SC', sans-serif;
       color: #111827;
       line-height: calc(1.6 * var(--resume-sp, 1));
-      padding: 2rem;
     }
     .resume-preview h1 {
       font-size: calc(2rem * var(--resume-fs, 1));
@@ -51,6 +51,24 @@ export const classicTemplate: TemplateDefinition = {
     }
     .resume-preview p {
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
+    }
+    .resume-preview code {
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 0.8125em;
+      padding: 0.125em 0.45em;
+      background: #F3F4F6;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      color: #1F2937;
+      white-space: nowrap;
+    }
+    .resume-preview pre code {
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      color: inherit;
+      white-space: pre-wrap;
     }
   `,
   defaultTheme: {

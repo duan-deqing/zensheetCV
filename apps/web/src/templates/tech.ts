@@ -13,12 +13,12 @@ export const techTemplate: TemplateDefinition = {
     p: 'description',
     hr: 'divider',
   },
+  pageBackground: '#111827',
   css: `
     .resume-preview {
       font-family: 'JetBrains Mono', 'Fira Code', monospace;
       color: #E5E7EB;
       line-height: calc(1.6 * var(--resume-sp, 1));
-      padding: 2rem;
       background: #111827;
     }
     .resume-preview h1 {
@@ -52,6 +52,24 @@ export const techTemplate: TemplateDefinition = {
       color: var(--resume-primary, #10B981);
     }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #9CA3AF; }
+    .resume-preview code {
+      font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+      font-size: 0.8125em;
+      padding: 0.125em 0.45em;
+      background: #1F2937;
+      border: 1px solid #374151;
+      border-radius: 4px;
+      color: var(--resume-primary, #10B981);
+      white-space: nowrap;
+    }
+    .resume-preview pre code {
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      color: inherit;
+      white-space: pre-wrap;
+    }
   `,
   defaultTheme: {
     primaryColor: '#10B981',

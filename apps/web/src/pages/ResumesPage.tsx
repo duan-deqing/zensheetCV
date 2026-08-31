@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { CSSProperties } from 'react';
-import type { Resume } from '@stylan/shared-types';
+import type { MarginOption, Resume, ThemeConfig } from '@stylan/shared-types';
 import { useResume } from '@/hooks/useResume';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
-import { FONT_SCALE, SPACING_SCALE, resumeColsCss } from '@/preview/previewShared';
+import { CONTENT_PADDING_MM, FONT_SCALE, MARGIN_MM, SPACING_SCALE, resumeColsCss } from '@/preview/previewShared';
 
 /** 线性垃圾桶图标，颜色跟随 currentColor */
 function TrashIcon({ className }: { className?: string }) {
@@ -41,7 +41,8 @@ const DEFAULT_MARKDOWN = '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## �
  * 否则多份模板 CSS 同指 .rp-thumb 会互相覆盖、全部变成最后一张的样式 */
 function ResumePaperPreview({ resume }: { resume: Resume }) {
   const templateId = resume.template_id || 'classic';
-  const theme = resume.theme_config || {};
+  // 兼容旧数据：pageMargin 为单值边距字段，现已拆分为 marginX/marginY
+  const theme = (resume.theme_config || {}) as ThemeConfig & { pageMargin?: MarginOption };
   const defaults = getTemplateById(templateId).defaultTheme;
   // 简历 id 为 UUID，可安全用作 CSS 类名
   const scopeClass = `rp-thumb-${resume.id}`;
@@ -69,7 +70,21 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
             } as CSSProperties
           }
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkResumeCols]}>{normalized}</ReactMarkdown>
+          {/* 每页四周总留白 = 页边距 + 内容边距，与分页预览/导出一致；
+              旧数据仅有 pageMargin 单值字段时以其回退 */}
+          <div
+            style={{
+              padding: `${
+                (MARGIN_MM[theme.marginY ?? theme.pageMargin ?? 'none'] ?? 0) +
+                (CONTENT_PADDING_MM[theme.contentPadding ?? 'none'] ?? 0)
+              }mm ${
+                (MARGIN_MM[theme.marginX ?? theme.pageMargin ?? 'none'] ?? 0) +
+                (CONTENT_PADDING_MM[theme.contentPadding ?? 'none'] ?? 0)
+              }mm`,
+            }}
+          >
+            <ReactMarkdown remarkPlugins={[remarkGfm, remarkResumeCols]}>{normalized}</ReactMarkdown>
+          </div>
         </div>
       </div>
     </div>

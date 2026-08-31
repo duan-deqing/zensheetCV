@@ -20,7 +20,7 @@ function PaletteIcon() {
 }
 
 export function PreviewToolbar() {
-  const { currentTemplate, scale, setScale, isFullscreen, toggleFullscreen, setCurrentTemplate, setThemeConfig } = usePreview();
+  const { currentTemplate, themeConfig, scale, setScale, isFullscreen, toggleFullscreen, setCurrentTemplate, setThemeConfig } = usePreview();
   const { updateTemplate, updateTheme } = useResumeStore();
   const { themePanelOpen, toggleThemePanel } = useUI();
 
@@ -29,18 +29,23 @@ export function PreviewToolbar() {
 
     // Update preview context
     setCurrentTemplate(toApiTemplate(template));
-    const defaultTheme: ThemeConfig = {
+    // 切换模板只重置视觉主题（主色/字体/字号/间距）为模板默认；
+    // 页面布局设置（页边距/内容边距）保留用户当前选择，对所有模板生效
+    const nextTheme: ThemeConfig = {
       primaryColor: template.defaultTheme.primaryColor,
       fontFamily: template.defaultTheme.fontFamily,
       fontSize: template.defaultTheme.fontSize,
       spacing: template.defaultTheme.spacing,
+      marginX: themeConfig.marginX,
+      marginY: themeConfig.marginY,
+      contentPadding: themeConfig.contentPadding ?? 'none',
     };
-    setThemeConfig(defaultTheme);
+    setThemeConfig(nextTheme);
 
     // Update resume data（模板默认主题一并写入，随自动保存落库）
     updateTemplate(templateId);
-    updateTheme(defaultTheme);
-  }, [setCurrentTemplate, setThemeConfig, updateTemplate, updateTheme]);
+    updateTheme(nextTheme);
+  }, [currentTemplate?.id, setCurrentTemplate, setThemeConfig, themeConfig, updateTemplate, updateTheme]);
 
   return (
     <div className="relative flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">

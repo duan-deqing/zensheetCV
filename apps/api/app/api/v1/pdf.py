@@ -12,7 +12,7 @@ pdf_service = PDFService()
 
 @router.post("/generate", response_model=PDFGenerateResponse)
 async def generate_pdf(data: PDFGenerateRequest, user_id: str = Depends(get_current_user_id)):
-    file_id = await pdf_service.generate_pdf(data.html, data.css)
+    file_id = await pdf_service.generate_pdf(data.html, data.css, data.margin_x_mm, data.margin_y_mm)
     return {"download_url": f"/api/v1/pdf/download/{file_id}", "expires_at": ""}
 
 

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/store/AuthContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
+import { usePreview } from '@/store/PreviewContext';
+import { CONTENT_PADDING_MM, FONT_SCALE, MARGIN_MM, SPACING_SCALE } from '@/preview/previewShared';
 import { useResume } from '@/hooks/useResume';
 import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
@@ -237,16 +239,60 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
 export function TopBar() {
   const { user, logout } = useAuth();
   const { exportPDF, isExporting } = usePDFExport();
+  const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
 
   const handleExportPDF = async () => {
-    const el = document.querySelector('.resume-preview');
-    if (!el) {
+    // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
+    const root = document.querySelector('.resume-export-root');
+    if (!(root instanceof HTMLElement)) {
       show('error', '未找到预览内容');
       return;
     }
-    // 预览容器 innerHTML 已包含模板与主题的 <style> 标签，css 传空即可
-    const ok = await exportPDF(el.innerHTML, '');
+    const marginXMM = MARGIN_MM[themeConfig.marginX] ?? 0;
+    const marginYMM = MARGIN_MM[themeConfig.marginY] ?? 0;
+    const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? 'none'] ?? 0;
+    // 每页总留白 = 页边距 + 内容边距，由 Playwright 页边距承担：
+    // 页面边距会在每一页四周生效（CSS padding 在连续文档中无法跨页重复），
+    // 与分页预览中每页纸张的 padding 完全一致
+    const padXMM = marginXMM + contentPadMM;
+    const padYMM = marginYMM + contentPadMM;
+    const contentWMM = 210 - 2 * padXMM;
+    const contentHMM = 297 - 2 * padYMM;
+    // 模板背景全页出血（含边距区域）：应用到 body，Chromium 打印时画布背景铺满整页，
+    // 与预览「背景铺满纸面」一致，避免深色模板四周出现白边；
+    // 从排版源元素读取实际背景（渐变优先，纯色兜底），不依赖模板 id 查找
+    const src = root.querySelector('.resume-export-source');
+    const paperStyle = src ? window.getComputedStyle(src) : null;
+    const bgImage = paperStyle?.backgroundImage;
+    const bgColor = paperStyle?.backgroundColor;
+    const pageBackground =
+      bgImage && bgImage !== 'none'
+        ? bgImage
+        : bgColor && bgColor !== 'transparent'
+          ? bgColor
+          : '#FFFFFF';
+    // 显式注入当前主题变量（间距/字号/主色/字体）：不依赖 DOM 克隆的 <style>，
+    // 从机制上保证导出 PDF 与主题设置一致，避免克隆样式滞后或缺失
+    const themeOverride = `<style>.resume-preview{--resume-sp:${SPACING_SCALE[themeConfig.spacing] ?? 1};--resume-fs:${FONT_SCALE[themeConfig.fontSize] ?? 1};--resume-primary:${themeConfig.primaryColor};font-family:${themeConfig.fontFamily};}</style>`;
+    const ok = await exportPDF(
+      // min-height 取页面内容区高度（297 - 上下总留白）：若仍为 297mm，
+      // 内容盒必然超出首页内容区而产生一页空白尾页；
+      // flow-root 包含子元素 margin，防止首元素 top margin 塌陷到容器外使内容下移
+      `<div class="resume-preview" style="width:${contentWMM}mm;min-height:${contentHMM}mm;display:flow-root">${themeOverride}${root.innerHTML}</div>`,
+      // 导出文档注入与 index.html 相同的 webfont：无头 Chromium 默认只有系统回退字体，
+      // 字体度量不同会导致换行/内容高度与预览不一致，分割线与实际分页产生累积偏差
+      // 同时注入与 Tailwind preflight 等价的重置：预览中模板 CSS 基于 preflight（margin 全 0、
+      // 标题字号字重继承）调校，而 PDF 里 UA 默认样式（h1 margin-top 0.67em 等）会额外撑高顶部
+      `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+       blockquote, dl, dd, figure, h1, h2, h3, h4, h5, h6, hr, p, pre { margin: 0; }
+       ol, ul { list-style: none; margin: 0; padding: 0; }
+       h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+       a { color: inherit; text-decoration: inherit; }
+       body { background: ${pageBackground}; }`,
+      padXMM,
+      padYMM
+    );
     show(ok ? 'success' : 'error', ok ? 'PDF 导出成功' : 'PDF 导出失败');
   };
 

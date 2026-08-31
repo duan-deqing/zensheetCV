@@ -54,9 +54,9 @@ describe('editor restores saved template & theme on re-enter', () => {
       expect(dropdown.textContent).toContain('现代设计');
     }, { timeout: 15000 });
 
-    // 预览容器内联样式应注入已保存的主色调（背景颜色）
+    // 预览排版源（含模板/主题 <style>）应注入已保存的主色调与字号/间距变量
     await waitFor(() => {
-      const preview = document.querySelector('.resume-preview');
+      const preview = document.querySelector('.resume-export-root');
       expect(preview).not.toBeNull();
       const styles = preview!.querySelectorAll('style');
       const all = Array.from(styles).map((s) => s.textContent || '').join('\n');

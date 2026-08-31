@@ -12,6 +12,7 @@ import { useEditorDispatch } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
 import { getTemplateById, toApiTemplate } from '@/templates';
+import type { MarginOption, ThemeConfig } from '@stylan/shared-types';
 
 const MIN_EDITOR_PCT = 25;
 const MAX_EDITOR_PCT = 70;
@@ -78,12 +79,19 @@ export function EditorPage() {
             // 将简历已保存的模板/主题同步到预览
             const template = getTemplateById(resume.template_id || 'classic');
             setCurrentTemplate(toApiTemplate(template));
-            const theme = resume.theme_config || {};
+            // 兼容旧数据：pageMargin 为单值边距字段，现已拆分为 marginX/marginY
+            const theme = (resume.theme_config || {}) as ThemeConfig & {
+              pageMargin?: MarginOption;
+            };
             setThemeConfig({
               primaryColor: theme.primaryColor ?? template.defaultTheme.primaryColor,
               fontFamily: theme.fontFamily ?? template.defaultTheme.fontFamily,
               fontSize: theme.fontSize ?? template.defaultTheme.fontSize,
               spacing: theme.spacing ?? template.defaultTheme.spacing,
+              // 旧数据只有 pageMargin（单值），左右/上下均回退到它；缺省为 0 边距
+              marginX: theme.marginX ?? theme.pageMargin ?? 'none',
+              marginY: theme.marginY ?? theme.pageMargin ?? 'none',
+              contentPadding: theme.contentPadding ?? 'none',
             });
           }
         })

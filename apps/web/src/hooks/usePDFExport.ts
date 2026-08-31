@@ -7,7 +7,7 @@ export function usePDFExport() {
   const [error, setError] = useState<string | null>(null);
   const { currentResume } = useResumeStore();
 
-  const exportPDF = useCallback(async (html: string, css: string) => {
+  const exportPDF = useCallback(async (html: string, css: string, marginXMM = 0, marginYMM = 0) => {
     if (!currentResume) {
       setError('No resume selected');
       return;
@@ -21,6 +21,8 @@ export function usePDFExport() {
         resume_id: currentResume.id,
         html,
         css,
+        margin_x_mm: marginXMM,
+        margin_y_mm: marginYMM,
       });
 
       // download_url 为 /api/v1/pdf/download/...，apiClient 的 baseURL 已含 /api/v1，需去掉前缀

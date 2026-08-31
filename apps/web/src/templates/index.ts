@@ -11,6 +11,8 @@ export interface TemplateDefinition {
   thumbnail: string;
   blockMapping: Record<string, string>;
   css: string;
+  /** 页面背景（全页出血，含页边距区域），导出 PDF 时应用到 body */
+  pageBackground: string;
   defaultTheme: {
     primaryColor: string;
     fontFamily: string;

@@ -17,6 +17,13 @@ vite.config.d.ts
 .env.local
 .env.*.local
 
+# Playwright browsers (project-local install)
+apps/api/.playwright-browsers/
+
+# 参考项目源码与验证脚本的临时目录
+temp_mujicv/
+temp_react-resume-site/
+
 # Python
 __pycache__/
 *.py[cod]
