@@ -1,7 +1,10 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -19,6 +22,7 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     PDFService.cleanup_old_pdfs()
+    Path(settings.UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
     yield
     await engine.dispose()
 
@@ -45,6 +49,15 @@ app.include_router(resumes.router, prefix="/api/v1")
 app.include_router(templates.router, prefix="/api/v1")
 app.include_router(pdf.router, prefix="/api/v1")
 app.include_router(ai.router, prefix="/api/v1")
+
+# 头像等上传文件的静态服务（挂载前确保目录存在）
+avatars_dir = Path(settings.UPLOAD_DIR) / "avatars"
+avatars_dir.mkdir(parents=True, exist_ok=True)
+app.mount(
+    "/api/v1/static/avatars",
+    StaticFiles(directory=avatars_dir),
+    name="avatars",
+)
 
 @app.get("/health")
 async def health_check():

@@ -20,7 +20,7 @@ describe('App routing', () => {
 
   it('renders home page', async () => {
     render(<App />);
-    expect(await screen.findAllByText(/Stylan Resume/i)).not.toHaveLength(0);
+    expect(await screen.findAllByText(/ZENSHEET/i)).not.toHaveLength(0);
     expect(screen.getByText('免费注册')).toBeInTheDocument();
     expect(screen.getAllByText('登录').length).toBeGreaterThan(0);
   });

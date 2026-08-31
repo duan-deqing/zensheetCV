@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/store/AuthContext';
+import { useUI } from '@/store/UIContext';
 
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
 
 export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
+  const { toggleUserModal } = useUI();
   const { pathname } = useLocation();
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
@@ -78,7 +80,7 @@ export function Navbar() {
               to="/"
               className="text-[15px] font-extrabold uppercase tracking-tight text-gray-900 shrink-0"
             >
-              Stylan Resume<span className="text-primary-600">//</span>
+              ZENSHEET<span className="text-primary-600">·禅笺</span>
             </Link>
             <div className="hidden md:flex items-center gap-7">
               <Link to="/" className={linkClass('/')}>
@@ -89,15 +91,40 @@ export function Navbar() {
                   我的简历
                 </Link>
               )}
+              <Link to="/docs" className={linkClass('/docs')}>
+                文档
+              </Link>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {isAuthenticated ? (
               <>
-                <span className="hidden sm:inline text-sm text-gray-700 truncate max-w-[10rem]">
-                  {user?.name}
-                </span>
+                {/* 头像 + 用户名，点击打开设置弹窗，与编辑页 TopBar 同构 */}
+                <button
+                  onClick={toggleUserModal}
+                  className="flex items-center gap-2 group px-1"
+                  aria-haspopup="dialog"
+                  aria-label="用户信息"
+                >
+                  {user?.avatar ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_URL || ''}${user.avatar}`}
+                      alt={`${user?.name ?? '用户'} 的头像`}
+                      className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <span
+                      className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                      aria-hidden="true"
+                    >
+                      {(user?.name ?? '?').slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-[10rem]">
+                    {user?.name}
+                  </span>
+                </button>
                 <button
                   onClick={logout}
                   className="text-sm text-gray-500 hover:text-gray-900 transition-colors px-2"

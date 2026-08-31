@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "stylan-resume-api"
-version = "0.1.0"
+version = "0.7.0"
 description = "在线简历编辑器后端 API"
 authors = ["Stylan"]
 readme = "README.md"

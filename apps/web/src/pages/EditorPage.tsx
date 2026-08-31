@@ -60,8 +60,18 @@ export function EditorPage() {
   const { id } = useParams();
   const { fetchResume } = useResume();
   const editorDispatch = useEditorDispatch();
-  const { setCurrentTemplate, setThemeConfig, themeReady, setThemeReady } = usePreview();
+  const { setCurrentTemplate, setThemeConfig, themeReady, setThemeReady, isFullscreen, toggleFullscreen } = usePreview();
   const { aiPanelOpen, toggleAIPanel } = useUI();
+
+  // 全屏预览时按 Esc 退出
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') toggleFullscreen();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [isFullscreen, toggleFullscreen]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const leftColRef = useRef<HTMLDivElement>(null);
@@ -184,9 +194,17 @@ export function EditorPage() {
           .editor-fade-up { animation: none; }
         }
       `}</style>
-      <TopBar />
+      {/* 全屏预览：隐藏顶栏与编辑器列，仅保留预览 */}
+      {!isFullscreen && <TopBar />}
       <div className="flex flex-1 overflow-hidden">
-        <div ref={containerRef} className="flex flex-1 min-w-0 p-3">
+        {isFullscreen ? (
+          <div className="flex flex-1 min-w-0 p-3">
+            <div className="flex-1 min-w-0">
+              <ResumePreview />
+            </div>
+          </div>
+        ) : (
+          <div ref={containerRef} className="flex flex-1 min-w-0 p-3">
           {/* 左列：编辑器 + 底部 AI 面板 */}
           <div
             ref={leftColRef}
@@ -229,7 +247,8 @@ export function EditorPage() {
           <div className="editor-fade-up flex-1 min-w-0" style={{ animationDelay: '0.08s' }}>
             <ResumePreview />
           </div>
-        </div>
+          </div>
+        )}
       </div>
       <Toast />
     </div>

@@ -13,6 +13,7 @@ interface UIContextType {
   templateModalOpen: boolean;
   photoModalOpen: boolean;
   iconModalOpen: boolean;
+  userModalOpen: boolean;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
   addedTemplates: string[];
   toasts: ToastMessage[];
@@ -22,6 +23,7 @@ interface UIContextType {
   toggleTemplateModal: () => void;
   togglePhotoModal: () => void;
   toggleIconModal: () => void;
+  toggleUserModal: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
   setAIPanelOpen: (open: boolean) => void;
@@ -41,6 +43,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [iconModalOpen, setIconModalOpen] = useState(false);
+  const [userModalOpen, setUserModalOpen] = useState(false);
   // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
   const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
     try {
@@ -58,6 +61,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const toggleTemplateModal = useCallback(() => setTemplateModalOpen((p) => !p), []);
   const togglePhotoModal = useCallback(() => setPhotoModalOpen((p) => !p), []);
   const toggleIconModal = useCallback(() => setIconModalOpen((p) => !p), []);
+  const toggleUserModal = useCallback(() => setUserModalOpen((p) => !p), []);
 
   const addTemplate = useCallback((id: string) => {
     setAddedTemplates((prev) => {
@@ -117,6 +121,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         templateModalOpen,
         photoModalOpen,
         iconModalOpen,
+        userModalOpen,
         addedTemplates,
         toasts,
         toggleSidebar,
@@ -125,6 +130,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         toggleTemplateModal,
         togglePhotoModal,
         toggleIconModal,
+        toggleUserModal,
         addTemplate,
         removeTemplate,
         setAIPanelOpen,

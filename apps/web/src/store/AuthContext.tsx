@@ -9,6 +9,8 @@ interface AuthContextType {
   login: (data: LoginRequest) => Promise<boolean>;
   register: (data: UserCreate) => Promise<boolean>;
   logout: () => void;
+  /** 用服务器返回的最新用户信息替换当前用户（如头像上传后） */
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -67,8 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const updateUser = useCallback((u: User) => setUser(u), []);
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

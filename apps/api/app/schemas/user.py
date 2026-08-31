@@ -29,3 +29,14 @@ class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserSchema
+
+
+class ProfileUpdate(BaseModel):
+    """修改个人资料：仅提交需要修改的字段"""
+    name: str | None = None
+    email: EmailStr | None = None
+
+
+class PasswordChange(BaseModel):
+    old_password: str
+    new_password: str

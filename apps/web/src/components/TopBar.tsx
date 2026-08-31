@@ -34,6 +34,25 @@ function FileIcon() {
   );
 }
 
+/** 书本图标（使用文档入口），颜色跟随 currentColor */
+function BookIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  );
+}
+
 /** 文件菜单：导入 / 导出 Markdown，弹层与全站下拉风格一致，结果气泡显示在按钮上方 */
 function FileMenu() {
   const { markdown } = useEditor();
@@ -289,7 +308,7 @@ export function TopBar() {
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal, toggleIconModal } = useUI();
+  const { toggleTemplateModal, toggleIconModal, toggleUserModal } = useUI();
 
   const handleExportPDF = async () => {
     // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
@@ -397,6 +416,19 @@ export function TopBar() {
               图标
             </button>
           </HoverTip>
+          {/* 使用文档入口：跳转文档页 */}
+          <HoverTip text="使用文档">
+            <button
+              type="button"
+              onClick={() => {
+                window.location.hash = '#/docs';
+              }}
+              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <BookIcon />
+              文档
+            </button>
+          </HoverTip>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -414,7 +446,32 @@ export function TopBar() {
         </button>
         {user && (
             <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
-              <span className="text-[13px] text-gray-600">{user.name}</span>
+              {/* 头像 + 用户名，点击打开用户信息弹窗 */}
+              <HoverTip text="用户信息">
+                <button
+                  onClick={toggleUserModal}
+                  className="flex items-center gap-2 group"
+                  aria-haspopup="dialog"
+                >
+                  {user.avatar ? (
+                    <img
+                      src={`${import.meta.env.VITE_API_URL || ''}${user.avatar}`}
+                      alt={`${user.name} 的头像`}
+                      className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <span
+                      className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                      aria-hidden="true"
+                    >
+                      {user.name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
+                    {user.name}
+                  </span>
+                </button>
+              </HoverTip>
               <button
                 onClick={logout}
                 className="text-[13px] text-gray-500 hover:text-primary-600 transition-colors"

@@ -20,7 +20,7 @@ describe('navbar layout', () => {
 
   it('home page has exactly 1 navbar', async () => {
     render(<App />);
-    await screen.findAllByText(/Stylan Resume/i);
+    await screen.findAllByText(/ZENSHEET/i);
     const navs = document.querySelectorAll('nav');
     expect(navs.length).toBe(1);
   });

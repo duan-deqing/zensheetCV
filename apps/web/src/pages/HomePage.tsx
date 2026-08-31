@@ -171,8 +171,8 @@ export function HomePage() {
       {/* Hero：左文右真实简历预览 */}
       <section className="max-w-7xl mx-auto px-6 pt-14 pb-16 lg:pt-20 grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <p className="fade-up font-mono text-xs uppercase tracking-[0.22em] text-primary-600 mb-5">
-            &lt; STYLAN RESUME /&gt;
+          <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
+            &lt; ZENSHEET · 禅笺 /&gt;
           </p>
           <h1
             className="fade-up text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] mb-5"
@@ -343,8 +343,8 @@ export function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="font-mono text-xs uppercase tracking-[0.2em] text-gray-400">
-            STYLAN RESUME
+          <p className="font-mono text-xs tracking-[0.18em] text-gray-400">
+            ZENSHEET · 禅笺
           </p>
           <p className="text-sm text-gray-500">Markdown 简历编辑器 · 模板 · AI · PDF</p>
         </div>

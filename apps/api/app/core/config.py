@@ -5,8 +5,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Stylan Resume API"
-    APP_VERSION: str = "0.1.0"
+    APP_NAME: str = "Zensheet API · 禅笺"
+    APP_VERSION: str = "0.7.0"
     DEBUG: bool = False
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./app.db"
@@ -15,6 +15,8 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
+
+    UPLOAD_DIR: str = "uploads"
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 

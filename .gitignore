@@ -71,3 +71,6 @@ playwright/.cache/
 
 # Data directory
 data/
+
+# 运行时上传文件（头像等）
+apps/api/uploads/

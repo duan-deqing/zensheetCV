@@ -52,3 +52,56 @@ class AuthService:
             select(UserModel).where(UserModel.id == user_id)
         )
         return result.scalar_one_or_none()
+
+    async def update_avatar(self, user_id: str, avatar_url: str) -> UserModel | None:
+        result = await self.db.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+        user.avatar = avatar_url
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+
+    async def update_profile(
+        self, user_id: str, name: str | None = None, email: str | None = None
+    ) -> UserModel | None:
+        """更新用户名/邮箱，邮箱重复时抛 ValueError"""
+        result = await self.db.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+        if email and email != user.email:
+            dup = await self.db.execute(
+                select(UserModel).where(
+                    UserModel.email == email, UserModel.id != user_id
+                )
+            )
+            if dup.scalar_one_or_none():
+                raise ValueError("该邮箱已被其他账号使用")
+            user.email = email
+        if name and name != user.name:
+            user.name = name
+        await self.db.commit()
+        await self.db.refresh(user)
+        return user
+
+    async def change_password(
+        self, user_id: str, old_password: str, new_password: str
+    ) -> bool | None:
+        """校验旧密码并更新；旧密码错误抛 ValueError；用户不存在返回 None"""
+        result = await self.db.execute(
+            select(UserModel).where(UserModel.id == user_id)
+        )
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+        if not pwd_context.verify(old_password, user.hashed_password):
+            raise ValueError("原密码不正确")
+        user.hashed_password = pwd_context.hash(new_password)
+        await self.db.commit()
+        return True

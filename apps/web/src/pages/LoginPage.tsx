@@ -44,7 +44,7 @@ export function LoginPage() {
               继续打磨<span className="text-primary-600">简历</span>
             </h2>
             <p className="fade-up text-gray-600 leading-relaxed max-w-[30em]" style={{ animationDelay: '0.16s' }}>
-              登录您的 STYLAN RESUME 账户，上次的进度都在。
+              登录您的 ZENSHEET · 禅笺 账户，上次的进度都在。
             </p>
           </div>
           <div className="mt-14 divide-y divide-gray-200">

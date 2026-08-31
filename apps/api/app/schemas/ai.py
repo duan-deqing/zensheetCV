@@ -1,8 +1,12 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 class AIPolishRequest(BaseModel):
     text: str = Field(..., min_length=1, max_length=10000)
     context: str = "工作经历"
+
+class AIModelsRequest(BaseModel):
+    base_url: HttpUrl
+    api_key: str = Field(..., min_length=1, max_length=200)
 
 class AIKeywordsRequest(BaseModel):
     jd: str = Field(..., min_length=1, max_length=20000)

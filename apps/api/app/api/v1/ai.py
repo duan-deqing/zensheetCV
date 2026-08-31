@@ -1,9 +1,10 @@
 import json
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from openai import AsyncOpenAI
 
 from app.core.deps import get_current_user_id
-from app.schemas.ai import AIPolishRequest, AIKeywordsRequest, AIGenerateRequest
+from app.schemas.ai import AIPolishRequest, AIKeywordsRequest, AIGenerateRequest, AIModelsRequest
 from app.services.ai_service import AIService
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -20,6 +21,17 @@ async def sse_stream(stream):
         yield sse_event({"done": True})
     except Exception as e:
         yield sse_event({"error": f"AI 服务异常: {str(e)}"})
+
+
+@router.post("/models")
+async def list_models(data: AIModelsRequest, user_id: str = Depends(get_current_user_id)):
+    """代理转发供应商 GET /models（OpenAI 兼容协议），避免浏览器直连被 CORS 拦截"""
+    client = AsyncOpenAI(api_key=data.api_key, base_url=str(data.base_url), timeout=15.0)
+    try:
+        page = await client.models.list()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"无法获取模型列表: {e}") from e
+    return {"models": [m.id for m in page.data]}
 
 
 @router.post("/polish")
