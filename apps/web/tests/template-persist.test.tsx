@@ -45,16 +45,14 @@ describe('editor persists template switch + theme change on manual save', () => 
     await waitFor(() => expect(screen.queryByText('// MARKDOWN')).not.toBeInTheDocument(), { timeout: 15000 });
 
     // 1. 打开模板库（TopBar「模板」按钮），添加「现代设计」(modern) 后关闭弹窗；
-    //    主题面板下拉仅包含当前模板 + 已添加模板
+    //    主题面板模板卡片仅包含当前模板 + 已添加模板
     fireEvent.click(screen.getByRole('button', { name: '模板' }));
     fireEvent.click(await screen.findByRole('button', { name: '添加 现代设计' }));
     fireEvent.click(screen.getByRole('button', { name: '关闭模板库' }));
 
-    // 2. 打开主题面板，切换模板为「现代设计」
+    // 2. 打开主题面板，点击「现代设计」预览卡片切换模板
     fireEvent.click(screen.getByRole('button', { name: '主题' }));
-    fireEvent.click(screen.getByRole('button', { name: '选择模板' }));
-    const option = await screen.findByRole('option', { name: /现代设计/ });
-    fireEvent.click(option);
+    fireEvent.click(screen.getByRole('button', { name: '切换到模板 现代设计' }));
 
     // 3. 面板保持打开，选择翡翠绿色板
     const swatches = await waitFor(() => {

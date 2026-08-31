@@ -40,7 +40,7 @@ describe('editor restores saved template & theme on re-enter', () => {
     window.location.hash = '';
   });
 
-  it('dropdown shows saved template and preview uses saved primary color', async () => {
+  it('template cards show saved template as current and preview uses saved primary color', async () => {
     window.location.hash = '#/editor/r1';
     render(<App />);
 
@@ -48,12 +48,12 @@ describe('editor restores saved template & theme on re-enter', () => {
     await screen.findByText('模板恢复测试', {}, { timeout: 15000 });
     await waitFor(() => expect(screen.queryByText('// MARKDOWN')).not.toBeInTheDocument(), { timeout: 15000 });
 
-    // 主题侧边栏中的模板下拉应显示已保存的模板，而不是回退到第一个「经典简洁」；
-    // 下拉在主题面板内，需先点击顶栏「主题」按钮展开面板
+    // 主题侧边栏中的模板卡片应以「选中」状态标记已保存的模板，而不是回退到第一个「经典简洁」；
+    // 卡片在主题面板内，需先点击顶栏「主题」按钮展开面板
     fireEvent.click(screen.getByRole('button', { name: '主题' }));
     await waitFor(() => {
-      const dropdown = screen.getByRole('button', { name: '选择模板' });
-      expect(dropdown.textContent).toContain('现代设计');
+      const card = screen.getByRole('button', { name: '切换到模板 现代设计' });
+      expect(card.getAttribute('aria-pressed')).toBe('true');
     }, { timeout: 15000 });
 
     // 预览排版源（含模板/主题 <style>）应注入已保存的主色调与字号/间距变量

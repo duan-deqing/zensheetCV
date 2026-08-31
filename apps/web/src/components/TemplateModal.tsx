@@ -1,55 +1,12 @@
 import { useEffect } from 'react';
-import ReactMarkdown, { type Components } from 'react-markdown';
-import type { CSSProperties } from 'react';
 import { useUI } from '@/store/UIContext';
 import { usePreview } from '@/store/PreviewContext';
-import { builtinTemplates, getTemplateCss } from '@/templates';
-import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
-import { CONTENT_PADDING_MM, MARGIN_MM, resumeIconsCss } from '@/preview/previewShared';
-import { defaultTheme } from '@stylan/shared-types';
-import { SAMPLE_MARKDOWN_COMPACT as PREVIEW_MARKDOWN } from '@/sampleResume';
+import { builtinTemplates } from '@/templates';
+import { TemplatePreview } from '@/components/TemplatePreview';
 import { HoverTip } from '@/components/HoverTip';
 
-/** 模板卡片预览：与首页/编辑页同一套作用域替换方案，A4 宽 794px 等比缩放 */
-function TemplatePreview({ templateId }: { templateId: string }) {
-  const scoped = getTemplateCss(templateId).replace(
-    /\.resume-preview/g,
-    `.tpl-${templateId}`,
-  );
-  const iconMap = getIconMap();
-  const components = {
-    [RESUME_ICON_TAG]: ({ name }: { name?: string }) => {
-      const svg = name ? iconMap[name] : undefined;
-      if (!svg) return null;
-      return <span className="resume-icon" dangerouslySetInnerHTML={{ __html: svg }} />;
-    },
-  } as Components; // 自定义元素名不在 JSX.IntrinsicElements 中，需断言
-  // 与预览/导出一致的每页留白 = 页边距 + 内容边距
-  const padXMM =
-    (MARGIN_MM[defaultTheme.marginX] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
-  return (
-    <div className="relative h-52 overflow-hidden border-b border-gray-100 bg-gray-50">
-      <style>{scoped}</style>
-      <style>{resumeIconsCss(`.tpl-${templateId}`)}</style>
-      <div
-        className={`tpl-${templateId} absolute left-0 top-0 origin-top-left bg-white`}
-        style={{ transform: 'scale(0.42)', width: 794 } as CSSProperties}
-      >
-        <div style={{ padding: `${padXMM}mm ${padXMM}mm` }}>
-          <ReactMarkdown
-            remarkPlugins={[remarkResumeIcons(iconMap)]}
-            components={components}
-          >
-            {PREVIEW_MARKDOWN}
-          </ReactMarkdown>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /** 模板库弹窗：以卡片展示全部内置模板（实时预览 + 名称 + 标签 + 添加按钮）。
- *  「添加」后该模板进入主题面板的模板下拉菜单可供切换 */
+ *  「添加」后该模板进入主题面板的模板卡片列表可供切换 */
 export function TemplateModal() {
   const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, removeTemplate, addToast } = useUI();
   const { currentTemplate } = usePreview();
@@ -131,7 +88,7 @@ export function TemplateModal() {
                   isCurrent ? 'border-primary-400 ring-1 ring-primary-200' : 'border-gray-200'
                 }`}
               >
-                <TemplatePreview templateId={t.id} />
+                <TemplatePreview templateId={t.id} height={208} mode="fill" className="border-b border-gray-100" />
                 <div className="p-3 flex flex-col gap-1.5 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h4>

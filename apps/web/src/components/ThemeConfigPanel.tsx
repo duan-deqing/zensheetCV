@@ -1,8 +1,10 @@
+import { useEffect, useRef } from 'react';
 import { usePreview } from '@/store/PreviewContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
 import { Dropdown } from '@/components/Dropdown';
 import { HoverTip } from '@/components/HoverTip';
+import { TemplatePreview } from '@/components/TemplatePreview';
 import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
 import { builtinTemplates } from '@/templates';
 import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
@@ -75,6 +77,13 @@ export function ThemeConfigPanel() {
   const { themePanelOpen, toggleThemePanel, addedTemplates } = useUI();
   const switchTemplate = useTemplateSwitch();
 
+  // 当前模板卡片引用：打开面板/切换模板时自动滚动到可视区（jsdom 无 scrollIntoView，需可选调用）
+  const currentCardRef = useRef<HTMLButtonElement | null>(null);
+  const currentId = currentTemplate?.id || 'classic';
+  useEffect(() => {
+    currentCardRef.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+  }, [currentId, themePanelOpen]);
+
   if (!themePanelOpen) return null;
 
   const applyTheme = (partial: Partial<ThemeConfig>) => {
@@ -83,8 +92,7 @@ export function ThemeConfigPanel() {
     updateTheme(partial);
   };
 
-  // 下拉可选模板 = 当前模板 + 模板库中已添加的模板
-  const currentId = currentTemplate?.id || 'classic';
+  // 可选模板 = 当前模板 + 模板库中已添加的模板
   const availableTemplates = builtinTemplates.filter(
     (t) => t.id === currentId || addedTemplates.includes(t.id),
   );
@@ -125,17 +133,44 @@ export function ThemeConfigPanel() {
       </div>
 
       <div className="p-4 flex flex-col gap-6">
-        {/* 分组：模板 */}
+        {/* 分组：模板（预览卡片，一屏最多 4 张，超出纵向滚动并吸附到卡片） */}
         <section>
           <GroupTitle>模板</GroupTitle>
-          {/* 切换后视觉主题重置为该模板默认，页面布局设置保留 */}
-          <Dropdown
-            options={availableTemplates.map((t) => ({ value: t.id, label: t.name }))}
-            value={currentId}
-            onChange={switchTemplate}
-            ariaLabel="选择模板"
-            placeholder="选择模板"
-          />
+          {/* 卡片高 175px（预览 144 + 分隔线 1 + 名称 28 + 上下边框 2），两行 + gap = 358px；切换后视觉主题重置为该模板默认，页面布局设置保留 */}
+          <div
+            className="grid grid-cols-2 gap-2 max-h-[358px] overflow-y-auto snap-y snap-mandatory [scrollbar-width:thin]"
+            aria-label="选择模板"
+          >
+            {availableTemplates.map((t) => {
+              const isCurrent = t.id === currentId;
+              return (
+                <button
+                  key={t.id}
+                  ref={isCurrent ? currentCardRef : undefined}
+                  onClick={() => switchTemplate(t.id)}
+                  aria-pressed={isCurrent}
+                  aria-label={`切换到模板 ${t.name}`}
+                  className={`snap-start rounded-lg border overflow-hidden bg-white text-left transition-colors ${
+                    isCurrent
+                      ? 'border-primary-400 ring-1 ring-primary-200'
+                      : 'border-gray-200 hover:border-gray-400'
+                  }`}
+                >
+                  {/* text-left 抵消 button UA 的 text-align:center，保证预览排版与模板库一致 */}
+                  <TemplatePreview templateId={t.id} height={144} className="border-b border-gray-100" />
+                  <span className="h-7 flex items-center justify-center px-1">
+                    <span
+                      className={`text-[11px] font-medium truncate ${
+                        isCurrent ? 'text-primary-600' : 'text-gray-600'
+                      }`}
+                    >
+                      {t.name}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </section>
 
         {/* 分组：视觉风格 */}
