@@ -62,7 +62,7 @@ export function ButtonStatus({
     <span
       key={status.seq}
       role="status"
-      className={`${anim} inline-flex items-center gap-1.5 h-7 px-3 rounded-full border text-xs font-medium shadow-lg whitespace-nowrap ${
+      className={`${anim} inline-flex items-center gap-1.5 h-7 px-3 rounded-full border text-[13px] font-medium shadow-lg whitespace-nowrap ${
         ok
           ? 'border-green-200 bg-green-50 text-green-700'
           : 'border-red-200 bg-red-50 text-red-700'

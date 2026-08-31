@@ -10,10 +10,15 @@ interface UIContextType {
   sidebarOpen: boolean;
   themePanelOpen: boolean;
   aiPanelOpen: boolean;
+  templateModalOpen: boolean;
+  /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
+  addedTemplates: string[];
   toasts: ToastMessage[];
   toggleSidebar: () => void;
   toggleThemePanel: () => void;
   toggleAIPanel: () => void;
+  toggleTemplateModal: () => void;
+  addTemplate: (id: string) => void;
   setAIPanelOpen: (open: boolean) => void;
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
@@ -21,16 +26,42 @@ interface UIContextType {
 
 const UIContext = createContext<UIContextType | null>(null);
 
+/** 已添加模板在 localStorage 中的键 */
+const ADDED_TEMPLATES_KEY = 'stylan.added_templates';
+
 export function UIProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [themePanelOpen, setThemePanelOpen] = useState(false);
   const [aiPanelOpen, setAIPanelOpen] = useState(false);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
+  const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem(ADDED_TEMPLATES_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  });
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const toggleSidebar = useCallback(() => setSidebarOpen((p) => !p), []);
   const toggleThemePanel = useCallback(() => setThemePanelOpen((p) => !p), []);
   const toggleAIPanel = useCallback(() => setAIPanelOpen((p) => !p), []);
+  const toggleTemplateModal = useCallback(() => setTemplateModalOpen((p) => !p), []);
+
+  const addTemplate = useCallback((id: string) => {
+    setAddedTemplates((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      try {
+        localStorage.setItem(ADDED_TEMPLATES_KEY, JSON.stringify(next));
+      } catch {
+        /* localStorage 不可用时仅保留在内存 */
+      }
+      return next;
+    });
+  }, []);
 
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -62,10 +93,14 @@ export function UIProvider({ children }: { children: ReactNode }) {
         sidebarOpen,
         themePanelOpen,
         aiPanelOpen,
+        templateModalOpen,
+        addedTemplates,
         toasts,
         toggleSidebar,
         toggleThemePanel,
         toggleAIPanel,
+        toggleTemplateModal,
+        addTemplate,
         setAIPanelOpen,
         addToast,
         removeToast,

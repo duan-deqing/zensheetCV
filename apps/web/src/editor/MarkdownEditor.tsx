@@ -16,7 +16,7 @@ const editorBaseTheme = EditorView.theme(
       caretColor: '#2563eb',
       fontFamily: "'JetBrains Mono', monospace",
       // 无行号栏，用内边距留出书写区边距
-      padding: '16px 20px',
+      padding: '10px 0',
     },
     // 必须用半透明色：选区层 z-index 为 -1，绘制在行背景之下，
     // 不透明的活动行背景会盖住选区高亮（CM6 默认主题同理使用 #cceeff44）

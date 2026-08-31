@@ -1,10 +1,5 @@
-import { useCallback } from 'react';
 import { usePreview } from '@/store/PreviewContext';
-import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
-import { builtinTemplates, getTemplateById, toApiTemplate } from '@/templates';
-import { Dropdown } from '@/components/Dropdown';
-import type { ThemeConfig } from '@stylan/shared-types';
 
 /** 调色盘线性图标，颜色跟随 currentColor */
 function PaletteIcon() {
@@ -19,33 +14,11 @@ function PaletteIcon() {
   );
 }
 
+/** 预览窗口顶栏：眉标 + 主题面板开关 + 缩放/全屏控制。
+ *  模板切换已移至主题侧边栏（ThemeConfigPanel） */
 export function PreviewToolbar() {
-  const { currentTemplate, themeConfig, scale, setScale, isFullscreen, toggleFullscreen, setCurrentTemplate, setThemeConfig } = usePreview();
-  const { updateTemplate, updateTheme } = useResumeStore();
+  const { scale, setScale, isFullscreen, toggleFullscreen } = usePreview();
   const { themePanelOpen, toggleThemePanel } = useUI();
-
-  const handleTemplateChange = useCallback((templateId: string) => {
-    const template = getTemplateById(templateId);
-
-    // Update preview context
-    setCurrentTemplate(toApiTemplate(template));
-    // 切换模板只重置视觉主题（主色/字体/字号/间距）为模板默认；
-    // 页面布局设置（页边距/内容边距）保留用户当前选择，对所有模板生效
-    const nextTheme: ThemeConfig = {
-      primaryColor: template.defaultTheme.primaryColor,
-      fontFamily: template.defaultTheme.fontFamily,
-      fontSize: template.defaultTheme.fontSize,
-      spacing: template.defaultTheme.spacing,
-      marginX: themeConfig.marginX,
-      marginY: themeConfig.marginY,
-      contentPadding: themeConfig.contentPadding ?? 'none',
-    };
-    setThemeConfig(nextTheme);
-
-    // Update resume data（模板默认主题一并写入，随自动保存落库）
-    updateTemplate(templateId);
-    updateTheme(nextTheme);
-  }, [currentTemplate?.id, setCurrentTemplate, setThemeConfig, themeConfig, updateTemplate, updateTheme]);
 
   return (
     <div className="relative flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
@@ -55,19 +28,10 @@ export function PreviewToolbar() {
       >
         {'< PREVIEW />'}
       </p>
-      <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
-      <Dropdown
-        className="w-32 shrink-0"
-        options={builtinTemplates.map((t) => ({ value: t.id, label: t.name }))}
-        value={currentTemplate?.id || 'classic'}
-        onChange={handleTemplateChange}
-        ariaLabel="选择模板"
-        placeholder="选择模板"
-      />
       <div className="ml-auto flex items-center gap-1 shrink-0">
         <button
           onClick={toggleThemePanel}
-          className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium rounded-md transition-colors ${
+          className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
             themePanelOpen
               ? 'bg-primary-100 text-primary-700'
               : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
@@ -80,22 +44,22 @@ export function PreviewToolbar() {
         <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
         <button
           onClick={() => setScale(Math.max(50, scale - 10))}
-          className="font-mono text-xs w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
           title="缩小"
         >
           −
         </button>
-        <span className="font-mono text-xs text-gray-500 w-10 text-center tabular-nums">{scale}%</span>
+        <span className="font-mono text-[13px] text-gray-500 w-10 text-center tabular-nums">{scale}%</span>
         <button
           onClick={() => setScale(Math.min(150, scale + 10))}
-          className="font-mono text-xs w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
           title="放大"
         >
           +
         </button>
         <button
           onClick={toggleFullscreen}
-          className="font-mono text-xs w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors ml-1"
+          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors ml-1"
           title={isFullscreen ? '退出全屏' : '全屏预览'}
         >
           {isFullscreen ? '⊡' : '⊞'}

@@ -2,17 +2,28 @@ import { Link } from 'react-router-dom';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import type { CSSProperties } from 'react';
 import { useAuth } from '@/store/AuthContext';
-import { getTemplateCss } from '@/templates';
+import { getTemplateById, getTemplateCss } from '@/templates';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
-import { resumeIconsCss } from '@/preview/previewShared';
+import {
+  CONTENT_PADDING_MM,
+  FONT_SCALE,
+  MARGIN_MM,
+  SPACING_SCALE,
+  resumeIconsCss,
+} from '@/preview/previewShared';
+import { defaultTheme } from '@stylan/shared-types';
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
    （react-markdown + 各模板真实 CSS），非静态截图 */
 const SAMPLE_MARKDOWN = `# 林晚舟
 
-产品经理 · 5 年经验 · 上海
+icon:info 产品经理 · 5 年经验 · 上海
 
 icon:phone 138-0000-0000 · icon:email lin@mail.com · icon:github linwanzhou
+
+## 技能
+
+\`Axure\` \`Figma\` \`SQL\` \`数据分析\` \`A/B 测试\`
 
 ## 工作经历
 
@@ -36,13 +47,6 @@ icon:phone 138-0000-0000 · icon:email lin@mail.com · icon:github linwanzhou
 
 2014.09 - 2018.06`;
 
-const TEMPLATE_ACCENTS: Record<string, string> = {
-  classic: '#111827',
-  modern: '#2563eb',
-  elegant: '#9f1239',
-  tech: '#0f766e',
-};
-
 function MiniResume({
   templateId,
   className = '',
@@ -55,6 +59,13 @@ function MiniResume({
     /\.resume-preview/g,
     `.rp-${templateId}`,
   );
+  // 与编辑页/我的简历页一致：使用模板自带默认主题（主色/字体/字号/间距）
+  const theme = getTemplateById(templateId).defaultTheme;
+  // 每页四周总留白 = 页边距 + 内容边距，与分页预览/导出同一套默认值
+  const padXMM =
+    (MARGIN_MM[defaultTheme.marginX] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
+  const padYMM =
+    (MARGIN_MM[defaultTheme.marginY] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
   const iconMap = getIconMap();
   const components = {
     [RESUME_ICON_TAG]: ({ name }: { name?: string }) => {
@@ -69,14 +80,23 @@ function MiniResume({
       <style>{resumeIconsCss(`.rp-${templateId}`)}</style>
       <div
         className={`rp-${templateId}`}
-        style={{ '--resume-primary': TEMPLATE_ACCENTS[templateId] } as CSSProperties}
+        style={
+          {
+            '--resume-primary': theme.primaryColor,
+            fontFamily: theme.fontFamily,
+            '--resume-fs': FONT_SCALE[theme.fontSize] ?? 1,
+            '--resume-sp': SPACING_SCALE[theme.spacing] ?? 1,
+          } as CSSProperties
+        }
       >
-        <ReactMarkdown
-          remarkPlugins={[remarkResumeIcons(iconMap)]}
-          components={components}
-        >
-          {SAMPLE_MARKDOWN}
-        </ReactMarkdown>
+        <div style={{ padding: `${padYMM}mm ${padXMM}mm` }}>
+          <ReactMarkdown
+            remarkPlugins={[remarkResumeIcons(iconMap)]}
+            components={components}
+          >
+            {SAMPLE_MARKDOWN}
+          </ReactMarkdown>
+        </div>
       </div>
     </div>
   );
@@ -104,8 +124,20 @@ function ResumePaper({
   );
 }
 
+/** 模板展示区数据：span 为 3 列网格中的占位格数（每行合计 3） */
+const TEMPLATE_SHOWCASE = [
+  { id: 'classic', tag: 'CLASSIC', name: '经典简洁', desc: '黑白正式，适合大多数求职场景', span: 2 },
+  { id: 'modern', tag: 'MODERN', name: '现代蓝调', desc: '互联网与产品岗位首选', span: 1 },
+  { id: 'elegant', tag: 'ELEGANT', name: '优雅酒红', desc: '咨询、金融与品牌岗位', span: 1 },
+  { id: 'tech', tag: 'TECH', name: '科技墨绿', desc: '研发与技术岗位', span: 1 },
+  { id: 'muji', tag: 'MUJI', name: '墨纸极简', desc: '深色题头，移植自 MujiCV 默认主题', span: 1 },
+  { id: 'azure', tag: 'AZURE', name: '青线极简', desc: '主题色细线标题，素净克制', span: 1 },
+  { id: 'sunrise', tag: 'SUNRISE', name: '朝阳暖橙', desc: '渐变题头，明快有活力', span: 1 },
+  { id: 'carbon', tag: 'CARBON', name: '碳黑章标', desc: '灰底章节条 + 竖标，正式商务风', span: 1 },
+] as const;
+
 const SPECS = [
-  { value: '04', unit: 'TEMPLATES', label: '内置模板' },
+  { value: '08', unit: 'TEMPLATES', label: '内置模板' },
   { value: '03', unit: 'AI TOOLS', label: '润色 · 关键词 · 生成' },
   { value: 'A4', unit: 'PDF EXPORT', label: '服务端渲染导出' },
   { value: '00', unit: 'COST', label: '注册即可使用' },
@@ -276,53 +308,28 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* 模板展示：不对称网格，4 套模板 4 个单元格，全部真实渲染 */}
+      {/* 模板展示：不对称网格，8 套模板全部真实渲染 */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">四套模板，同一份内容</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">八套模板，同一份内容</h2>
         <p className="text-gray-600 mb-10">
           换模板不用改一个字。以下全部为编辑器内的真实渲染效果。
         </p>
         <div className="grid md:grid-cols-3 gap-5">
-          <div className="md:col-span-2 card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-            <ResumePaper templateId="classic" zoom={0.5} className="h-[300px] border-b border-gray-100" />
-            <div className="flex items-baseline justify-between px-5 py-4">
-              <div>
-                <h3 className="font-semibold">经典简洁</h3>
-                <p className="text-sm text-gray-500 mt-0.5">黑白正式，适合大多数求职场景</p>
+          {TEMPLATE_SHOWCASE.map((t) => (
+            <div
+              key={t.id}
+              className={`${t.span === 2 ? 'md:col-span-2 ' : ''}card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300`}
+            >
+              <ResumePaper templateId={t.id} zoom={0.5} className="h-[300px] border-b border-gray-100" />
+              <div className="flex items-baseline justify-between px-5 py-4">
+                <div>
+                  <h3 className="font-semibold">{t.name}</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">{t.desc}</p>
+                </div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">{t.tag}</p>
               </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">CLASSIC</p>
             </div>
-          </div>
-          <div className="card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-            <ResumePaper templateId="modern" zoom={0.5} className="h-[300px] border-b border-gray-100" />
-            <div className="flex items-baseline justify-between px-5 py-4">
-              <div>
-                <h3 className="font-semibold">现代蓝调</h3>
-                <p className="text-sm text-gray-500 mt-0.5">互联网与产品岗位首选</p>
-              </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">MODERN</p>
-            </div>
-          </div>
-          <div className="card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-            <ResumePaper templateId="elegant" zoom={0.5} className="h-[300px] border-b border-gray-100" />
-            <div className="flex items-baseline justify-between px-5 py-4">
-              <div>
-                <h3 className="font-semibold">优雅酒红</h3>
-                <p className="text-sm text-gray-500 mt-0.5">咨询、金融与品牌岗位</p>
-              </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">ELEGANT</p>
-            </div>
-          </div>
-          <div className="md:col-span-2 card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-            <ResumePaper templateId="tech" zoom={0.5} className="h-[300px] border-b border-gray-100" />
-            <div className="flex items-baseline justify-between px-5 py-4">
-              <div>
-                <h3 className="font-semibold">科技墨绿</h3>
-                <p className="text-sm text-gray-500 mt-0.5">研发与技术岗位</p>
-              </div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">TECH</p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 

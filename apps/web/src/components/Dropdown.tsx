@@ -50,7 +50,7 @@ export function Dropdown<T extends string>({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
-        className={`w-full flex items-center justify-between gap-2 text-xs border rounded-md px-2.5 py-2 bg-white transition-colors outline-none ${
+        className={`w-full flex items-center justify-between gap-2 text-[13px] border rounded-md px-2.5 py-2 bg-white transition-colors outline-none ${
           open
             ? 'border-primary-300 ring-2 ring-primary-500/30'
             : 'border-gray-200 hover:border-gray-300 focus:ring-2 focus:ring-primary-500/30'
@@ -100,7 +100,7 @@ export function Dropdown<T extends string>({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center justify-between gap-2 text-left text-xs px-3 py-2 transition-colors ${
+                className={`w-full flex items-center justify-between gap-2 text-left text-[13px] px-3 py-2 transition-colors ${
                   selected
                     ? 'bg-primary-50 text-primary-700 font-medium'
                     : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'

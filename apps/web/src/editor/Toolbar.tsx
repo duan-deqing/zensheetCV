@@ -57,7 +57,7 @@ export function Toolbar() {
             key={btn.label}
             onClick={btn.action}
             title={btn.title}
-            className="px-2 h-7 font-mono text-xs font-medium text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors flex items-center shrink-0"
+            className="px-2 h-7 font-mono text-[13px] font-medium text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors flex items-center shrink-0"
             style={{ fontWeight: btn.fontWeight, fontStyle: btn.fontStyle }}
           >
             {btn.label === 'link' ? <LinkIcon /> : btn.label === 'image' ? <ImageIcon /> : btn.label}

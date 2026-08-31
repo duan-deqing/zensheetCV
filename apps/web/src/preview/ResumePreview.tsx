@@ -8,6 +8,7 @@ import { normalizeColMarkers, remarkResumeCols } from './remarkResumeCols';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from './resumeIcons';
 import {
   CONTENT_PADDING_MM,
+  DEFAULT_CONTENT_PADDING,
   FONT_SCALE,
   MARGIN_MM,
   SPACING_SCALE,
@@ -157,7 +158,7 @@ export function ResumePreview() {
   // 预览作为每页纸张的 padding，导出作为 Playwright 页边距，两者数值一致、逐页生效
   const marginXMM = MARGIN_MM[themeConfig.marginX] ?? 0;
   const marginYMM = MARGIN_MM[themeConfig.marginY] ?? 0;
-  const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? 'none'] ?? 0;
+  const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING] ?? 0;
   const padXMM = marginXMM + contentPadMM;
   const padYMM = marginYMM + contentPadMM;
   const contentWMM = A4_WIDTH_MM - 2 * padXMM;

@@ -1,5 +1,5 @@
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // 模拟一份已保存为 modern 模板 + 自定义主色调（翡翠绿）的简历
@@ -48,7 +48,9 @@ describe('editor restores saved template & theme on re-enter', () => {
     await screen.findByText('模板恢复测试', {}, { timeout: 15000 });
     await waitFor(() => expect(screen.queryByText('// MARKDOWN')).not.toBeInTheDocument(), { timeout: 15000 });
 
-    // 预览工具栏的模板下拉应显示已保存的模板，而不是回退到第一个「经典简洁」
+    // 主题侧边栏中的模板下拉应显示已保存的模板，而不是回退到第一个「经典简洁」；
+    // 下拉在主题面板内，需先点击顶栏「主题」按钮展开面板
+    fireEvent.click(screen.getByRole('button', { name: '主题' }));
     await waitFor(() => {
       const dropdown = screen.getByRole('button', { name: '选择模板' });
       expect(dropdown.textContent).toContain('现代设计');

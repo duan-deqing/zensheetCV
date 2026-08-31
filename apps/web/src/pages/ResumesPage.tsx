@@ -9,7 +9,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
-import { CONTENT_PADDING_MM, FONT_SCALE, MARGIN_MM, SPACING_SCALE, resumeColsCss } from '@/preview/previewShared';
+import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, FONT_SCALE, MARGIN_MM, SPACING_SCALE, resumeColsCss } from '@/preview/previewShared';
 
 /** 线性垃圾桶图标，颜色跟随 currentColor */
 function TrashIcon({ className }: { className?: string }) {
@@ -76,10 +76,10 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
             style={{
               padding: `${
                 (MARGIN_MM[theme.marginY ?? theme.pageMargin ?? 'none'] ?? 0) +
-                (CONTENT_PADDING_MM[theme.contentPadding ?? 'none'] ?? 0)
+                (CONTENT_PADDING_MM[theme.contentPadding ?? DEFAULT_CONTENT_PADDING] ?? 0)
               }mm ${
                 (MARGIN_MM[theme.marginX ?? theme.pageMargin ?? 'none'] ?? 0) +
-                (CONTENT_PADDING_MM[theme.contentPadding ?? 'none'] ?? 0)
+                (CONTENT_PADDING_MM[theme.contentPadding ?? DEFAULT_CONTENT_PADDING] ?? 0)
               }mm`,
             }}
           >

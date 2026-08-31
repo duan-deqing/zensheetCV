@@ -18,6 +18,9 @@ export const CONTENT_PADDING_MM: Record<MarginOption, number> = {
   none: 0, narrow: 5, normal: 10, wide: 15,
 };
 
+/** 默认内容边距档位：标准 10mm（theme_config 缺失该字段时的回退值） */
+export const DEFAULT_CONTENT_PADDING: MarginOption = 'normal';
+
 /** :::left / :::mid / :::right 三栏布局样式。
  * scope 为空时全局生效；传入选择器前缀（如 '.rp-thumb'）时仅作用于该容器内。
  * 弹性基准取内容宽度（flex-basis: auto），按内容分配比例、减少换行；

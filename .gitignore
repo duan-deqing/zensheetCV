@@ -39,6 +39,9 @@ env/
 .mypy_cache/
 .ruff_cache/
 
+# uv 本地运行产物（项目依赖管理用 poetry）
+uv.lock
+
 # Database
 *.db
 *.sqlite

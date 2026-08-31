@@ -24,7 +24,7 @@ export const defaultTheme: ThemeConfig = {
   spacing: 'normal',
   marginX: 'none',
   marginY: 'none',
-  contentPadding: 'none',
+  contentPadding: 'normal',
 };
 
 export interface Resume {

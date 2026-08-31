@@ -26,6 +26,43 @@
   body {
     @apply min-h-screen bg-white text-gray-900;
   }
+
+  /* 全局滚动条：窄滑块（透明 border 内缩视觉宽度），隐藏两端箭头按钮 */
+  * {
+    scrollbar-width: thin; /* Firefox：细滚动条（本身无箭头） */
+    scrollbar-color: #d1d5db transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    /* 半透明 border + background-clip 内缩滑块，视觉宽度约 4px 的窄条 */
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #9ca3af;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none; /* 隐藏上下/左右两端箭头 */
+    width: 0;
+    height: 0;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 @layer components {

@@ -13,6 +13,7 @@ import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
 import { getTemplateById, toApiTemplate } from '@/templates';
 import type { MarginOption, ThemeConfig } from '@stylan/shared-types';
+import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
 
 const MIN_EDITOR_PCT = 25;
 const MAX_EDITOR_PCT = 70;
@@ -91,7 +92,7 @@ export function EditorPage() {
               // 旧数据只有 pageMargin（单值），左右/上下均回退到它；缺省为 0 边距
               marginX: theme.marginX ?? theme.pageMargin ?? 'none',
               marginY: theme.marginY ?? theme.pageMargin ?? 'none',
-              contentPadding: theme.contentPadding ?? 'none',
+              contentPadding: theme.contentPadding ?? DEFAULT_CONTENT_PADDING,
             });
           }
         })
@@ -205,7 +206,7 @@ export function EditorPage() {
             ) : (
               <button
                 onClick={toggleAIPanel}
-                className="mt-1.5 h-9 shrink-0 flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-colors"
+                className="mt-1.5 h-9 shrink-0 flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-colors"
               >
                 <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-500">
                   {'// AI'}

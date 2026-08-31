@@ -19,7 +19,7 @@ export function AIPanel() {
   ] as const;
 
   const textareaClass =
-    'w-full h-24 font-mono text-xs leading-relaxed p-3 bg-gray-50 border border-gray-200 rounded-lg resize-none outline-none placeholder:text-gray-400 focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-colors';
+    'w-full h-24 font-mono text-[13px] leading-relaxed p-3 bg-gray-50 border border-gray-200 rounded-lg resize-none outline-none placeholder:text-gray-400 focus:bg-white focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-colors';
 
   return (
     <div className="w-full h-full bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
@@ -43,7 +43,7 @@ export function AIPanel() {
           <button
             key={tab.id}
             onClick={() => { setActiveTab(tab.id); reset(); }}
-            className={`flex-1 font-mono text-xs py-2.5 transition-colors border-b-2 -mb-px ${
+            className={`flex-1 font-mono text-[13px] py-2.5 transition-colors border-b-2 -mb-px ${
               activeTab === tab.id
                 ? 'text-primary-600 border-primary-600 font-medium'
                 : 'text-gray-500 border-transparent hover:text-primary-600 hover:bg-primary-50'
@@ -57,7 +57,7 @@ export function AIPanel() {
         {activeTab === 'polish' && (
           <>
             <textarea value={input} onChange={(e) => setInput(e.target.value)} placeholder="粘贴需要润色的简历内容..." className={textareaClass} />
-            <button onClick={() => polish(input)} disabled={!input.trim() || result.isStreaming} className="btn-primary w-full font-mono text-xs h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={() => polish(input)} disabled={!input.trim() || result.isStreaming} className="btn-primary w-full font-mono text-[13px] h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
               {result.isStreaming ? '润色中...' : '开始润色'}
             </button>
           </>
@@ -65,7 +65,7 @@ export function AIPanel() {
         {activeTab === 'keywords' && (
           <>
             <textarea value={jdInput} onChange={(e) => setJdInput(e.target.value)} placeholder="粘贴目标职位描述(JD)..." className={textareaClass} />
-            <button onClick={() => analyzeKeywords(jdInput, markdown)} disabled={!jdInput.trim() || result.isStreaming} className="btn-primary w-full font-mono text-xs h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={() => analyzeKeywords(jdInput, markdown)} disabled={!jdInput.trim() || result.isStreaming} className="btn-primary w-full font-mono text-[13px] h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
               {result.isStreaming ? '分析中...' : '分析关键词'}
             </button>
           </>
@@ -73,7 +73,7 @@ export function AIPanel() {
         {activeTab === 'generate' && (
           <>
             <textarea value={generatePoints} onChange={(e) => setGeneratePoints(e.target.value)} placeholder="输入项目要点，每行一个..." className={textareaClass} />
-            <button onClick={() => generateContent(generatePoints.split('\n').filter(Boolean))} disabled={!generatePoints.trim() || result.isStreaming} className="btn-primary w-full font-mono text-xs h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
+            <button onClick={() => generateContent(generatePoints.split('\n').filter(Boolean))} disabled={!generatePoints.trim() || result.isStreaming} className="btn-primary w-full font-mono text-[13px] h-9 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">
               {result.isStreaming ? '生成中...' : '生成描述'}
             </button>
           </>
@@ -93,7 +93,7 @@ export function AIPanel() {
                 </button>
               )}
             </div>
-            <p className="font-mono text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">{result.text}</p>
+            <p className="font-mono text-[13px] text-gray-600 leading-relaxed whitespace-pre-wrap">{result.text}</p>
           </div>
         )}
       </div>

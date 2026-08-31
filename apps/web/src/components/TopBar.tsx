@@ -4,10 +4,12 @@ import { useAuth } from '@/store/AuthContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
-import { CONTENT_PADDING_MM, FONT_SCALE, MARGIN_MM, SPACING_SCALE } from '@/preview/previewShared';
+import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, FONT_SCALE, MARGIN_MM, SPACING_SCALE } from '@/preview/previewShared';
 import { useResume } from '@/hooks/useResume';
 import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
+import { TemplateModal } from '@/components/TemplateModal';
+import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
 
 /** 文档图标，颜色跟随 currentColor */
@@ -166,6 +168,27 @@ function PencilIcon() {
   );
 }
 
+/** 四宫格图标，颜色跟随 currentColor */
+function LayoutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+}
+
 /** 估算文本显示宽度：中文等全角字符约 1em，英文/数字约 0.55em */
 function textWidth(s: string) {
   return [...s].reduce((w, c) => w + (c.charCodeAt(0) > 0x2e80 ? 1 : 0.55), 0);
@@ -241,6 +264,7 @@ export function TopBar() {
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
+  const { toggleTemplateModal } = useUI();
 
   const handleExportPDF = async () => {
     // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
@@ -251,7 +275,7 @@ export function TopBar() {
     }
     const marginXMM = MARGIN_MM[themeConfig.marginX] ?? 0;
     const marginYMM = MARGIN_MM[themeConfig.marginY] ?? 0;
-    const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? 'none'] ?? 0;
+    const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING] ?? 0;
     // 每页总留白 = 页边距 + 内容边距，由 Playwright 页边距承担：
     // 页面边距会在每一页四周生效（CSS padding 在连续文档中无法跨页重复），
     // 与分页预览中每页纸张的 padding 完全一致
@@ -312,6 +336,16 @@ export function TopBar() {
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
           <EditableTitle onNotify={show} />
           <FileMenu />
+          {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
+          <button
+            type="button"
+            onClick={toggleTemplateModal}
+            className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+            title="模板库"
+          >
+            <LayoutIcon />
+            模板
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -340,6 +374,7 @@ export function TopBar() {
           )}
         </div>
       </div>
+      <TemplateModal />
     </header>
   );
 }

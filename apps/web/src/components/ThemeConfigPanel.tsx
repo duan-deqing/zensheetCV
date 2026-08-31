@@ -4,6 +4,9 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
 import { Dropdown } from '@/components/Dropdown';
 import { BUILTIN_ICONS, sanitizeCustomSvg } from '@/preview/resumeIcons';
+import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
+import { builtinTemplates } from '@/templates';
+import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
 import type { ThemeConfig } from '@stylan/shared-types';
 
 const colorPresets = [
@@ -56,11 +59,22 @@ const contentPaddingOptions = [
   { value: 'wide', label: '宽 · 15mm' },
 ] as const;
 
+/** 分组标题：mono 眉标风格（`// 分组名`），与面板头部同构 */
+function GroupTitle({ children }: { children: string }) {
+  return (
+    <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 pb-1.5 mb-3 border-b border-gray-100">
+      {'// '}
+      {children}
+    </p>
+  );
+}
+
 /** 预览窗口内的主题设置侧边栏，随 themePanelOpen 滑入/移除 */
 export function ThemeConfigPanel() {
-  const { themeConfig, setThemeConfig } = usePreview();
+  const { currentTemplate, themeConfig, setThemeConfig } = usePreview();
   const { updateTheme } = useResumeStore();
-  const { themePanelOpen, toggleThemePanel } = useUI();
+  const { themePanelOpen, toggleThemePanel, addedTemplates } = useUI();
+  const switchTemplate = useTemplateSwitch();
 
   if (!themePanelOpen) return null;
 
@@ -69,6 +83,12 @@ export function ThemeConfigPanel() {
     // 同步写入简历数据，随自动保存落库
     updateTheme(partial);
   };
+
+  // 下拉可选模板 = 当前模板 + 模板库中已添加的模板
+  const currentId = currentTemplate?.id || 'classic';
+  const availableTemplates = builtinTemplates.filter(
+    (t) => t.id === currentId || addedTemplates.includes(t.id),
+  );
 
   return (
     <aside
@@ -103,111 +123,135 @@ export function ThemeConfigPanel() {
         </button>
       </div>
 
-      <div className="p-4 flex flex-col gap-5">
-        {/* 主色调 */}
-        <div>
-          <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-            主色调
-          </label>
-          <div className="grid grid-cols-6 gap-2">
-            {colorPresets.map((color) => (
-              <button
-                key={color.value}
-                onClick={() => applyTheme({ primaryColor: color.value })}
-                className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                  themeConfig.primaryColor === color.value
-                    ? 'border-gray-900 scale-110'
-                    : 'border-transparent'
-                }`}
-                style={{ backgroundColor: color.value }}
-                title={color.label}
+      <div className="p-4 flex flex-col gap-6">
+        {/* 分组：模板 */}
+        <section>
+          <GroupTitle>模板</GroupTitle>
+          {/* 切换后视觉主题重置为该模板默认，页面布局设置保留 */}
+          <Dropdown
+            options={availableTemplates.map((t) => ({ value: t.id, label: t.name }))}
+            value={currentId}
+            onChange={switchTemplate}
+            ariaLabel="选择模板"
+            placeholder="选择模板"
+          />
+        </section>
+
+        {/* 分组：视觉风格 */}
+        <section className="flex flex-col gap-4">
+          <GroupTitle>视觉风格</GroupTitle>
+          {/* 主色调 */}
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+              主色调
+            </label>
+            <div className="grid grid-cols-6 gap-2">
+              {colorPresets.map((color) => (
+                <button
+                  key={color.value}
+                  onClick={() => applyTheme({ primaryColor: color.value })}
+                  className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                    themeConfig.primaryColor === color.value
+                      ? 'border-gray-900 scale-110'
+                      : 'border-transparent'
+                  }`}
+                  style={{ backgroundColor: color.value }}
+                  title={color.label}
+                />
+              ))}
+            </div>
+          </div>
+          {/* 字体：下拉选择 */}
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+              字体
+            </label>
+            <Dropdown
+              options={fontPresets}
+              value={
+                fontPresets.some((f) => f.value === themeConfig.fontFamily)
+                  ? themeConfig.fontFamily
+                  : ''
+              }
+              onChange={(v) => applyTheme({ fontFamily: v })}
+              placeholder="当前字体（自定义）"
+              ariaLabel="选择字体"
+            />
+          </div>
+          {/* 字号 / 间距 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+                字号
+              </label>
+              <Dropdown
+                options={sizeOptions}
+                value={themeConfig.fontSize}
+                onChange={(v) => applyTheme({ fontSize: v })}
+                ariaLabel="选择字号"
               />
-            ))}
+            </div>
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+                间距
+              </label>
+              <Dropdown
+                options={spacingOptions}
+                value={themeConfig.spacing}
+                onChange={(v) => applyTheme({ spacing: v })}
+                ariaLabel="选择间距"
+              />
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* 字体：下拉选择 */}
-        <div>
-          <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-            字体
-          </label>
-          <Dropdown
-            options={fontPresets}
-            value={
-              fontPresets.some((f) => f.value === themeConfig.fontFamily)
-                ? themeConfig.fontFamily
-                : ''
-            }
-            onChange={(v) => applyTheme({ fontFamily: v })}
-            placeholder="当前字体（自定义）"
-            ariaLabel="选择字体"
-          />
-        </div>
+        {/* 分组：页面布局（预览与 PDF 导出共用，随主题持久化） */}
+        <section className="flex flex-col gap-4">
+          <GroupTitle>页面布局</GroupTitle>
+          {/* 页边距：左右 / 上下独立选择 */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+                左右边距
+              </label>
+              <Dropdown
+                options={marginOptions}
+                value={themeConfig.marginX}
+                onChange={(v) => applyTheme({ marginX: v })}
+                ariaLabel="选择左右页边距"
+              />
+            </div>
+            <div>
+              <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+                上下边距
+              </label>
+              <Dropdown
+                options={marginOptions}
+                value={themeConfig.marginY}
+                onChange={(v) => applyTheme({ marginY: v })}
+                ariaLabel="选择上下页边距"
+              />
+            </div>
+          </div>
+          {/* 内容边距：内容到页面边界的距离（四边），叠加在页边距上 */}
+          <div>
+            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
+              内容边距
+            </label>
+            <Dropdown
+              options={contentPaddingOptions}
+              value={themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING}
+              onChange={(v) => applyTheme({ contentPadding: v })}
+              ariaLabel="选择内容边距"
+            />
+          </div>
+        </section>
 
-        {/* 字号 / 间距 */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              字号
-            </label>
-            <Dropdown
-              options={sizeOptions}
-              value={themeConfig.fontSize}
-              onChange={(v) => applyTheme({ fontSize: v })}
-              ariaLabel="选择字号"
-            />
-          </div>
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              间距
-            </label>
-            <Dropdown
-              options={spacingOptions}
-              value={themeConfig.spacing}
-              onChange={(v) => applyTheme({ spacing: v })}
-              ariaLabel="选择间距"
-            />
-          </div>
-        </div>
-        {/* 页边距：左右 / 上下独立选择，预览与 PDF 导出共用，随主题持久化 */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              左右边距
-            </label>
-            <Dropdown
-              options={marginOptions}
-              value={themeConfig.marginX}
-              onChange={(v) => applyTheme({ marginX: v })}
-              ariaLabel="选择左右页边距"
-            />
-          </div>
-          <div>
-            <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              上下边距
-            </label>
-            <Dropdown
-              options={marginOptions}
-              value={themeConfig.marginY}
-              onChange={(v) => applyTheme({ marginY: v })}
-              ariaLabel="选择上下页边距"
-            />
-          </div>
-        </div>
-        {/* 内容边距：内容到页面边界的距离（四边），叠加在页边距上，随主题持久化 */}
-        <div>
-          <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-            内容边距
-          </label>
-          <Dropdown
-            options={contentPaddingOptions}
-            value={themeConfig.contentPadding ?? 'none'}
-            onChange={(v) => applyTheme({ contentPadding: v })}
-            ariaLabel="选择内容边距"
-          />
-        </div>
-
-        <IconSection themeConfig={themeConfig} onApply={applyTheme} />
+        {/* 分组：图标 */}
+        <section>
+          <GroupTitle>图标</GroupTitle>
+          <IconSection themeConfig={themeConfig} onApply={applyTheme} />
+        </section>
       </div>
     </aside>
   );
@@ -268,9 +312,9 @@ function IconSection({
         .tp-icon { display: inline-flex; align-items: center; vertical-align: -0.125em; }
         .tp-icon svg { width: 1em; height: 1em; fill: currentColor; }
       `}</style>
-      <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-        图标 · Markdown 中写 icon:名称
-      </label>
+      <p className="text-[11px] text-gray-400 mb-2">
+        Markdown 中写 <code className="font-mono">icon:名称</code>，点击内置图标可复制语法
+      </p>
 
       {/* 内置图标速览：点击复制语法（参考开源 MujiCV 的快捷图标面板） */}
       <div className="grid grid-cols-6 gap-1.5 mb-3">
@@ -295,7 +339,7 @@ function IconSection({
           {Object.entries(customIcons).map(([key, value]) => (
             <span
               key={key}
-              className="inline-flex items-center gap-1 pl-2 pr-1 h-7 border border-gray-200 rounded-md text-xs text-gray-600"
+              className="inline-flex items-center gap-1 pl-2 pr-1 h-7 border border-gray-200 rounded-md text-[13px] text-gray-600"
             >
               <span
                 className="tp-icon"
@@ -320,11 +364,11 @@ function IconSection({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="图标名，如 qq"
-          className="flex-1 min-w-0 h-8 px-2 text-xs border border-gray-200 rounded-md focus:outline-none focus:border-primary-400"
+          className="flex-1 min-w-0 h-8 px-2 text-[13px] border border-gray-200 rounded-md focus:outline-none focus:border-primary-400"
         />
         <button
           onClick={saveIcon}
-          className="h-8 px-3 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shrink-0"
+          className="h-8 px-3 text-[13px] font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shrink-0"
         >
           添加
         </button>
@@ -334,9 +378,9 @@ function IconSection({
         onChange={(e) => setSvg(e.target.value)}
         placeholder="粘贴 SVG 代码，如 <svg viewBox='0 0 1024 1024'><path d='...'/></svg>"
         rows={3}
-        className="w-full px-2 py-1.5 text-xs font-mono border border-gray-200 rounded-md resize-y focus:outline-none focus:border-primary-400"
+        className="w-full px-2 py-1.5 text-[13px] font-mono border border-gray-200 rounded-md resize-y focus:outline-none focus:border-primary-400"
       />
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-[13px] text-red-500 mt-1">{error}</p>}
     </div>
   );
 }

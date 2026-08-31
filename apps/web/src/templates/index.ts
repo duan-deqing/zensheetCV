@@ -2,6 +2,10 @@ import { classicTemplate } from './classic';
 import { modernTemplate } from './modern';
 import { elegantTemplate } from './elegant';
 import { techTemplate } from './tech';
+import { mujiTemplate } from './muji';
+import { azureTemplate } from './azure';
+import { sunriseTemplate } from './sunrise';
+import { carbonTemplate } from './carbon';
 import type { FontSizeOption, SpacingOption, Template } from '@stylan/shared-types';
 
 export interface TemplateDefinition {
@@ -26,6 +30,10 @@ export const builtinTemplates: TemplateDefinition[] = [
   modernTemplate,
   elegantTemplate,
   techTemplate,
+  mujiTemplate,
+  azureTemplate,
+  sunriseTemplate,
+  carbonTemplate,
 ];
 
 export function getTemplateById(id: string): TemplateDefinition {
