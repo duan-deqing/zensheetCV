@@ -93,6 +93,9 @@ export function EditorPage() {
               marginX: theme.marginX ?? theme.pageMargin ?? 'none',
               marginY: theme.marginY ?? theme.pageMargin ?? 'none',
               contentPadding: theme.contentPadding ?? DEFAULT_CONTENT_PADDING,
+              // 自定义图标与照片（含位置信息）随 theme_config 整体落库，原样恢复
+              customIcons: theme.customIcons,
+              photos: theme.photos,
             });
           }
         })

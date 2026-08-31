@@ -48,7 +48,7 @@ BUILTIN_TEMPLATES = [
     {
         "id": "muji",
         "name": "墨纸极简",
-        "description": "深色题头 + 居中胶囊标题，移植自 MujiCV 默认主题，沉稳耐看",
+        "description": "深色题头横幅 + 居中胶囊标题，黑白灰沉稳耐看",
         "thumbnail": "/templates/muji-thumb.svg",
         "css_styles": "/* muji template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
@@ -58,7 +58,7 @@ BUILTIN_TEMPLATES = [
     {
         "id": "azure",
         "name": "青线极简",
-        "description": "主题色细线标题 + 灰阶正文，移植自 MujiCV 极简色主题，素净克制",
+        "description": "主题色细线标题 + 灰阶正文，留白克制、素净轻盈",
         "thumbnail": "/templates/azure-thumb.svg",
         "css_styles": "/* azure template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
@@ -68,7 +68,7 @@ BUILTIN_TEMPLATES = [
     {
         "id": "sunrise",
         "name": "朝阳暖橙",
-        "description": "渐变题头 + 暖橙标题线，移植自 MujiCV 朝阳黄主题，明快有活力",
+        "description": "暖橙渐变题头 + 主题色标题线，明快有活力",
         "thumbnail": "/templates/sunrise-thumb.svg",
         "css_styles": "/* sunrise template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},

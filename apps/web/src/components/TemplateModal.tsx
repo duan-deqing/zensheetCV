@@ -67,7 +67,7 @@ function TemplatePreview({ templateId }: { templateId: string }) {
 /** 模板库弹窗：以卡片展示全部内置模板（实时预览 + 名称 + 标签 + 添加按钮）。
  *  「添加」后该模板进入主题面板的模板下拉菜单可供切换 */
 export function TemplateModal() {
-  const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, addToast } = useUI();
+  const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, removeTemplate, addToast } = useUI();
   const { currentTemplate } = usePreview();
 
   // Esc 关闭
@@ -95,16 +95,29 @@ export function TemplateModal() {
           from { opacity: 0; transform: translateY(12px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes backdropIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
         .tpl-modal-in { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .tpl-backdrop-in { animation: backdropIn 0.2s ease-out both; }
         @media (prefers-reduced-motion: reduce) {
-          .tpl-modal-in { animation: none; }
+          .tpl-modal-in, .tpl-backdrop-in { animation: none; }
         }
       `}</style>
-      {/* 遮罩：点击关闭 */}
-      <div className="absolute inset-0 bg-gray-900/40" onClick={toggleTemplateModal} aria-hidden="true" />
-      <div className="tpl-modal-in relative w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white border border-gray-200 rounded-2xl shadow-xl">
+      {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
+      <div
+        className="tpl-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
+        onClick={toggleTemplateModal}
+        aria-hidden="true"
+      />
+      {/* 面板：宽度按屏幕 16:9 比例计算，顶栏固定、滚动区限制在其下方 */}
+      <div
+        className="tpl-modal-in relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden"
+        style={{ width: 'min(1600px, 94vw, calc(82vh * 16 / 9))', maxHeight: '85vh' }}
+      >
         {/* 头部：mono 眉标 + 关闭按钮，与主题面板同构 */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 flex-none">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 mb-0.5">
               {'// TEMPLATES'}
@@ -121,7 +134,7 @@ export function TemplateModal() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 p-4 overflow-y-auto flex-1 min-h-0">
           {builtinTemplates.map((t) => {
             const isCurrent = t.id === currentId;
             const isAdded = addedTemplates.includes(t.id);
@@ -136,7 +149,15 @@ export function TemplateModal() {
                 <div className="p-3 flex flex-col gap-1.5 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-sm font-semibold text-gray-900 truncate">{t.name}</h4>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400 shrink-0">
+                    {/* 彩色胶囊标签：取模板默认主色着色 */}
+                    <span
+                      className="font-mono text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border shrink-0"
+                      style={{
+                        color: t.defaultTheme.primaryColor,
+                        borderColor: `color-mix(in srgb, ${t.defaultTheme.primaryColor} 35%, transparent)`,
+                        backgroundColor: `color-mix(in srgb, ${t.defaultTheme.primaryColor} 10%, transparent)`,
+                      }}
+                    >
                       {t.id}
                     </span>
                   </div>
@@ -150,10 +171,14 @@ export function TemplateModal() {
                     </button>
                   ) : isAdded ? (
                     <button
-                      disabled
-                      className="w-full h-8 rounded-md bg-gray-100 text-gray-400 text-[13px] font-medium cursor-default"
+                      onClick={() => {
+                        removeTemplate(t.id);
+                        addToast(`已移除「${t.name}」`, 'info');
+                      }}
+                      className="w-full h-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 text-[13px] font-medium transition-colors"
+                      aria-label={`取消添加 ${t.name}`}
                     >
-                      已添加 · 可在主题面板切换
+                      取消添加
                     </button>
                   ) : (
                     <button

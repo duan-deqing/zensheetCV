@@ -7,7 +7,7 @@ import type { TemplateDefinition } from './index';
 export const mujiTemplate: TemplateDefinition = {
   id: 'muji',
   name: '墨纸极简',
-  description: '深色题头 + 居中胶囊标题，移植自 MujiCV 默认主题，沉稳耐看',
+  description: '深色题头横幅 + 居中胶囊标题，黑白灰沉稳耐看',
   thumbnail: '/templates/muji-thumb.svg',
   blockMapping: {
     h1: 'name',

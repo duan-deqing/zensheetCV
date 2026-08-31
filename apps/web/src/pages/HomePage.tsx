@@ -130,8 +130,8 @@ const TEMPLATE_SHOWCASE = [
   { id: 'modern', tag: 'MODERN', name: '现代蓝调', desc: '互联网与产品岗位首选', span: 1 },
   { id: 'elegant', tag: 'ELEGANT', name: '优雅酒红', desc: '咨询、金融与品牌岗位', span: 1 },
   { id: 'tech', tag: 'TECH', name: '科技墨绿', desc: '研发与技术岗位', span: 1 },
-  { id: 'muji', tag: 'MUJI', name: '墨纸极简', desc: '深色题头，移植自 MujiCV 默认主题', span: 1 },
-  { id: 'azure', tag: 'AZURE', name: '青线极简', desc: '主题色细线标题，素净克制', span: 1 },
+  { id: 'muji', tag: 'MUJI', name: '墨纸极简', desc: '深色题头，沉稳耐看', span: 1 },
+  { id: 'azure', tag: 'AZURE', name: '青线极简', desc: '细线标题，素净轻盈', span: 1 },
   { id: 'sunrise', tag: 'SUNRISE', name: '朝阳暖橙', desc: '渐变题头，明快有活力', span: 1 },
   { id: 'carbon', tag: 'CARBON', name: '碳黑章标', desc: '灰底章节条 + 竖标，正式商务风', span: 1 },
 ] as const;
@@ -326,7 +326,17 @@ export function HomePage() {
                   <h3 className="font-semibold">{t.name}</h3>
                   <p className="text-sm text-gray-500 mt-0.5">{t.desc}</p>
                 </div>
-                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400">{t.tag}</p>
+                {/* 彩色胶囊标签：取模板默认主色着色 */}
+                <span
+                  className="font-mono text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border shrink-0"
+                  style={{
+                    color: getTemplateById(t.id).defaultTheme.primaryColor,
+                    borderColor: `color-mix(in srgb, ${getTemplateById(t.id).defaultTheme.primaryColor} 35%, transparent)`,
+                    backgroundColor: `color-mix(in srgb, ${getTemplateById(t.id).defaultTheme.primaryColor} 10%, transparent)`,
+                  }}
+                >
+                  {t.tag}
+                </span>
               </div>
             </div>
           ))}

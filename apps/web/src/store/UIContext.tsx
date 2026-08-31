@@ -11,6 +11,7 @@ interface UIContextType {
   themePanelOpen: boolean;
   aiPanelOpen: boolean;
   templateModalOpen: boolean;
+  photoModalOpen: boolean;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
   addedTemplates: string[];
   toasts: ToastMessage[];
@@ -18,7 +19,9 @@ interface UIContextType {
   toggleThemePanel: () => void;
   toggleAIPanel: () => void;
   toggleTemplateModal: () => void;
+  togglePhotoModal: () => void;
   addTemplate: (id: string) => void;
+  removeTemplate: (id: string) => void;
   setAIPanelOpen: (open: boolean) => void;
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
@@ -34,6 +37,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [themePanelOpen, setThemePanelOpen] = useState(false);
   const [aiPanelOpen, setAIPanelOpen] = useState(false);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
   // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
   const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
     try {
@@ -49,11 +53,24 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const toggleThemePanel = useCallback(() => setThemePanelOpen((p) => !p), []);
   const toggleAIPanel = useCallback(() => setAIPanelOpen((p) => !p), []);
   const toggleTemplateModal = useCallback(() => setTemplateModalOpen((p) => !p), []);
+  const togglePhotoModal = useCallback(() => setPhotoModalOpen((p) => !p), []);
 
   const addTemplate = useCallback((id: string) => {
     setAddedTemplates((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
+      try {
+        localStorage.setItem(ADDED_TEMPLATES_KEY, JSON.stringify(next));
+      } catch {
+        /* localStorage 不可用时仅保留在内存 */
+      }
+      return next;
+    });
+  }, []);
+
+  const removeTemplate = useCallback((id: string) => {
+    setAddedTemplates((prev) => {
+      const next = prev.filter((t) => t !== id);
       try {
         localStorage.setItem(ADDED_TEMPLATES_KEY, JSON.stringify(next));
       } catch {
@@ -94,13 +111,16 @@ export function UIProvider({ children }: { children: ReactNode }) {
         themePanelOpen,
         aiPanelOpen,
         templateModalOpen,
+        photoModalOpen,
         addedTemplates,
         toasts,
         toggleSidebar,
         toggleThemePanel,
         toggleAIPanel,
         toggleTemplateModal,
+        togglePhotoModal,
         addTemplate,
+        removeTemplate,
         setAIPanelOpen,
         addToast,
         removeToast,

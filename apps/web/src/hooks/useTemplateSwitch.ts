@@ -24,6 +24,7 @@ export function useTemplateSwitch() {
         marginY: themeConfig.marginY,
         contentPadding: themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING,
         customIcons: themeConfig.customIcons,
+        photos: themeConfig.photos,
       };
       setThemeConfig(nextTheme);
       // 模板默认主题一并写入，随自动保存落库

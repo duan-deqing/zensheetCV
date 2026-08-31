@@ -21,6 +21,10 @@ export const CONTENT_PADDING_MM: Record<MarginOption, number> = {
 /** 默认内容边距档位：标准 10mm（theme_config 缺失该字段时的回退值） */
 export const DEFAULT_CONTENT_PADDING: MarginOption = 'normal';
 
+/** A4 纸张尺寸（mm@96dpi：210mm ≈ 794px），预览纸张与 PDF 导出换算共用 */
+export const A4_WIDTH_MM = 210;
+export const A4_HEIGHT_MM = 297;
+
 /** :::left / :::mid / :::right 三栏布局样式。
  * scope 为空时全局生效；传入选择器前缀（如 '.rp-thumb'）时仅作用于该容器内。
  * 弹性基准取内容宽度（flex-basis: auto），按内容分配比例、减少换行；

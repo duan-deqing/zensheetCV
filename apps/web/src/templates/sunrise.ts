@@ -7,7 +7,7 @@ import type { TemplateDefinition } from './index';
 export const sunriseTemplate: TemplateDefinition = {
   id: 'sunrise',
   name: '朝阳暖橙',
-  description: '渐变题头 + 暖橙标题线，移植自 MujiCV 朝阳黄主题，明快有活力',
+  description: '暖橙渐变题头 + 主题色标题线，明快有活力',
   thumbnail: '/templates/sunrise-thumb.svg',
   blockMapping: {
     h1: 'name',

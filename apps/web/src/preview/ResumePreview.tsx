@@ -3,10 +3,14 @@ import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useEditor } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
+import { usePhotoSync } from '@/hooks/usePhotoSync';
 import { getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from './remarkResumeCols';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from './resumeIcons';
+import { ResumePhotos } from './ResumePhotos';
 import {
+  A4_HEIGHT_MM,
+  A4_WIDTH_MM,
   CONTENT_PADDING_MM,
   DEFAULT_CONTENT_PADDING,
   FONT_SCALE,
@@ -18,9 +22,7 @@ import {
 import { ThemeConfigPanel } from '@/components/ThemeConfigPanel';
 import { PreviewToolbar } from './PreviewToolbar';
 
-/** A4 纸尺寸（mm）与 mm → px 换算（CSS 标准 96dpi） */
-const A4_WIDTH_MM = 210;
-const A4_HEIGHT_MM = 297;
+/** mm → px 换算（CSS 标准 96dpi） */
 const MM_TO_PX = 96 / 25.4;
 
 /* ------------------------------------------------------------------ */
@@ -126,6 +128,7 @@ function paginate(
 export function ResumePreview() {
   const { markdown } = useEditor();
   const { currentTemplate, themeConfig, themeReady, scale, setScale } = usePreview();
+  const { photos, setPhotos } = usePhotoSync();
 
   const templateId = currentTemplate?.id || 'classic';
   const css = getTemplateCss(templateId);
@@ -239,6 +242,16 @@ export function ResumePreview() {
     });
   }, [pages, contentHtml]);
 
+  // 照片：选中/更新/删除，同步预览状态并随自动保存落库
+  const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
+  const updatePhoto = (id: string, patch: Partial<{ x: number; y: number; width: number }>) => {
+    setPhotos(photos.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  };
+  const deletePhoto = (id: string) => {
+    setPhotos(photos.filter((p) => p.id !== id));
+    setSelectedPhotoId(null);
+  };
+
   // 初始缩放自适应：纸张（794px = 210mm@96dpi）超出可视宽度时缩小到刚好放下（参考 MujiCV）
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -297,6 +310,7 @@ export function ResumePreview() {
                   {pages.offsets.map((_p, k) => (
                     <div
                       key={k}
+                      data-resume-page
                       className="resume-preview bg-white relative"
                       style={{
                         width: `${A4_WIDTH_MM}mm`,
@@ -305,12 +319,23 @@ export function ResumePreview() {
                         boxShadow:
                           '0 0 1px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.12)',
                       }}
+                      onPointerDown={(e) => {
+                        // 点击照片以外区域取消选中
+                        if (!(e.target as HTMLElement).closest('.resume-photo')) setSelectedPhotoId(null);
+                      }}
                     >
                       <div
                         ref={(el) => {
                           pageRefs.current[k] = el;
                         }}
                         style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}
+                      />
+                      <ResumePhotos
+                        photos={photos.filter((p) => p.page === k + 1)}
+                        selectedId={selectedPhotoId}
+                        onSelect={setSelectedPhotoId}
+                        onUpdate={updatePhoto}
+                        onDelete={deletePhoto}
                       />
                     </div>
                   ))}

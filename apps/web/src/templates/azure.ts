@@ -7,7 +7,7 @@ import type { TemplateDefinition } from './index';
 export const azureTemplate: TemplateDefinition = {
   id: 'azure',
   name: '青线极简',
-  description: '主题色细线标题 + 灰阶正文，移植自 MujiCV 极简色主题，素净克制',
+  description: '主题色细线标题 + 灰阶正文，留白克制、素净轻盈',
   thumbnail: '/templates/azure-thumb.svg',
   blockMapping: {
     h1: 'name',
