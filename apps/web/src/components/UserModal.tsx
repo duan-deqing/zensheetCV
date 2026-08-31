@@ -898,7 +898,7 @@ export function UserModal() {
             {tab === 'about' && (
               <div className="flex flex-col h-full">
                 <p className="font-mono text-xs tracking-[0.18em] text-primary-600">
-                  {'< ZENSHEET · 禅笺 />'}
+                  {'< ZENSHEET · 简历 />'}
                 </p>
                 <p className="mt-2 text-[13px] text-gray-600 leading-relaxed">
                   一个在线 Markdown 简历编辑器：左侧书写 Markdown，右侧实时预览排版，
@@ -909,13 +909,13 @@ export function UserModal() {
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       项目名称
                     </dt>
-                    <dd className="text-[13px] text-gray-700">ZENSHEET · 禅笺 — 在线 Markdown 简历编辑器</dd>
+                    <dd className="text-[13px] text-gray-700">ZENSHEET · 简历 — 在线 Markdown 简历编辑器</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       当前版本
                     </dt>
-                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.7.0</dd>
+                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.8.0</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">

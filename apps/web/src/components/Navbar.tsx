@@ -80,7 +80,8 @@ export function Navbar() {
               to="/"
               className="text-[15px] font-extrabold uppercase tracking-tight text-gray-900 shrink-0"
             >
-              ZENSHEET<span className="text-primary-600">·禅笺</span>
+              ZENSHEET{' '}
+              <span className="text-primary-600">· 简历</span>
             </Link>
             <div className="hidden md:flex items-center gap-7">
               <Link to="/" className={linkClass('/')}>

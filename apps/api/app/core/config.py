@@ -5,8 +5,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Zensheet API · 禅笺"
-    APP_VERSION: str = "0.7.0"
+    APP_NAME: str = "Zensheet API · 简历"
+    APP_VERSION: str = "0.8.0"
     DEBUG: bool = False
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./app.db"

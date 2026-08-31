@@ -172,7 +172,7 @@ export function HomePage() {
       <section className="max-w-7xl mx-auto px-6 pt-14 pb-16 lg:pt-20 grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
-            &lt; ZENSHEET · 禅笺 /&gt;
+            &lt; ZENSHEET · 简历 /&gt;
           </p>
           <h1
             className="fade-up text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] mb-5"
@@ -186,7 +186,7 @@ export function HomePage() {
             className="fade-up text-lg text-gray-600 leading-relaxed max-w-[32em] mb-8"
             style={{ animationDelay: '0.16s' }}
           >
-            实时预览、多套模板、AI 润色与关键词优化，导出高质量 PDF。
+            八套模板实时预览，支持图标与照片排版，AI 润色与关键词优化，一键导出高质量 PDF。
           </p>
           <div
             className="fade-up flex flex-wrap items-center gap-3"
@@ -344,9 +344,20 @@ export function HomePage() {
       <footer className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="font-mono text-xs tracking-[0.18em] text-gray-400">
-            ZENSHEET · 禅笺
+            ZENSHEET · 简历
           </p>
-          <p className="text-sm text-gray-500">Markdown 简历编辑器 · 模板 · AI · PDF</p>
+          <p className="text-sm text-gray-500">
+            在线 Markdown 简历编辑器 · 模板 · AI · PDF · 由{' '}
+            <a
+              href="https://duan-deqing.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary-600 underline decoration-primary-300 decoration-1 underline-offset-4 transition-colors hover:text-primary-700 hover:decoration-primary-600"
+            >
+              STYLAN
+            </a>{' '}
+            &amp; GLM-5.3-flash 打造
+          </p>
         </div>
       </footer>
     </div>

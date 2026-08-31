@@ -1,30 +1,41 @@
-# Stylan Resume - 在线简历编辑器
+# ZENSHEET · 简历 (Zensheet) - 在线 Markdown 简历编辑器
 
-> 通过 Markdown 编辑简历，选择定制模板，导出高质量 PDF
+> 静下心来，写好一份简历。通过 Markdown 编辑简历，选择定制模板，导出高质量 PDF
+
+## 关于
+
+| 项目     | 内容                                       |
+| -------- | ------------------------------------------ |
+| 项目名称 | ZENSHEET · 简历 — 在线 Markdown 简历编辑器 |
+| 当前版本 | v0.7.0                                     |
+| 作者     | STYLAN & GLM-5.3-flash                     |
+| 许可证   | MIT                                        |
 
 ## 功能
 
 - Markdown 实时编辑与预览（左右分栏，所见即所得）
-- 4 套精美简历模板（经典 / 现代 / 优雅 / 技术）
-- 主题配置（颜色、字体、字号、间距自定义）
-- 服务端 PDF 导出（Playwright 高质量渲染）
-- 用户系统（注册 / 登录 / JWT 认证）
-- AI 辅助写作（内容润色 / 关键词优化 / 智能生成，基于 OpenAI GPT-4o-mini）
+- 8 套精美简历模板（经典简洁 / 现代蓝调 / 优雅酒红 / 科技墨绿 / 墨纸极简 / 青线极简 / 朝阳暖橙 / 碳黑章标）
+- 主题配置（颜色、字体、字号、间距、页边距自定义，模板切换预览卡片）
+- 图标与照片（内置图标库一键插入、简历照片上传与自由摆放）
+- 服务端 PDF 导出（Playwright 高质量渲染，分页与预览一致）
+- 用户系统（注册 / 登录 / JWT 认证、头像上传与裁剪、账号资料与密码修改）
+- AI 辅助写作（经历润色 / 关键词匹配 / 要点成段，支持 OpenAI、DeepSeek、GLM、LongCat 等多家 OpenAI 兼容供应商，用户可配置自己的 API Key）
 - 多简历管理（CRUD、分页）
+- 内置使用文档页面
 - 响应式布局
 
 ## 技术栈
 
-| 层级 | 技术 |
-|------|------|
-| **前端** | React 18 + TypeScript + Vite + Tailwind CSS + CodeMirror |
-| **后端** | Python + FastAPI + SQLAlchemy (async) + Pydantic v2 |
-| **数据库** | SQLite (aiosqlite) |
-| **PDF** | Playwright + Jinja2 |
-| **AI** | OpenAI GPT-4o-mini |
-| **认证** | JWT (python-jose) + bcrypt |
-| **包管理** | pnpm (前端) + Poetry (后端) |
-| **CI** | GitHub Actions |
+| 层级       | 技术                                                                     |
+| ---------- | ------------------------------------------------------------------------ |
+| **前端**   | React 18 + TypeScript + Vite + Tailwind CSS + CodeMirror 6               |
+| **后端**   | Python + FastAPI + SQLAlchemy (async) + Pydantic v2                      |
+| **数据库** | SQLite (aiosqlite)                                                       |
+| **PDF**    | Playwright + Jinja2                                                      |
+| **AI**     | OpenAI 兼容协议（支持 OpenAI / DeepSeek / GLM / LongCat / 自定义供应商） |
+| **认证**   | JWT (python-jose) + bcrypt                                               |
+| **包管理** | pnpm (前端) + Poetry (后端)                                              |
+| **CI**     | GitHub Actions                                                           |
 
 ## 快速开始
 
@@ -88,17 +99,20 @@ poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
 
 后端通过 `pydantic-settings` 从 `.env` 文件读取配置。创建 `apps/api/.env` 或在部署环境中导出变量。
 
-| 变量 | 说明 | 默认值 | 必填 |
-|------|------|--------|------|
-| `APP_NAME` | 应用名称 | `Stylan Resume API` | 否 |
-| `APP_VERSION` | 应用版本 | `0.1.0` | 否 |
-| `DEBUG` | 调试模式 | `True` | 否 |
-| `DATABASE_URL` | 数据库连接字符串 | `sqlite+aiosqlite:///./app.db` | 否 |
-| `SECRET_KEY` | JWT 签名密钥 (生产环境必须修改) | `change-me-in-production` | **是** |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token 过期时间 (分钟) | `10080` (7 天) | 否 |
-| `OPENAI_API_KEY` | OpenAI API 密钥 | (空) | **是** (AI 功能) |
-| `OPENAI_MODEL` | OpenAI 模型 | `gpt-4o-mini` | 否 |
-| `CORS_ORIGINS` | 允许的 CORS 来源 (JSON 数组) | `["http://localhost:5173","http://localhost:3000"]` | 否 |
+| 变量                          | 说明                                      | 默认值                                              | 必填             |
+| ----------------------------- | ----------------------------------------- | --------------------------------------------------- | ---------------- |
+| `APP_NAME`                    | 应用名称                                  | `Zensheet API · 简历`                               | 否               |
+| `APP_VERSION`                 | 应用版本                                  | `0.7.0`                                             | 否               |
+| `DEBUG`                       | 调试模式                                  | `True`                                              | 否               |
+| `DATABASE_URL`                | 数据库连接字符串                          | `sqlite+aiosqlite:///./app.db`                      | 否               |
+| `SECRET_KEY`                  | JWT 签名密钥 (生产环境必须修改)           | `change-me-in-production`                           | **是**           |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token 过期时间 (分钟)                     | `10080` (7 天)                                      | 否               |
+| `OPENAI_API_KEY`              | 服务端默认 OpenAI 兼容 API 密钥 (AI 功能) | (空)                                                | **是** (AI 功能) |
+| `OPENAI_MODEL`                | 服务端默认模型                            | `gpt-4o-mini`                                       | 否               |
+| `UPLOAD_DIR`                  | 上传文件目录 (头像等)                     | `uploads`                                           | 否               |
+| `CORS_ORIGINS`                | 允许的 CORS 来源 (JSON 数组)              | `["http://localhost:5173","http://localhost:3000"]` | 否               |
+
+> 除服务端默认密钥外，AI 功能支持用户在「设置 → AI」中为不同供应商（OpenAI / DeepSeek / GLM / LongCat / 自定义）单独配置 API Key，密钥仅存储于用户浏览器本地。
 
 **最小生产配置 (`.env`):**
 
@@ -115,13 +129,13 @@ CORS_ORIGINS=["https://your-domain.com"]
 
 ```bash
 # 前端测试 (Vitest)
-npm run test:web
-
-# 后端测试 (Pytest + pytest-asyncio)
-npm run test:api
+pnpm run test:web
 
 # 前端代码检查
-npm run lint:web
+pnpm run lint:web
+
+# 后端测试 (Pytest + pytest-asyncio)
+cd apps/api && poetry run pytest
 ```
 
 CI 流水线 (`.github/workflows/ci.yml`) 在每次 push / PR 时自动运行前端构建、后端测试 (含覆盖率)。
@@ -132,22 +146,26 @@ CI 流水线 (`.github/workflows/ci.yml`) 在每次 push / PR 时自动运行前
 
 所有 API 前缀为 `/api/v1`。
 
-| 模块 | 路由 | 说明 |
-|------|------|------|
-| **认证** | `POST /auth/register` | 用户注册 |
-| | `POST /auth/login` | 用户登录，返回 JWT |
-| | `GET /auth/me` | 获取当前用户信息 |
-| **简历** | `GET /resumes` | 获取当前用户简历列表 (分页) |
-| | `POST /resumes` | 创建简历 |
-| | `GET /resumes/{id}` | 获取简历详情 |
-| | `PUT /resumes/{id}` | 更新简历 |
-| | `DELETE /resumes/{id}` | 删除简历 |
-| **模板** | `GET /templates` | 获取内置模板列表 |
-| **PDF** | `POST /pdf/generate` | 生成 PDF (返回下载链接) |
-| | `GET /pdf/download/{file_id}` | 下载生成的 PDF |
-| **AI** | `POST /ai/polish` | 润色文本 (SSE 流式) |
-| | `POST /ai/keywords` | 分析 JD 关键词匹配 |
-| | `POST /ai/generate` | 智能生成内容 (SSE 流式) |
+| 模块     | 路由                          | 说明                                         |
+| -------- | ----------------------------- | -------------------------------------------- |
+| **认证** | `POST /auth/register`         | 用户注册                                     |
+|          | `POST /auth/login`            | 用户登录，返回 JWT                           |
+|          | `GET /auth/me`                | 获取当前用户信息                             |
+|          | `PUT /auth/me`                | 更新用户名 / 邮箱                            |
+|          | `PUT /auth/password`          | 修改密码                                     |
+|          | `POST /auth/avatar`           | 上传头像                                     |
+| **简历** | `GET /resumes`                | 获取当前用户简历列表 (分页)                  |
+|          | `POST /resumes`               | 创建简历                                     |
+|          | `GET /resumes/{id}`           | 获取简历详情                                 |
+|          | `PUT /resumes/{id}`           | 更新简历                                     |
+|          | `DELETE /resumes/{id}`        | 删除简历                                     |
+| **模板** | `GET /templates`              | 获取内置模板列表                             |
+| **PDF**  | `POST /pdf/generate`          | 生成 PDF (返回下载链接)                      |
+|          | `GET /pdf/download/{file_id}` | 下载生成的 PDF                               |
+| **AI**   | `POST /ai/polish`             | 润色文本 (SSE 流式)                          |
+|          | `POST /ai/keywords`           | 分析 JD 关键词匹配                           |
+|          | `POST /ai/generate`           | 智能生成内容 (SSE 流式)                      |
+|          | `POST /ai/models`             | 拉取供应商可用模型列表 (代理转发，规避 CORS) |
 
 ---
 
@@ -160,112 +178,69 @@ stylan_resume/
 │   │   ├── src/
 │   │   │   ├── api/               # API 请求客户端 (axios)
 │   │   │   ├── components/        # 通用 UI 组件
-│   │   │   │   ├── AIPanel.tsx
-│   │   │   │   ├── ErrorBoundary.tsx
-│   │   │   │   ├── LoadingSpinner.tsx
-│   │   │   │   ├── ProtectedRoute.tsx
-│   │   │   │   ├── ResumeList.tsx
-│   │   │   │   ├── SaveButton.tsx
-│   │   │   │   ├── ThemeConfigPanel.tsx
-│   │   │   │   ├── Toast.tsx
-│   │   │   │   └── TopBar.tsx
+│   │   │   │   ├── AIPanel.tsx            # AI 辅助写作面板
+│   │   │   │   ├── AvatarCropModal.tsx    # 头像裁剪上传弹窗
+│   │   │   │   ├── IconModal.tsx          # 图标库弹窗
+│   │   │   │   ├── PhotoModal.tsx         # 照片上传弹窗
+│   │   │   │   ├── TemplateModal.tsx      # 模板库弹窗
+│   │   │   │   ├── TemplatePreview.tsx    # 模板预览卡片
+│   │   │   │   ├── ThemeConfigPanel.tsx   # 主题配置面板
+│   │   │   │   ├── UserModal.tsx          # 设置窗口（账号 / AI / 安全 / 关于）
+│   │   │   │   ├── Navbar.tsx             # 首页导航栏
+│   │   │   │   ├── TopBar.tsx             # 编辑器工具栏
+│   │   │   │   └── ...
 │   │   │   ├── editor/            # Markdown 编辑器模块
 │   │   │   │   ├── MarkdownEditor.tsx
 │   │   │   │   ├── Toolbar.tsx
 │   │   │   │   └── shortcuts.ts
 │   │   │   ├── hooks/             # 自定义 Hooks
-│   │   │   │   ├── useAI.ts
-│   │   │   │   ├── useAutoSave.ts
-│   │   │   │   ├── useKeyboardShortcut.ts
-│   │   │   │   ├── usePDFExport.ts
-│   │   │   │   ├── useResume.ts
-│   │   │   │   └── useToast.ts
 │   │   │   ├── pages/             # 页面组件
+│   │   │   │   ├── DocsPage.tsx           # 使用文档页
 │   │   │   │   ├── EditorPage.tsx
 │   │   │   │   ├── HomePage.tsx
 │   │   │   │   ├── LoginPage.tsx
-│   │   │   │   └── RegisterPage.tsx
+│   │   │   │   ├── RegisterPage.tsx
+│   │   │   │   └── ResumesPage.tsx
 │   │   │   ├── preview/           # 简历预览模块
 │   │   │   │   ├── PreviewToolbar.tsx
+│   │   │   │   ├── ResumePhotos.tsx
 │   │   │   │   └── ResumePreview.tsx
+│   │   │   ├── settings/          # AI 供应商与密钥设置（浏览器本地存储）
 │   │   │   ├── store/             # 状态管理 (React Context)
-│   │   │   │   ├── AuthContext.tsx
-│   │   │   │   ├── EditorContext.tsx
-│   │   │   │   ├── PreviewContext.tsx
-│   │   │   │   ├── ResumeContext.tsx
-│   │   │   │   └── UIContext.tsx
-│   │   │   ├── templates/         # 简历模板定义
-│   │   │   │   ├── classic.ts
-│   │   │   │   ├── elegant.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── modern.ts
-│   │   │   │   └── tech.ts
+│   │   │   ├── templates/         # 8 套简历模板定义
+│   │   │   │   ├── classic.ts  modern.ts  elegant.ts  tech.ts
+│   │   │   │   ├── muji.ts     azure.ts   sunrise.ts   carbon.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── sampleResume.ts    # 共享示例简历内容
 │   │   │   ├── App.tsx            # 应用入口与路由
-│   │   │   ├── main.tsx           # React DOM 挂载
-│   │   │   └── vite-env.d.ts
-│   │   ├── tests/
-│   │   │   ├── setup.ts
-│   │   │   └── unit/
-│   │   │       ├── MarkdownEditor.test.tsx
-│   │   │       └── store.test.tsx
+│   │   │   └── main.tsx           # React DOM 挂载
+│   │   ├── tests/                 # Vitest 测试
 │   │   ├── package.json
-│   │   ├── tsconfig.json
-│   │   ├── tsconfig.node.json
 │   │   └── vite.config.ts
 │   │
 │   └── api/                       # FastAPI 后端
 │       ├── app/
 │       │   ├── api/v1/            # API 路由层
 │       │   │   ├── ai.py          # AI 辅助写作接口
-│       │   │   ├── auth.py        # 认证接口
+│       │   │   ├── auth.py        # 认证 / 资料 / 头像接口
 │       │   │   ├── pdf.py         # PDF 生成接口
 │       │   │   ├── resumes.py     # 简历 CRUD 接口
 │       │   │   └── templates.py   # 模板接口
 │       │   ├── core/              # 核心配置
-│       │   │   ├── config.py      # Pydantic Settings
-│       │   │   ├── deps.py        # 依赖注入 (get_db)
-│       │   │   └── security.py    # JWT / 密码工具
 │       │   ├── db/                # 数据库
-│       │   │   ├── base.py        # SQLAlchemy Base
-│       │   │   └── session.py      # 异步引擎 / Session
 │       │   ├── models/            # SQLAlchemy 模型
-│       │   │   ├── resume.py
-│       │   │   └── user.py
 │       │   ├── schemas/           # Pydantic 模型
-│       │   │   ├── ai.py
-│       │   │   ├── pdf.py
-│       │   │   ├── resume.py
-│       │   │   ├── template.py
-│       │   │   └── user.py
 │       │   ├── services/          # 业务逻辑
-│       │   │   ├── ai_service.py
-│       │   │   ├── auth_service.py
-│       │   │   ├── pdf_service.py
-│       │   │   └── resume_service.py
 │       │   └── main.py            # FastAPI 应用入口
+│       ├── uploads/               # 运行时上传目录（头像等，不入库）
 │       ├── tests/
-│       │   ├── conftest.py
-│       │   └── integration/
-│       │       ├── test_ai.py
-│       │       ├── test_auth.py
-│       │       ├── test_resumes.py
-│       │       └── test_templates.py
 │       └── pyproject.toml
 │
 ├── packages/
 │   └── shared-types/              # 前后端共享类型
-│       ├── src/
-│       │   ├── api.ts
-│       │   ├── index.ts
-│       │   ├── resume.ts
-│       │   └── user.ts
-│       ├── package.json
-│       └── tsconfig.json
 │
 ├── docs/
-│   └── superpowers/
-│       ├── plans/                 # 各阶段实施计划
-│       └── specs/                 # 设计规格
+│   └── superpowers/               # 实施计划与设计规格
 │
 ├── .github/workflows/ci.yml       # CI 配置
 ├── pnpm-workspace.yaml            # pnpm workspace 配置

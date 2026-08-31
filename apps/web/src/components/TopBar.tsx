@@ -12,6 +12,7 @@ import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 import { TemplateModal } from '@/components/TemplateModal';
 import { PhotoModal } from '@/components/PhotoModal';
 import { IconModal } from '@/components/IconModal';
+import { DocsDrawer } from '@/components/DocsDrawer';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
 
@@ -308,7 +309,7 @@ export function TopBar() {
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal, toggleIconModal, toggleUserModal } = useUI();
+  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer } = useUI();
 
   const handleExportPDF = async () => {
     // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
@@ -416,13 +417,11 @@ export function TopBar() {
               图标
             </button>
           </HoverTip>
-          {/* 使用文档入口：跳转文档页 */}
+          {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
           <HoverTip text="使用文档">
             <button
               type="button"
-              onClick={() => {
-                window.location.hash = '#/docs';
-              }}
+              onClick={toggleDocsDrawer}
               className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <BookIcon />
@@ -485,6 +484,7 @@ export function TopBar() {
       <TemplateModal />
       <PhotoModal />
       <IconModal />
+      <DocsDrawer open={docsDrawerOpen} onClose={toggleDocsDrawer} />
     </header>
   );
 }

@@ -14,6 +14,8 @@ interface UIContextType {
   photoModalOpen: boolean;
   iconModalOpen: boolean;
   userModalOpen: boolean;
+  /** 编辑器右侧文档抽屉 */
+  docsDrawerOpen: boolean;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
   addedTemplates: string[];
   toasts: ToastMessage[];
@@ -24,6 +26,7 @@ interface UIContextType {
   togglePhotoModal: () => void;
   toggleIconModal: () => void;
   toggleUserModal: () => void;
+  toggleDocsDrawer: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
   setAIPanelOpen: (open: boolean) => void;
@@ -44,6 +47,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [iconModalOpen, setIconModalOpen] = useState(false);
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
   // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
   const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
     try {
@@ -62,6 +66,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const togglePhotoModal = useCallback(() => setPhotoModalOpen((p) => !p), []);
   const toggleIconModal = useCallback(() => setIconModalOpen((p) => !p), []);
   const toggleUserModal = useCallback(() => setUserModalOpen((p) => !p), []);
+  const toggleDocsDrawer = useCallback(() => setDocsDrawerOpen((p) => !p), []);
 
   const addTemplate = useCallback((id: string) => {
     setAddedTemplates((prev) => {
@@ -122,6 +127,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         photoModalOpen,
         iconModalOpen,
         userModalOpen,
+        docsDrawerOpen,
         addedTemplates,
         toasts,
         toggleSidebar,
@@ -131,6 +137,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         togglePhotoModal,
         toggleIconModal,
         toggleUserModal,
+        toggleDocsDrawer,
         addTemplate,
         removeTemplate,
         setAIPanelOpen,
