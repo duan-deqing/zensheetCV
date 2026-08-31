@@ -61,6 +61,13 @@ export const sunriseTemplate: TemplateDefinition = {
       color: #4A3B2E;
     }
     .resume-preview ul { padding-left: 1.1rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.4rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol li {
+      font-size: 0.9em;
+      margin-bottom: calc(0.375rem * var(--resume-sp, 1));
+      color: #5C4F42;
+    }
+    .resume-preview ol li::marker { color: #F9855D; }
     .resume-preview ul li {
       font-size: 0.9em;
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));

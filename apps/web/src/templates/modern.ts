@@ -47,6 +47,8 @@ export const modernTemplate: TemplateDefinition = {
       color: #374151;
     }
     .resume-preview ul { padding-left: 1.25rem; list-style: none; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol li { margin-bottom: calc(0.375rem * var(--resume-sp, 1)); }
     .resume-preview ul li { position: relative; padding-left: 1rem; margin-bottom: calc(0.375rem * var(--resume-sp, 1)); }
     .resume-preview ul li::before {
       content: ''; position: absolute; left: 0; top: 0.6em;

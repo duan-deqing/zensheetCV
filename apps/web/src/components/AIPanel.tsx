@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAI } from '@/hooks/useAI';
 import { useEditor } from '@/store/EditorContext';
 import { useUI } from '@/store/UIContext';
+import { HoverTip } from '@/components/HoverTip';
 
 export function AIPanel() {
   const [activeTab, setActiveTab] = useState<'polish' | 'keywords' | 'generate'>('polish');
@@ -29,14 +30,15 @@ export function AIPanel() {
         </p>
         <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
         <h2 className="text-sm font-semibold text-gray-900">AI 助手</h2>
-        <button
-          onClick={toggleAIPanel}
-          className="ml-auto w-7 h-7 font-mono text-sm text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors flex items-center justify-center shrink-0"
-          title="收起 AI 助手"
-          aria-label="收起 AI 助手"
-        >
-          ✕
-        </button>
+        <HoverTip text="收起 AI 助手">
+          <button
+            onClick={toggleAIPanel}
+            className="ml-auto w-7 h-7 font-mono text-sm text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors flex items-center justify-center shrink-0"
+            aria-label="收起 AI 助手"
+          >
+            ✕
+          </button>
+        </HoverTip>
       </div>
       <div className="flex border-b border-gray-200">
         {tabs.map((tab) => (

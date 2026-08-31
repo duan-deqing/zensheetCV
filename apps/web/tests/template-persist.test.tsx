@@ -58,7 +58,7 @@ describe('editor persists template switch + theme change on manual save', () => 
 
     // 3. 面板保持打开，选择翡翠绿色板
     const swatches = await waitFor(() => {
-      const els = document.querySelectorAll('button[title="翡翠绿"]');
+      const els = document.querySelectorAll('button[aria-label="翡翠绿"]');
       expect(els.length).toBeGreaterThan(0);
       return els;
     }, { timeout: 10000 });

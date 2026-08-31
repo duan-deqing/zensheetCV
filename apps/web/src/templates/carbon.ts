@@ -56,6 +56,13 @@ export const carbonTemplate: TemplateDefinition = {
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));
     }
     .resume-preview ul { padding-left: 1.2rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.4rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol li {
+      font-size: 0.92em;
+      margin-bottom: calc(0.45rem * var(--resume-sp, 1));
+      color: #222222;
+    }
+    .resume-preview ol li::marker { color: #1A1A1A; }
     .resume-preview ul li {
       list-style: square;
       font-size: 0.92em;

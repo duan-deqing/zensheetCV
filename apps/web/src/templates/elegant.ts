@@ -46,6 +46,7 @@ export const elegantTemplate: TemplateDefinition = {
       color: #44403C;
     }
     .resume-preview ul { padding-left: 1.5rem; list-style: square; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview li { margin-bottom: calc(0.375rem * var(--resume-sp, 1)); }
     .resume-preview p { margin-bottom: calc(0.625rem * var(--resume-sp, 1)); }
     .resume-preview code {

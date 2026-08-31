@@ -12,40 +12,10 @@ import {
   resumeIconsCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
+import { SAMPLE_MARKDOWN } from '@/sampleResume';
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
-   （react-markdown + 各模板真实 CSS），非静态截图 */
-const SAMPLE_MARKDOWN = `# 林晚舟
-
-icon:info 产品经理 · 5 年经验 · 上海
-
-icon:phone 138-0000-0000 · icon:email lin@mail.com · icon:github linwanzhou
-
-## 技能
-
-\`Axure\` \`Figma\` \`SQL\` \`数据分析\` \`A/B 测试\`
-
-## 工作经历
-
-### 云帆科技 · 高级产品经理
-
-2021.03 - 至今
-
-- 主导协作平台从 0 到 1，两年内服务 1200+ 企业客户
-- 建立需求评审与灰度发布流程，线上事故率下降 38%
-
-### 星图网络 · 产品经理
-
-2018.07 - 2021.02
-
-- 负责内容分发中台，DAU 增长 2.4 倍
-- 搭建数据看板，需求交付周期缩短至 9 天
-
-## 教育背景
-
-### 浙江大学 · 信息管理与信息系统
-
-2014.09 - 2018.06`;
+   （react-markdown + 各模板真实 CSS），非静态截图，内容见 @/sampleResume */
 
 function MiniResume({
   templateId,

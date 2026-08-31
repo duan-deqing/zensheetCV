@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { HoverTip } from '@/components/HoverTip';
 import { useAuth } from '@/store/AuthContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
@@ -10,6 +11,7 @@ import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 import { TemplateModal } from '@/components/TemplateModal';
 import { PhotoModal } from '@/components/PhotoModal';
+import { IconModal } from '@/components/IconModal';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
 
@@ -190,6 +192,27 @@ function LayoutIcon() {
   );
 }
 
+/** 笑脸图标，颜色跟随 currentColor */
+function SmileIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+      <line x1="9" y1="9" x2="9.01" y2="9" />
+      <line x1="15" y1="9" x2="15.01" y2="9" />
+    </svg>
+  );
+}
+
 /** 估算文本显示宽度：中文等全角字符约 1em，英文/数字约 0.55em */
 function textWidth(s: string) {
   return [...s].reduce((w, c) => w + (c.charCodeAt(0) > 0x2e80 ? 1 : 0.55), 0);
@@ -245,18 +268,19 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => {
-        setDraft(currentResume.title);
-        setEditing(true);
-      }}
-      title="点击修改名称"
-      className="group flex items-center gap-1.5 min-w-0 text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
-    >
-      <span className="truncate">{currentResume.title}</span>
-      <PencilIcon />
-    </button>
+    <HoverTip text="点击修改名称">
+      <button
+        type="button"
+        onClick={() => {
+          setDraft(currentResume.title);
+          setEditing(true);
+        }}
+        className="group flex items-center gap-1.5 min-w-0 text-sm font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+      >
+        <span className="truncate">{currentResume.title}</span>
+        <PencilIcon />
+      </button>
+    </HoverTip>
   );
 }
 
@@ -265,7 +289,7 @@ export function TopBar() {
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal } = useUI();
+  const { toggleTemplateModal, toggleIconModal } = useUI();
 
   const handleExportPDF = async () => {
     // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
@@ -339,27 +363,40 @@ export function TopBar() {
       {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住 */}
       <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
-          <Link
-            to="/resumes"
-            className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
-            title="返回简历列表"
-          >
-            <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
-            <span>我的简历</span>
-          </Link>
+          <HoverTip text="返回简历列表">
+            <Link
+              to="/resumes"
+              className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
+            >
+              <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
+              <span>我的简历</span>
+            </Link>
+          </HoverTip>
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
           <EditableTitle onNotify={show} />
           <FileMenu />
           {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
-          <button
-            type="button"
-            onClick={toggleTemplateModal}
-            className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-            title="模板库"
-          >
-            <LayoutIcon />
-            模板
-          </button>
+          <HoverTip text="模板库">
+            <button
+              type="button"
+              onClick={toggleTemplateModal}
+              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <LayoutIcon />
+              模板
+            </button>
+          </HoverTip>
+          {/* 图标库入口：点击图标复制 icon:名称 语法 */}
+          <HoverTip text="图标库">
+            <button
+              type="button"
+              onClick={toggleIconModal}
+              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <SmileIcon />
+              图标
+            </button>
+          </HoverTip>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -390,6 +427,7 @@ export function TopBar() {
       </div>
       <TemplateModal />
       <PhotoModal />
+      <IconModal />
     </header>
   );
 }

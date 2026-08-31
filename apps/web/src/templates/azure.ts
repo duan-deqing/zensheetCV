@@ -50,6 +50,13 @@ export const azureTemplate: TemplateDefinition = {
     }
     .resume-preview h3 + p { color: #9A9A9A; font-size: 0.875em; }
     .resume-preview ul { padding-left: 1.25rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol li {
+      font-size: 0.9em;
+      margin-bottom: calc(0.375rem * var(--resume-sp, 1));
+      color: #747474;
+    }
+    .resume-preview ol li::marker { color: var(--resume-primary, #5974D4); }
     .resume-preview ul li {
       font-size: 0.9em;
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));

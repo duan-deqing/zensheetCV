@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { MarkdownEditor } from '@/editor/MarkdownEditor';
 import { ResumePreview } from '@/preview/ResumePreview';
 import { TopBar } from '@/components/TopBar';
+import { HoverTip } from '@/components/HoverTip';
 import { AIPanel } from '@/components/AIPanel';
 import { Toast } from '@/components/Toast';
 import { useAutoSave } from '@/hooks/useAutoSave';
@@ -30,7 +31,7 @@ function EditorSkeleton() {
       className="h-full flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden"
       aria-hidden="true"
     >
-      <div className="flex items-center px-4 py-2.5 border-b border-gray-200">
+      <div className="flex h-11 items-center px-3 border-b border-gray-200">
         <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-gray-300">
           {'// MARKDOWN'}
         </span>
@@ -197,11 +198,12 @@ export function EditorPage() {
             </div>
             {aiPanelOpen ? (
               <>
-                <div
-                  className="h-1.5 my-1.5 cursor-row-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
-                  onMouseDown={startVerticalDrag}
-                  title="拖拽调整 AI 助手高度"
-                />
+                <HoverTip text="拖拽调整 AI 助手高度">
+                  <div
+                    className="h-1.5 my-1.5 cursor-row-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
+                    onMouseDown={startVerticalDrag}
+                  />
+                </HoverTip>
                 <div className="min-h-0 shrink-0" style={{ height: aiPanelHeight }}>
                   <AIPanel />
                 </div>
@@ -218,11 +220,12 @@ export function EditorPage() {
               </button>
             )}
           </div>
-          <div
-            className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
-            onMouseDown={startDrag}
-            title="拖拽调整编辑器宽度"
-          />
+          <HoverTip text="拖拽调整编辑器宽度">
+            <div
+              className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
+              onMouseDown={startDrag}
+            />
+          </HoverTip>
           <div className="editor-fade-up flex-1 min-w-0" style={{ animationDelay: '0.08s' }}>
             <ResumePreview />
           </div>

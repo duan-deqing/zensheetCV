@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUI } from '@/store/UIContext';
 import { usePhotoSync } from '@/hooks/usePhotoSync';
+import { HoverTip } from '@/components/HoverTip';
 
 /** 证件照尺寸（一寸 295×413，宽高比 ≈ 0.714），框与裁切均按此比例 */
 const ID_PHOTO_W = 295;
@@ -110,18 +111,16 @@ export function PhotoModal() {
       <div className="ph-modal-in relative flex flex-col items-center bg-white border border-gray-200 rounded-2xl shadow-xl px-6 pt-5 pb-6">
         {/* 头部 */}
         <div className="w-full flex items-center justify-between mb-4">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 mb-0.5">{'// PHOTO'}</p>
-            <h3 className="text-sm font-semibold text-gray-900">上传照片</h3>
-          </div>
-          <button
-            onClick={close}
-            className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-            aria-label="关闭"
-            title="关闭"
-          >
-            ✕
-          </button>
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600">{'// PHOTO'}</p>
+          <HoverTip text="关闭">
+            <button
+              onClick={close}
+              className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
+              aria-label="关闭"
+            >
+              ✕
+            </button>
+          </HoverTip>
         </div>
 
         {/* 证件照比例框：未上传时中间为上传按钮，上传后预览（居中裁切） */}
@@ -133,7 +132,7 @@ export function PhotoModal() {
             <button
               className="w-full h-full cursor-pointer group relative"
               onClick={() => fileRef.current?.click()}
-              title="点击重新选择图片"
+              aria-label="点击重新选择图片"
             >
               <img src={src} alt="照片预览" className="w-full h-full object-cover" draggable={false} />
               <span className="absolute inset-x-0 bottom-0 py-1 text-[11px] text-white bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity">

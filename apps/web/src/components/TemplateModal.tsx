@@ -7,24 +7,8 @@ import { builtinTemplates, getTemplateCss } from '@/templates';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
 import { CONTENT_PADDING_MM, MARGIN_MM, resumeIconsCss } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
-
-/** 卡片预览用示例内容：走真实渲染管线（react-markdown + 模板 CSS + 图标插件） */
-const PREVIEW_MARKDOWN = `# 林晚舟
-
-产品经理 · 5 年经验
-
-icon:phone 138-0000-0000 · icon:email lin@mail.com
-
-## 工作经历
-
-### 云帆科技 · 高级产品经理
-
-- 主导协作平台从 0 到 1，服务 1200+ 企业客户
-- 建立需求评审流程，线上事故率下降 38%
-
-### 星图网络 · 产品经理
-
-- 负责内容分发中台，DAU 增长 2.4 倍`;
+import { SAMPLE_MARKDOWN_COMPACT as PREVIEW_MARKDOWN } from '@/sampleResume';
+import { HoverTip } from '@/components/HoverTip';
 
 /** 模板卡片预览：与首页/编辑页同一套作用域替换方案，A4 宽 794px 等比缩放 */
 function TemplatePreview({ templateId }: { templateId: string }) {
@@ -116,22 +100,24 @@ export function TemplateModal() {
         className="tpl-modal-in relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden"
         style={{ width: 'min(1600px, 94vw, calc(82vh * 16 / 9))', maxHeight: '85vh' }}
       >
-        {/* 头部：mono 眉标 + 关闭按钮，与主题面板同构 */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 flex-none">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 mb-0.5">
-              {'// TEMPLATES'}
-            </p>
-            <h3 className="text-sm font-semibold text-gray-900">模板库</h3>
-          </div>
-          <button
-            onClick={toggleTemplateModal}
-            className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-            aria-label="关闭模板库"
-            title="关闭"
+        {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
+        <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">
+          <p
+            className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0"
+            aria-hidden="true"
           >
-            ✕
-          </button>
+            {'< TEMPLATES />'}
+          </p>
+          <h3 className="text-sm font-semibold text-gray-900">模板库</h3>
+          <HoverTip text="关闭">
+            <button
+              onClick={toggleTemplateModal}
+              className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
+              aria-label="关闭模板库"
+            >
+              ✕
+            </button>
+          </HoverTip>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 p-4 overflow-y-auto flex-1 min-h-0">

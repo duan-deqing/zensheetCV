@@ -5,7 +5,7 @@ import { EditorView } from '@codemirror/view';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags as t } from '@lezer/highlight';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
-import { Toolbar } from './Toolbar';
+import { ToolbarActions, ToolbarHeader } from './Toolbar';
 import { editorViewRef } from './insertMarkdown';
 
 // 与主页一致的白底 + 蓝色 accent 外观
@@ -22,6 +22,9 @@ const editorBaseTheme = EditorView.theme(
     // 不透明的活动行背景会盖住选区高亮（CM6 默认主题同理使用 #cceeff44）
     '.cm-activeLine': { backgroundColor: 'rgba(243, 244, 246, 0.5)' },
     '.cm-cursor': { borderLeftColor: '#2563eb' },
+    // 去掉 CM6 默认主题聚焦时的 dotted outline（编辑器容器已有边框，避免出现虚线框）。
+    // 注意：theme() 中根元素选择器须以 & 开头，写成 .cm-editor 会被编译为后代选择器而匹配不到根节点
+    '&.cm-focused': { outline: 'none' },
     '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
       backgroundColor: '#dbeafe',
     },
@@ -86,24 +89,31 @@ export function MarkdownEditor() {
 
   return (
     <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-      <Toolbar />
-      <div className="flex-1 overflow-auto">
-        <CodeMirror
-          value={doc}
-          height="100%"
-          extensions={extensions}
-          onChange={onChange}
-          onCreateEditor={(view) => {
-            editorViewRef.current = view;
-          }}
-          className="h-full text-sm"
-          basicSetup={{
-            lineNumbers: false,
-            foldGutter: false,
-            highlightActiveLine: true,
-            highlightActiveLineGutter: false,
-          }}
-        />
+      {/* 顶栏：标识 + 字数统计 */}
+      <ToolbarHeader />
+      {/* 编辑器窗口：功能按钮行位于窗口内部（代码区上方），随窗口宽度折叠 */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="shrink-0 bg-gray-50/70 border-b border-gray-100">
+          <ToolbarActions />
+        </div>
+        <div className="flex-1 min-h-0">
+          <CodeMirror
+            value={doc}
+            height="100%"
+            extensions={extensions}
+            onChange={onChange}
+            onCreateEditor={(view) => {
+              editorViewRef.current = view;
+            }}
+            className="h-full text-sm"
+            basicSetup={{
+              lineNumbers: false,
+              foldGutter: false,
+              highlightActiveLine: true,
+              highlightActiveLineGutter: false,
+            }}
+          />
+        </div>
       </div>
     </div>
   );

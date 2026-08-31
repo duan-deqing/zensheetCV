@@ -46,6 +46,8 @@ export const techTemplate: TemplateDefinition = {
       color: #D1D5DB;
     }
     .resume-preview ul { padding-left: 1rem; list-style: none; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ol li { margin-bottom: calc(0.25rem * var(--resume-sp, 1)); color: #9CA3AF; }
     .resume-preview ul li { position: relative; padding-left: 1rem; margin-bottom: calc(0.25rem * var(--resume-sp, 1)); color: #9CA3AF; }
     .resume-preview ul li::before {
       content: '>'; position: absolute; left: 0;

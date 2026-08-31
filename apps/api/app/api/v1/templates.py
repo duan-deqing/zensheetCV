@@ -16,6 +16,16 @@ BUILTIN_TEMPLATES = [
         "default_theme": {"primaryColor": "#111827", "fontFamily": "serif", "fontSize": "base", "spacing": "normal"},
     },
     {
+        "id": "carbon",
+        "name": "碳黑章标",
+        "description": "灰底章节条 + 左侧竖标，黑白灰商务风，适合正式求职与国企/事业单位",
+        "thumbnail": "/templates/carbon-thumb.svg",
+        "css_styles": "/* carbon template css */",
+        "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
+        "is_builtin": True,
+        "default_theme": {"primaryColor": "#1A1A1A", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+    },
+    {
         "id": "modern",
         "name": "现代设计",
         "description": "蓝色主调，现代感十足，适合互联网/科技公司",
@@ -74,16 +84,6 @@ BUILTIN_TEMPLATES = [
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
         "default_theme": {"primaryColor": "#F9855D", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
-    },
-    {
-        "id": "carbon",
-        "name": "碳黑章标",
-        "description": "灰底章节条 + 左侧竖标，黑白灰商务风，适合正式求职与国企/事业单位",
-        "thumbnail": "/templates/carbon-thumb.svg",
-        "css_styles": "/* carbon template css */",
-        "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
-        "is_builtin": True,
-        "default_theme": {"primaryColor": "#1A1A1A", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
     },
 ]
 

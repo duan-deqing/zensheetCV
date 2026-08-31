@@ -1,5 +1,6 @@
 import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
+import { HoverTip } from '@/components/HoverTip';
 
 /** 调色盘线性图标，颜色跟随 currentColor */
 function PaletteIcon() {
@@ -40,53 +41,58 @@ export function PreviewToolbar() {
         {'< PREVIEW />'}
       </p>
       <div className="ml-auto flex items-center gap-1 shrink-0">
-        <button
-          onClick={togglePhotoModal}
-          className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
-            photoModalOpen
-              ? 'bg-primary-100 text-primary-700'
-              : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
-          }`}
-          title="上传照片（证件照比例，可在页面上拖动与缩放）"
-        >
-          <PhotoIcon />
-          照片
-        </button>
-        <button
-          onClick={toggleThemePanel}
-          className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
-            themePanelOpen
-              ? 'bg-primary-100 text-primary-700'
-              : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
-          }`}
-          title="主题配置"
-        >
-          <PaletteIcon />
-          主题
-        </button>
+        <HoverTip text="上传照片（证件照比例，可在页面上拖动与缩放）">
+          <button
+            onClick={togglePhotoModal}
+            className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
+              photoModalOpen
+                ? 'bg-primary-100 text-primary-700'
+                : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+            }`}
+          >
+            <PhotoIcon />
+            照片
+          </button>
+        </HoverTip>
+        <HoverTip text="主题配置">
+          <button
+            onClick={toggleThemePanel}
+            className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
+              themePanelOpen
+                ? 'bg-primary-100 text-primary-700'
+                : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+            }`}
+          >
+            <PaletteIcon />
+            主题
+          </button>
+        </HoverTip>
         <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
-        <button
-          onClick={() => setScale(Math.max(50, scale - 10))}
-          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-          title="缩小"
-        >
-          −
-        </button>
+        <HoverTip text="缩小">
+          <button
+            onClick={() => setScale(Math.max(50, scale - 10))}
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+          >
+            −
+          </button>
+        </HoverTip>
         <span className="font-mono text-[13px] text-gray-500 w-10 text-center tabular-nums">{scale}%</span>
-        <button
-          onClick={() => setScale(Math.min(150, scale + 10))}
-          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-          title="放大"
-        >
-          +
-        </button>
-        <button
-          onClick={toggleFullscreen}
-          className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors ml-1"
-          title={isFullscreen ? '退出全屏' : '全屏预览'}
-        >
-          {isFullscreen ? '⊡' : '⊞'}
-        </button>
+        <HoverTip text="放大">
+          <button
+            onClick={() => setScale(Math.min(150, scale + 10))}
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+          >
+            +
+          </button>
+        </HoverTip>
+        <HoverTip text={isFullscreen ? '退出全屏' : '全屏预览'}>
+          <button
+            onClick={toggleFullscreen}
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors ml-1"
+          >
+            {isFullscreen ? '⊡' : '⊞'}
+          </button>
+        </HoverTip>
       </div>
     </div>
   );

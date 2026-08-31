@@ -46,6 +46,11 @@ export const classicTemplate: TemplateDefinition = {
       list-style: disc;
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
     }
+    .resume-preview ol {
+      padding-left: 1.25rem;
+      list-style: decimal;
+      margin-bottom: calc(0.5rem * var(--resume-sp, 1));
+    }
     .resume-preview li {
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
     }

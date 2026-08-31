@@ -63,7 +63,7 @@ describe('editor and resumes layout', () => {
     window.location.hash = '#/editor/r1';
     render(<App />);
     await screen.findByText('我的第一份简历', {}, { timeout: 5000 });
-    const splitter = document.querySelector('[title="拖拽调整编辑器宽度"]');
+    const splitter = document.querySelector('[aria-label="拖拽调整编辑器宽度"]');
     expect(splitter).not.toBeNull();
     expect(splitter.className).toContain('col-resize');
   });

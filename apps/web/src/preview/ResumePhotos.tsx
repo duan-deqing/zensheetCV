@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { ResumePhoto } from '@stylan/shared-types';
+import { HoverTip } from '@/components/HoverTip';
 
 /** 照片宽度范围（相对页宽百分比） */
 const MIN_WIDTH_PCT = 4;
@@ -126,17 +127,19 @@ export function ResumePhotos({ photos, selectedId, onSelect, onUpdate, onDelete 
                   onPointerUp={endDrag}
                 />
                 {/* 删除按钮 */}
-                <button
-                  className="absolute -top-2.5 -right-2.5 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-[11px] leading-none rounded-full shadow-sm cursor-pointer"
-                  title="删除照片"
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(p.id);
-                  }}
-                >
-                  ✕
-                </button>
+                <HoverTip text="删除照片">
+                  <button
+                    className="absolute -top-2.5 -right-2.5 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-[11px] leading-none rounded-full shadow-sm cursor-pointer"
+                    aria-label="删除照片"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(p.id);
+                    }}
+                  >
+                    ✕
+                  </button>
+                </HoverTip>
               </>
             )}
           </div>

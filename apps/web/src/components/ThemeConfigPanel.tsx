@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import { usePreview } from '@/store/PreviewContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
 import { Dropdown } from '@/components/Dropdown';
-import { BUILTIN_ICONS, sanitizeCustomSvg } from '@/preview/resumeIcons';
+import { HoverTip } from '@/components/HoverTip';
 import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
 import { builtinTemplates } from '@/templates';
 import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
@@ -106,21 +105,23 @@ export function ThemeConfigPanel() {
         }
       `}</style>
 
-      {/* 头部：mono 眉标 + 关闭按钮，与 AI 助手面板同构 */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 mb-0.5">
-            {'// THEME'}
-          </p>
-          <h3 className="text-sm font-semibold text-gray-900">主题配置</h3>
-        </div>
-        <button
-          onClick={toggleThemePanel}
-          className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-          title="关闭"
+      {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
+      <div className="flex items-center gap-3 px-4 py-2 bg-white border-b border-gray-200 shrink-0">
+        <p
+          className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0"
+          aria-hidden="true"
         >
-          ✕
-        </button>
+          {'< THEME />'}
+        </p>
+        <h3 className="text-sm font-semibold text-gray-900">主题配置</h3>
+        <HoverTip text="关闭">
+          <button
+            onClick={toggleThemePanel}
+            className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
+          >
+            ✕
+          </button>
+        </HoverTip>
       </div>
 
       <div className="p-4 flex flex-col gap-6">
@@ -147,17 +148,18 @@ export function ThemeConfigPanel() {
             </label>
             <div className="grid grid-cols-6 gap-2">
               {colorPresets.map((color) => (
-                <button
-                  key={color.value}
-                  onClick={() => applyTheme({ primaryColor: color.value })}
-                  className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                    themeConfig.primaryColor === color.value
-                      ? 'border-gray-900 scale-110'
-                      : 'border-transparent'
-                  }`}
-                  style={{ backgroundColor: color.value }}
-                  title={color.label}
-                />
+                <HoverTip key={color.value} text={color.label}>
+                  <button
+                    onClick={() => applyTheme({ primaryColor: color.value })}
+                    className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+                      themeConfig.primaryColor === color.value
+                        ? 'border-gray-900 scale-110'
+                        : 'border-transparent'
+                    }`}
+                    style={{ backgroundColor: color.value }}
+                    aria-label={color.label}
+                  />
+                </HoverTip>
               ))}
             </div>
           </div>
@@ -246,141 +248,7 @@ export function ThemeConfigPanel() {
             />
           </div>
         </section>
-
-        {/* 分组：图标 */}
-        <section>
-          <GroupTitle>图标</GroupTitle>
-          <IconSection themeConfig={themeConfig} onApply={applyTheme} />
-        </section>
       </div>
     </aside>
-  );
-}
-
-/** 自定义图标管理：内置图标速览（点击复制语法）+ 自定义图标增删。
- *  Markdown 中以 `icon:名称` 引用，随主题配置持久化 */
-function IconSection({
-  themeConfig,
-  onApply,
-}: {
-  themeConfig: ThemeConfig;
-  onApply: (partial: Partial<ThemeConfig>) => void;
-}) {
-  const customIcons = themeConfig.customIcons ?? {};
-  const [name, setName] = useState('');
-  const [svg, setSvg] = useState('');
-  const [error, setError] = useState('');
-
-  const saveIcon = () => {
-    const trimmedName = name.trim();
-    if (!/^[A-Za-z][A-Za-z0-9_-]*$/.test(trimmedName)) {
-      setError('名称需以字母开头，仅含字母 / 数字 / 连字符');
-      return;
-    }
-    if (BUILTIN_ICONS[trimmedName]) {
-      setError('该名称与内置图标冲突，请换一个名称');
-      return;
-    }
-    const clean = sanitizeCustomSvg(svg);
-    if (!clean) {
-      setError('SVG 无效：需为合法的 <svg> 且包含图形元素');
-      return;
-    }
-    onApply({ customIcons: { ...customIcons, [trimmedName]: clean } });
-    setName('');
-    setSvg('');
-    setError('');
-  };
-
-  const removeIcon = (key: string) => {
-    const next = { ...customIcons };
-    delete next[key];
-    onApply({ customIcons: next });
-  };
-
-  const copySyntax = async (key: string) => {
-    try {
-      await navigator.clipboard.writeText(`icon:${key}`);
-    } catch {
-      /* 剪贴板不可用时静默忽略 */
-    }
-  };
-
-  return (
-    <div>
-      <style>{`
-        .tp-icon { display: inline-flex; align-items: center; vertical-align: -0.125em; }
-        .tp-icon svg { width: 1em; height: 1em; fill: currentColor; }
-      `}</style>
-      <p className="text-[11px] text-gray-400 mb-2">
-        Markdown 中写 <code className="font-mono">icon:名称</code>，点击内置图标可复制语法
-      </p>
-
-      {/* 内置图标速览：点击复制语法（参考开源 MujiCV 的快捷图标面板） */}
-      <div className="grid grid-cols-6 gap-1.5 mb-3">
-        {Object.keys(BUILTIN_ICONS).map((key) => (
-          <button
-            key={key}
-            onClick={() => copySyntax(key)}
-            className="h-8 flex items-center justify-center border border-gray-200 rounded-md text-gray-600 hover:border-primary-400 hover:text-primary-600 transition-colors"
-            title={`复制 icon:${key}`}
-          >
-            <span
-              className="tp-icon text-base"
-              dangerouslySetInnerHTML={{ __html: BUILTIN_ICONS[key] }}
-            />
-          </button>
-        ))}
-      </div>
-
-      {/* 已有自定义图标 */}
-      {Object.keys(customIcons).length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {Object.entries(customIcons).map(([key, value]) => (
-            <span
-              key={key}
-              className="inline-flex items-center gap-1 pl-2 pr-1 h-7 border border-gray-200 rounded-md text-[13px] text-gray-600"
-            >
-              <span
-                className="tp-icon"
-                dangerouslySetInnerHTML={{ __html: value }}
-              />
-              {key}
-              <button
-                onClick={() => removeIcon(key)}
-                className="w-5 h-5 flex items-center justify-center text-gray-300 hover:text-red-500 transition-colors"
-                title="删除"
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* 新增自定义图标 */}
-      <div className="flex gap-1.5 mb-1.5">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="图标名，如 qq"
-          className="flex-1 min-w-0 h-8 px-2 text-[13px] border border-gray-200 rounded-md focus:outline-none focus:border-primary-400"
-        />
-        <button
-          onClick={saveIcon}
-          className="h-8 px-3 text-[13px] font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shrink-0"
-        >
-          添加
-        </button>
-      </div>
-      <textarea
-        value={svg}
-        onChange={(e) => setSvg(e.target.value)}
-        placeholder="粘贴 SVG 代码，如 <svg viewBox='0 0 1024 1024'><path d='...'/></svg>"
-        rows={3}
-        className="w-full px-2 py-1.5 text-[13px] font-mono border border-gray-200 rounded-md resize-y focus:outline-none focus:border-primary-400"
-      />
-      {error && <p className="text-[13px] text-red-500 mt-1">{error}</p>}
-    </div>
   );
 }

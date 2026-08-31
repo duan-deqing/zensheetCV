@@ -27,13 +27,13 @@ export interface TemplateDefinition {
 
 export const builtinTemplates: TemplateDefinition[] = [
   classicTemplate,
+  carbonTemplate,
   modernTemplate,
   elegantTemplate,
   techTemplate,
   mujiTemplate,
   azureTemplate,
   sunriseTemplate,
-  carbonTemplate,
 ];
 
 export function getTemplateById(id: string): TemplateDefinition {
