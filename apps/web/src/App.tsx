@@ -17,6 +17,12 @@ const LoginPage = lazy(() => import('@/pages/LoginPage').then((m) => ({ default:
 const RegisterPage = lazy(() => import('@/pages/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const ResumesPage = lazy(() => import('@/pages/ResumesPage').then((m) => ({ default: m.ResumesPage })));
 const DocsPage = lazy(() => import('@/pages/DocsPage').then((m) => ({ default: m.DocsPage })));
+const GuidePage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.GuidePage })));
+const MarkdownDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.MarkdownDocPage })));
+const ThemeDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.ThemeDocPage })));
+const IconsDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.IconsDocPage })));
+const AIDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.AIDocPage })));
+const ChangelogPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.ChangelogPage })));
 
 function App() {
   return (
@@ -35,6 +41,12 @@ function App() {
                       <Route path="/register" element={<RegisterPage />} />
                       <Route path="/resumes" element={<ProtectedRoute><ResumesPage /></ProtectedRoute>} />
                       <Route path="/docs" element={<DocsPage />} />
+                      <Route path="/docs/guide" element={<GuidePage />} />
+                      <Route path="/docs/markdown" element={<MarkdownDocPage />} />
+                      <Route path="/docs/theme" element={<ThemeDocPage />} />
+                      <Route path="/docs/icons" element={<IconsDocPage />} />
+                      <Route path="/docs/ai" element={<AIDocPage />} />
+                      <Route path="/docs/changelog" element={<ChangelogPage />} />
                       <Route path="/editor" element={<Navigate to="/resumes" replace />} />
                       <Route path="/editor/:id" element={<ProtectedRoute><EditorPage /></ProtectedRoute>} />
                     </Routes>

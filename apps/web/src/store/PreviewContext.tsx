@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useRef, useState, ReactNode } from 'react';
 import type { ThemeConfig, Template } from '@stylan/shared-types';
 import { defaultTheme } from '@stylan/shared-types';
 
@@ -27,8 +27,24 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   const [themeReady, setThemeReady] = useState(false);
   const [scale, setScale] = useState(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  /** 进入全屏前的缩放，退出时恢复 */
+  const scaleBeforeFullscreenRef = useRef<number | null>(null);
 
-  const toggleFullscreen = () => setIsFullscreen((prev) => !prev);
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      // 退出全屏：恢复之前的缩放
+      if (scaleBeforeFullscreenRef.current !== null) {
+        setScale(scaleBeforeFullscreenRef.current);
+        scaleBeforeFullscreenRef.current = null;
+      }
+      setIsFullscreen(false);
+    } else {
+      // 进入全屏：缩放自动切换为 100%
+      scaleBeforeFullscreenRef.current = scale;
+      setScale(100);
+      setIsFullscreen(true);
+    }
+  };
 
   return (
     <PreviewContext.Provider

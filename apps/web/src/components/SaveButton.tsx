@@ -4,6 +4,17 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useResume } from '@/hooks/useResume';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 
+/** 保存线性图标，颜色跟随 currentColor */
+function SaveIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
+      <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+      <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+    </svg>
+  );
+}
+
 export function SaveButton() {
   const { markdown, isDirty } = useEditor();
   const dispatch = useEditorDispatch();
@@ -38,13 +49,14 @@ export function SaveButton() {
     <button
       onClick={handleSave}
       disabled={!isDirty || saving}
-      className={`relative px-3.5 h-8 inline-flex items-center text-[13px] font-medium rounded-full transition-all ${
+      className={`relative px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full transition-all ${
         isDirty
           ? 'bg-primary-600 text-white hover:bg-primary-700 active:scale-[0.98]'
           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
       }`}
     >
       {saving ? '保存中...' : isDirty ? '保存' : '已保存'}
+      <SaveIcon />
       <ButtonStatus status={status} exiting={exiting} placement="left" />
     </button>
   );

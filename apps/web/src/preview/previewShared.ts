@@ -42,6 +42,20 @@ export const resumeColsCss = (scope = '') => `
   ${scope} .resume-col-right { text-align: right; }
 `;
 
+/** `>` 引用块样式：左侧主色竖线 + 缩进 + 弱化文字；
+ * Tailwind preflight 会重置 blockquote 默认样式，必须在预览中显式定义 */
+export const resumeQuoteCss = (scope = '') => `
+  ${scope} blockquote {
+    margin: calc(0.75rem * var(--resume-sp, 1)) 0;
+    padding: 0.2rem 0 0.2rem 0.9rem;
+    border-left: 3px solid var(--resume-primary, #1a1a1a);
+    color: #4b5563;
+  }
+  ${scope} blockquote p {
+    margin: 0.3rem 0;
+  }
+`;
+
 /** `icon:名称` 图标样式：尺寸随字号（1em），颜色跟随文字（currentColor） */
 export const resumeIconsCss = (scope = '') => `
   ${scope} .resume-icon {

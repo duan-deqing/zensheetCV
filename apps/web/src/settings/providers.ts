@@ -26,7 +26,8 @@ export const AI_PROVIDERS: AIProviderPreset[] = [
   {
     id: 'longcat',
     label: 'LongCat',
-    baseUrl: 'https://api.longcat.chat/openai',
+    // 官方对话端点为 /openai/v1/chat/completions，OpenAI SDK 会在 baseUrl 后拼接 /chat/completions
+    baseUrl: 'https://api.longcat.chat/openai/v1',
   },
   {
     id: 'custom',

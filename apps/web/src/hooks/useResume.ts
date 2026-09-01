@@ -49,6 +49,16 @@ export function useResume() {
     }
   }, [setCurrentResume, setLoading, setError]);
 
+  /** 复制一份简历（内容 / 模板 / 主题原样拷贝），名称追加「副本」 */
+  const copyResume = useCallback(async (resume: Resume) => {
+    return createResume({
+      title: `${resume.title} 副本`,
+      markdown: resume.markdown ?? '',
+      template_id: resume.template_id,
+      theme_config: (resume.theme_config || undefined) as ResumeCreate['theme_config'],
+    });
+  }, [createResume]);
+
   const updateResume = useCallback(async (id: string, data: ResumeUpdate) => {
     setError(null);
     try {
@@ -72,5 +82,5 @@ export function useResume() {
     }
   }, [setError]);
 
-  return { fetchResumes, fetchResume, createResume, updateResume, deleteResume };
+  return { fetchResumes, fetchResume, createResume, copyResume, updateResume, deleteResume };
 }

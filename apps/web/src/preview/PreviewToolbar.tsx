@@ -44,10 +44,10 @@ export function PreviewToolbar() {
         <HoverTip text="上传照片（证件照比例，可在页面上拖动与缩放）">
           <button
             onClick={togglePhotoModal}
-            className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
+            className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
               photoModalOpen
-                ? 'bg-primary-100 text-primary-700'
-                : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                ? 'text-primary-700 bg-primary-50'
+                : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
             }`}
           >
             <PhotoIcon />
@@ -57,10 +57,10 @@ export function PreviewToolbar() {
         <HoverTip text="主题配置">
           <button
             onClick={toggleThemePanel}
-            className={`h-7 px-2.5 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-md transition-colors ${
+            className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
               themePanelOpen
-                ? 'bg-primary-100 text-primary-700'
-                : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
+                ? 'text-primary-700 bg-primary-50'
+                : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
             }`}
           >
             <PaletteIcon />
@@ -71,7 +71,7 @@ export function PreviewToolbar() {
         <HoverTip text="缩小">
           <button
             onClick={() => setScale(Math.max(50, scale - 10))}
-            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
           >
             −
           </button>
@@ -80,7 +80,7 @@ export function PreviewToolbar() {
         <HoverTip text="放大">
           <button
             onClick={() => setScale(Math.min(150, scale + 10))}
-            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
           >
             +
           </button>
@@ -88,7 +88,7 @@ export function PreviewToolbar() {
         <HoverTip text={isFullscreen ? '退出全屏' : '全屏预览'}>
           <button
             onClick={toggleFullscreen}
-            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors ml-1"
+            className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors ml-1"
           >
             {isFullscreen ? '⊡' : '⊞'}
           </button>

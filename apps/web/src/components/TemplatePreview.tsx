@@ -8,6 +8,7 @@ import {
   MARGIN_MM,
   SPACING_SCALE,
   resumeIconsCss,
+  resumeQuoteCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
 import { SAMPLE_MARKDOWN as PREVIEW_MARKDOWN } from '@/sampleResume';
@@ -81,6 +82,7 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
     <div ref={boxRef} className={`relative overflow-hidden bg-gray-50 ${className}`} style={{ height }}>
       <style>{scoped}</style>
       <style>{resumeIconsCss(`.tpl-${templateId}`)}</style>
+      <style>{resumeQuoteCss(`.tpl-${templateId}`)}</style>
       <div
         ref={pageRef}
         className={`tpl-${templateId} absolute top-0 origin-top-left bg-white`}

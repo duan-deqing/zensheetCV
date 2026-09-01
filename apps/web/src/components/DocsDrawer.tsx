@@ -1,6 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { DocsContent, SECTIONS } from '@/components/DocsContent';
+import { Link } from 'react-router-dom';
+import {
+  AIDocContent,
+  DrawerNavContext,
+  GuideContent,
+  IconsDocContent,
+  MarkdownDocContent,
+  ThemeDocContent,
+} from '@/pages/docs/DocsSubPages';
 
 /** 关闭图标 */
 function CloseIcon() {
@@ -21,12 +29,33 @@ function CloseIcon() {
   );
 }
 
+/** 抽屉内的文档 Tab，与文档子页面一一对应 */
+const TABS = [
+  { id: 'guide', no: '01 · GUIDE', label: '使用指南', title: '使用指南', desc: '从注册到导出 PDF 的完整流程，并汇总其余教程入口。' },
+  { id: 'markdown', no: '02 · MARKDOWN', label: 'Markdown 教程', title: 'Markdown 简历教程', desc: '常用语法速查，附使用示例与实时渲染效果预览。' },
+  { id: 'theme', no: '03 · THEME', label: '主题配置', title: '主题配置', desc: '模板、视觉风格与页面布局的设置详解与注意事项。' },
+  { id: 'icons', no: '04 · ICONS', label: '图标库', title: '图标库', desc: 'icon: 语法、使用方式与常用内置图标一览。' },
+  { id: 'ai', no: '05 · AI', label: 'AI 助手', title: 'AI 助手', desc: '润色、关键词分析、要点成段，以及 API KEY 的获取与配置。' },
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
+
+/** 跨文档跳转路径 → 抽屉 Tab */
+const PATH_TO_TAB: Record<string, TabId> = {
+  '/docs/guide': 'guide',
+  '/docs/markdown': 'markdown',
+  '/docs/theme': 'theme',
+  '/docs/icons': 'icons',
+  '/docs/ai': 'ai',
+};
+
 /**
- * 编辑器右侧文档抽屉：从屏幕右缘滑出，正文与文档页共用 DocsContent。
- * 目录以横向胶囊形式置顶，滚动时高亮当前章节（基于抽屉容器自身滚动）。
+ * 编辑器右侧文档抽屉：从屏幕右缘滑出，按 Tab 呈现五份子文档，
+ * 正文组件与文档子页面共用（DocsSubPages 中的 *Content）。
+ * 文档间的跳转链接在抽屉内表现为切换 Tab，而非路由跳转。
  */
 export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const [active, setActive] = useState<string>(SECTIONS[0].id);
+  const [tab, setTab] = useState<TabId>('guide');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // 打开时锁定 body 滚动，Esc 关闭
@@ -44,30 +73,18 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
     };
   }, [open, onClose]);
 
-  // 容器滚动时高亮当前章节（取容器视口上方最近的章节）
+  // 切换 Tab 回到滚动顶部
   useEffect(() => {
-    if (!open) return;
-    const el = scrollRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      let current: string = SECTIONS[0].id;
-      for (const s of SECTIONS) {
-        const target = el.querySelector(`#${s.id}`);
-        if (target && target.getBoundingClientRect().top <= el.getBoundingClientRect().top + 24) {
-          current = s.id;
-        }
-      }
-      setActive(current);
-    };
-    onScroll();
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [open]);
+    scrollRef.current?.scrollTo({ top: 0 });
+  }, [tab]);
 
   if (!open) return null;
 
-  const jump = (id: string) => {
-    scrollRef.current?.querySelector(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const meta = TABS.find((t) => t.id === tab)!;
+
+  const handleNav = (to: string) => {
+    const next = PATH_TO_TAB[to];
+    if (next) setTab(next);
   };
 
   return createPortal(
@@ -78,8 +95,13 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           to { transform: translateX(0); }
         }
         .docs-drawer-panel { animation: docsDrawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes docsTabIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: none; }
+        }
+        .docs-drawer-tabpane { animation: docsTabIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @media (prefers-reduced-motion: reduce) {
-          .docs-drawer-panel { animation: none; }
+          .docs-drawer-panel, .docs-drawer-tabpane { animation: none; }
         }
       `}</style>
 
@@ -92,7 +114,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       />
 
       {/* 右侧文档面板：与屏幕边缘留出间距的浮动圆角卡片 */}
-      <aside className="docs-drawer-panel absolute top-4 right-4 bottom-4 w-[min(480px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-[0_24px_70px_rgba(17,24,39,0.22)] flex flex-col overflow-hidden">
+      <aside className="docs-drawer-panel absolute top-4 right-4 bottom-4 w-[min(560px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-[0_24px_70px_rgba(17,24,39,0.22)] flex flex-col overflow-hidden">
         {/* 面板顶栏：mono 标签 + 标题 + 关闭按钮 */}
         <div className="shrink-0 flex items-center justify-between px-5 h-12 border-b border-gray-200">
           <div className="flex items-baseline gap-2.5 min-w-0">
@@ -111,30 +133,61 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           </button>
         </div>
 
-        {/* 章节胶囊目录：横向换行排布，点击平滑跳转 */}
-        <div className="shrink-0 px-5 pt-3 pb-2 border-b border-gray-100">
+        {/* 子文档 Tab：与文档站点的五份子文档一一对应 */}
+        <div className="shrink-0 px-5 pt-3 pb-2.5 border-b border-gray-100">
           <div className="flex flex-wrap gap-1.5">
-            {SECTIONS.map((s) => (
+            {TABS.map((t) => (
               <button
-                key={s.id}
+                key={t.id}
                 type="button"
-                onClick={() => jump(s.id)}
-                aria-current={active === s.id ? 'true' : undefined}
+                onClick={() => setTab(t.id)}
+                aria-current={tab === t.id ? 'true' : undefined}
                 className={`px-2.5 py-1 rounded-full text-[12px] border transition-colors ${
-                  active === s.id
+                  tab === t.id
                     ? 'bg-primary-50 border-primary-200 text-primary-700 font-medium'
                     : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
-                {s.label}
+                {t.label}
               </button>
             ))}
           </div>
         </div>
 
-        {/* 文档正文：抽屉容器内滚动 */}
+        {/* 文档正文：抽屉容器内滚动，切换 Tab 时重放入场动画并回到顶部 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-5 py-5">
-          <DocsContent />
+          <div key={tab} className="docs-drawer-tabpane">
+            {/* 紧凑页头 */}
+            <header className="mb-7">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mb-1.5">
+                {meta.no}
+              </p>
+              <h3 className="text-lg font-bold tracking-tight text-gray-900">{meta.title}</h3>
+              <p className="text-[12px] text-gray-500 leading-relaxed mt-1.5">{meta.desc}</p>
+            </header>
+
+            <DrawerNavContext.Provider value={handleNav}>
+              {tab === 'guide' && <GuideContent />}
+              {tab === 'markdown' && <MarkdownDocContent />}
+              {tab === 'theme' && <ThemeDocContent />}
+              {tab === 'icons' && <IconsDocContent />}
+              {tab === 'ai' && <AIDocContent />}
+            </DrawerNavContext.Provider>
+          </div>
+        </div>
+
+        {/* 面板底栏：跳转完整文档站点 */}
+        <div className="shrink-0 flex items-center justify-between px-5 py-2.5 border-t border-gray-100">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-300">
+            ZENSHEET DOCS
+          </span>
+          <Link
+            to="/docs"
+            onClick={onClose}
+            className="text-[12px] font-medium text-primary-600 hover:text-primary-700 transition-colors"
+          >
+            查看完整文档 →
+          </Link>
         </div>
       </aside>
     </div>,

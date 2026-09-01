@@ -89,3 +89,40 @@ JD：{jd}
         async for chunk in stream:
             if chunk.choices and chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
+
+    async def chat(
+        self,
+        messages: list[dict],
+        api_key: str = "",
+        base_url: str = "",
+        model: str = "",
+    ) -> AsyncIterator[str]:
+        """通用对话（AI 助手聊天窗口）。BYOK 优先：请求携带供应商配置时使用之，
+        否则回退服务端配置的 OPENAI_API_KEY / OPENAI_MODEL"""
+        if api_key and base_url and model:
+            client = AsyncOpenAI(api_key=api_key, base_url=base_url)
+            use_model = model
+        elif self.client:
+            client = self.client
+            use_model = settings.OPENAI_MODEL
+        else:
+            yield "[错误] 未配置 AI 模型，请点击右上角用户名，在「设置 → AI」中配置供应商与 API KEY"
+            return
+
+        system_prompt = """你是 ZENSHEET 简历编辑器内置的简历顾问助手。你需要：
+1. 帮助用户润色简历表述、分析职位描述关键词、撰写项目与经历描述
+2. 回答求职与简历排版相关问题
+3. 使用简体中文，回复简洁、结构化，适当使用 Markdown 列表
+4. 用户可能随消息附带其当前简历 Markdown 内容，作为上下文参考"""
+        full_messages = [{"role": "system", "content": system_prompt}, *messages]
+
+        stream = await client.chat.completions.create(
+            model=use_model,
+            messages=full_messages,
+            stream=True,
+            max_tokens=1500,
+        )
+
+        async for chunk in stream:
+            if chunk.choices and chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content

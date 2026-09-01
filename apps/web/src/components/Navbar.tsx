@@ -6,6 +6,83 @@ import { useUI } from '@/store/UIContext';
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
 
+/** 导航线性图标基类：14px 描边风格，颜色跟随 currentColor */
+function NavIcon({ children }: { children: React.ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-4 h-4 shrink-0"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <NavIcon>
+      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </NavIcon>
+  );
+}
+
+function FileTextIcon() {
+  return (
+    <NavIcon>
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+      <path d="M16 13H8" />
+      <path d="M16 17H8" />
+    </NavIcon>
+  );
+}
+
+function BookIcon() {
+  return (
+    <NavIcon>
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+    </NavIcon>
+  );
+}
+
+function LoginIcon() {
+  return (
+    <NavIcon>
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      <polyline points="10 17 15 12 10 7" />
+      <line x1="15" x2="3" y1="12" y2="12" />
+    </NavIcon>
+  );
+}
+
+function UserPlusIcon() {
+  return (
+    <NavIcon>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <line x1="19" x2="19" y1="8" y2="14" />
+      <line x1="22" x2="16" y1="11" y2="11" />
+    </NavIcon>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <NavIcon>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" x2="9" y1="12" y2="12" />
+    </NavIcon>
+  );
+}
+
 export function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const { toggleUserModal } = useUI();
@@ -58,7 +135,7 @@ export function Navbar() {
   };
 
   const linkClass = (path: string) =>
-    `text-sm transition-colors ${
+    `inline-flex items-center gap-1.5 text-sm transition-colors ${
       isActive(path) ? 'text-primary-600 font-medium' : 'text-gray-500 hover:text-gray-900'
     }`;
 
@@ -85,14 +162,17 @@ export function Navbar() {
             </Link>
             <div className="hidden md:flex items-center gap-7">
               <Link to="/" className={linkClass('/')}>
+                <HomeIcon />
                 首页
               </Link>
               {isAuthenticated && (
                 <Link to="/resumes" className={linkClass('/resumes')}>
+                  <FileTextIcon />
                   我的简历
                 </Link>
               )}
               <Link to="/docs" className={linkClass('/docs')}>
+                <BookIcon />
                 文档
               </Link>
             </div>
@@ -128,8 +208,9 @@ export function Navbar() {
                 </button>
                 <button
                   onClick={logout}
-                  className="text-sm text-gray-500 hover:text-gray-900 transition-colors px-2"
+                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2"
                 >
+                  <LogoutIcon />
                   退出
                 </button>
               </>
@@ -137,16 +218,18 @@ export function Navbar() {
               <>
                 <span className="hidden sm:block w-px h-5 bg-gray-200" aria-hidden="true" />
                 <Link to="/login" className={`${linkClass('/login')} px-2`}>
+                  <LoginIcon />
                   登录
                 </Link>
                 <Link
                   to="/register"
-                  className={`h-9 inline-flex items-center px-4 rounded-full border font-semibold text-sm active:scale-[0.98] transition-all ${
+                  className={`h-9 inline-flex items-center gap-1.5 px-4 rounded-full border font-semibold text-sm active:scale-[0.98] transition-all ${
                     isActive('/register')
                       ? 'bg-primary-600 border-primary-600 text-white'
                       : 'bg-white border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white'
                   }`}
                 >
+                  <UserPlusIcon />
                   注册
                 </Link>
               </>

@@ -9,7 +9,8 @@ interface ToastMessage {
 interface UIContextType {
   sidebarOpen: boolean;
   themePanelOpen: boolean;
-  aiPanelOpen: boolean;
+  /** AI 助手聊天窗口（挤入预览右侧） */
+  aiWindowOpen: boolean;
   templateModalOpen: boolean;
   photoModalOpen: boolean;
   iconModalOpen: boolean;
@@ -21,7 +22,7 @@ interface UIContextType {
   toasts: ToastMessage[];
   toggleSidebar: () => void;
   toggleThemePanel: () => void;
-  toggleAIPanel: () => void;
+  toggleAIWindow: () => void;
   toggleTemplateModal: () => void;
   togglePhotoModal: () => void;
   toggleIconModal: () => void;
@@ -29,7 +30,6 @@ interface UIContextType {
   toggleDocsDrawer: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
-  setAIPanelOpen: (open: boolean) => void;
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
   removeToast: (id: string) => void;
 }
@@ -42,7 +42,7 @@ const ADDED_TEMPLATES_KEY = 'stylan.added_templates';
 export function UIProvider({ children }: { children: ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [themePanelOpen, setThemePanelOpen] = useState(false);
-  const [aiPanelOpen, setAIPanelOpen] = useState(false);
+  const [aiWindowOpen, setAIWindowOpen] = useState(false);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [iconModalOpen, setIconModalOpen] = useState(false);
@@ -61,7 +61,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   const toggleSidebar = useCallback(() => setSidebarOpen((p) => !p), []);
   const toggleThemePanel = useCallback(() => setThemePanelOpen((p) => !p), []);
-  const toggleAIPanel = useCallback(() => setAIPanelOpen((p) => !p), []);
+  const toggleAIWindow = useCallback(() => setAIWindowOpen((p) => !p), []);
   const toggleTemplateModal = useCallback(() => setTemplateModalOpen((p) => !p), []);
   const togglePhotoModal = useCallback(() => setPhotoModalOpen((p) => !p), []);
   const toggleIconModal = useCallback(() => setIconModalOpen((p) => !p), []);
@@ -122,7 +122,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       value={{
         sidebarOpen,
         themePanelOpen,
-        aiPanelOpen,
+        aiWindowOpen,
         templateModalOpen,
         photoModalOpen,
         iconModalOpen,
@@ -132,7 +132,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         toasts,
         toggleSidebar,
         toggleThemePanel,
-        toggleAIPanel,
+        toggleAIWindow,
         toggleTemplateModal,
         togglePhotoModal,
         toggleIconModal,
@@ -140,7 +140,6 @@ export function UIProvider({ children }: { children: ReactNode }) {
         toggleDocsDrawer,
         addTemplate,
         removeTemplate,
-        setAIPanelOpen,
         addToast,
         removeToast,
       }}

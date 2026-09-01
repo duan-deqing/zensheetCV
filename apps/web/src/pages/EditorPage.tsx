@@ -4,7 +4,10 @@ import { MarkdownEditor } from '@/editor/MarkdownEditor';
 import { ResumePreview } from '@/preview/ResumePreview';
 import { TopBar } from '@/components/TopBar';
 import { HoverTip } from '@/components/HoverTip';
-import { AIPanel } from '@/components/AIPanel';
+import { AIWindow } from '@/components/AIWindow';
+import { TemplateModal } from '@/components/TemplateModal';
+import { PhotoModal } from '@/components/PhotoModal';
+import { IconModal } from '@/components/IconModal';
 import { Toast } from '@/components/Toast';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcut';
@@ -18,11 +21,11 @@ import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
 
 const MIN_EDITOR_PCT = 25;
 const MAX_EDITOR_PCT = 70;
-const MIN_AI_HEIGHT = 140;
-/* 手柄几何：横向手柄 w-1.5 mx-2.5，中心相对左列右缘偏移 10+3=13px；
-   纵向手柄 h-1.5 my-1.5 在面板上方，中心相对面板顶缘偏移 6+3=9px */
+/* 手柄几何：横向手柄 w-1.5 mx-2.5，中心相对相邻列边缘偏移 10+3=13px */
 const H_HANDLE_OFFSET = 13;
-const V_HANDLE_OFFSET = 9;
+/* AI 聊天窗宽度拖拽限制 */
+const MIN_AI_WIDTH = 280;
+const MAX_AI_WIDTH_PCT = 0.45; // 占容器内容宽度上限
 
 /** 编辑器加载骨架屏：与编辑器卡片同构的脉冲占位 */
 function EditorSkeleton() {
@@ -61,7 +64,7 @@ export function EditorPage() {
   const { fetchResume } = useResume();
   const editorDispatch = useEditorDispatch();
   const { setCurrentTemplate, setThemeConfig, themeReady, setThemeReady, isFullscreen, toggleFullscreen } = usePreview();
-  const { aiPanelOpen, toggleAIPanel } = useUI();
+  const { aiWindowOpen } = useUI();
 
   // 全屏预览时按 Esc 退出
   useEffect(() => {
@@ -74,11 +77,10 @@ export function EditorPage() {
   }, [isFullscreen, toggleFullscreen]);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const leftColRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-  const isVDragging = useRef(false);
+  const isAIDragging = useRef(false);
   const [editorWidth, setEditorWidth] = useState(100 / 3); // 编辑器:预览 默认 1:2
-  const [aiPanelHeight, setAiPanelHeight] = useState(260);
+  const [aiWidth, setAiWidth] = useState(320); // AI 聊天窗宽度（px）
 
   // 按路由参数加载对应简历；数据就绪前编辑器/预览显示骨架屏，避免默认主题闪变
   useEffect(() => {
@@ -143,20 +145,26 @@ export function EditorPage() {
     };
   }, []);
 
-  // 拖拽调节底部 AI 面板高度（补偿手柄中心偏移，使手柄中心跟随鼠标）
+  const startDrag = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  // 拖拽调节 AI 聊天窗宽度：手柄在 AI 窗口左侧，鼠标向左移动窗口变宽
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
-      if (!isVDragging.current || !leftColRef.current) return;
-      const rect = leftColRef.current.getBoundingClientRect();
-      // 编辑器至少保留 200px
-      const max = Math.max(MIN_AI_HEIGHT + 20, rect.height - 200);
-      // 面板顶缘应为 clientY + 9px（手柄中心在面板顶缘上方 9px 处）
-      setAiPanelHeight(
-        Math.min(max, Math.max(MIN_AI_HEIGHT, rect.bottom - e.clientY - V_HANDLE_OFFSET)),
-      );
+      if (!isAIDragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const PAD = 12; // 与容器 p-3 对应
+      const contentRight = rect.right - PAD;
+      // AI 窗口左缘 = 手柄中心 + 13px 偏移
+      const width = contentRight - e.clientX - H_HANDLE_OFFSET;
+      setAiWidth(Math.min(rect.width * MAX_AI_WIDTH_PCT, Math.max(MIN_AI_WIDTH, width)));
     };
     const handleUp = () => {
-      isVDragging.current = false;
+      isAIDragging.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
@@ -168,17 +176,10 @@ export function EditorPage() {
     };
   }, []);
 
-  const startDrag = (e: React.MouseEvent) => {
+  const startAIDrag = (e: React.MouseEvent) => {
     e.preventDefault();
-    isDragging.current = true;
+    isAIDragging.current = true;
     document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  };
-
-  const startVerticalDrag = (e: React.MouseEvent) => {
-    e.preventDefault();
-    isVDragging.current = true;
-    document.body.style.cursor = 'row-resize';
     document.body.style.userSelect = 'none';
   };
 
@@ -205,38 +206,14 @@ export function EditorPage() {
           </div>
         ) : (
           <div ref={containerRef} className="flex flex-1 min-w-0 p-3">
-          {/* 左列：编辑器 + 底部 AI 面板 */}
+          {/* 左列：编辑器 */}
           <div
-            ref={leftColRef}
             className="editor-fade-up flex flex-col min-w-0 min-h-0"
             style={{ width: editorWidth + '%' }}
           >
             <div className="flex-1 min-h-0">
               {themeReady ? <MarkdownEditor /> : <EditorSkeleton />}
             </div>
-            {aiPanelOpen ? (
-              <>
-                <HoverTip text="拖拽调整 AI 助手高度">
-                  <div
-                    className="h-1.5 my-1.5 cursor-row-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
-                    onMouseDown={startVerticalDrag}
-                  />
-                </HoverTip>
-                <div className="min-h-0 shrink-0" style={{ height: aiPanelHeight }}>
-                  <AIPanel />
-                </div>
-              </>
-            ) : (
-              <button
-                onClick={toggleAIPanel}
-                className="mt-1.5 h-9 shrink-0 flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl text-[13px] text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-colors"
-              >
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-500">
-                  {'// AI'}
-                </span>
-                <span>AI 助手</span>
-              </button>
-            )}
           </div>
           <HoverTip text="拖拽调整编辑器宽度">
             <div
@@ -247,9 +224,25 @@ export function EditorPage() {
           <div className="editor-fade-up flex-1 min-w-0" style={{ animationDelay: '0.08s' }}>
             <ResumePreview />
           </div>
+          {/* AI 助手聊天窗口：与预览窗口同层级，打开时占据页面右侧 */}
+          {aiWindowOpen && (
+            <>
+              <HoverTip text="拖拽调整 AI 助手宽度">
+                <div
+                  className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
+                  onMouseDown={startAIDrag}
+                />
+              </HoverTip>
+              <AIWindow width={aiWidth} resumeId={id} />
+            </>
+          )}
           </div>
         )}
       </div>
+      {/* 弹窗常驻渲染：全屏时顶栏被卸载，弹窗放在这里保证照片/模板/图标窗口在全屏下仍可打开 */}
+      <TemplateModal />
+      <PhotoModal />
+      <IconModal />
       <Toast />
     </div>
   );

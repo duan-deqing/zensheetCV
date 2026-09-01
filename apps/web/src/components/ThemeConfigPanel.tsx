@@ -99,7 +99,7 @@ export function ThemeConfigPanel() {
 
   return (
     <aside
-      className="theme-side-in w-72 shrink-0 border-l border-gray-200 bg-white flex flex-col overflow-y-auto"
+      className="theme-side-in absolute right-2 top-2 bottom-2 z-10 w-72 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto"
       aria-label="主题配置"
     >
       <style>{`

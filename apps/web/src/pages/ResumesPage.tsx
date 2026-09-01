@@ -34,7 +34,66 @@ function TrashIcon({ className }: { className?: string }) {
   );
 }
 
+/** 线性复制图标：两个叠加的圆角矩形 */
+function CopyIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+/** 线性编辑图标：笔写方形 */
+function EditIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+      <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z" />
+    </svg>
+  );
+}
+
 const DEFAULT_MARKDOWN = '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n';
+
+/** 页脚随缘语录：每次进入页面随机展示一句 */
+const QUOTES = [
+  '纸上得来终觉浅，绝知此事要躬行。',
+  '种一棵树最好的时间是十年前，其次是现在。',
+  '路虽远，行则将至；事虽难，做则必成。',
+  '不积跬步，无以至千里。',
+  '每一份简历，都是过去对未来的自荐信。',
+  '山不让尘，川不辞盈。',
+  '星光不问赶路人，时光不负有心人。',
+  '所谓成长，就是把经历酿成能力。',
+  '机会总是留给有准备的人。',
+  '流水不争先，争的是滔滔不绝。',
+  '工具善用则益，AI 替你落笔，但路要你自己走过。',
+  '机器可以生成文字，唯有你的人生值得书写。',
+];
+
+/** 从语录中随机取一条（每次刷新 / 进入页面都会重新选择） */
+function pickQuote() {
+  return QUOTES[Math.floor(Math.random() * QUOTES.length)];
+}
 
 /** 竖直简历纸面缩略图：按该简历保存的模板与主题（主色调/字体/字号/间距）渲染，
  * 与编辑页预览使用同一套 Markdown 管线与变量体系。
@@ -94,10 +153,14 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
 
 export function ResumesPage() {
   const { resumes, isLoading, error } = useResumeStore();
-  const { fetchResumes, createResume, deleteResume } = useResume();
+  const { fetchResumes, createResume, copyResume, deleteResume } = useResume();
   const editorDispatch = useEditorDispatch();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
+  // 正在复制中的简历 id（按钮显示进行中状态）
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  // 页脚随缘语录：仅组件挂载（进入/刷新页面）时随机取一次
+  const [quote] = useState(pickQuote);
 
   useEffect(() => {
     fetchResumes();
@@ -122,13 +185,21 @@ export function ResumesPage() {
     if (ok) fetchResumes();
   };
 
+  const handleCopy = async (e: React.MouseEvent, resume: Resume) => {
+    e.stopPropagation();
+    setCopyingId(resume.id);
+    const copy = await copyResume(resume);
+    setCopyingId(null);
+    if (copy) fetchResumes();
+  };
+
   const handleEdit = (resume: any) => {
     editorDispatch({ type: 'RESET', payload: resume.markdown });
     navigate(`/editor/${resume.id}`);
   };
 
   return (
-    <div className="bg-white min-h-[calc(100dvh-5rem)]">
+    <div className="bg-white min-h-[calc(100dvh-5rem)] pb-14">
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* 页头：与主页同语言的 mono 眉标 + 计数 */}
         <div className="flex items-end justify-between mb-10 fade-up">
@@ -180,14 +251,25 @@ export function ResumesPage() {
                   <p className="font-mono text-[11px] text-gray-400 tabular-nums">
                     UPDATED {new Date(resume.updated_at).toLocaleString('zh-CN')}
                   </p>
-                  {/* 操作行：开始编辑靠左，删除靠右 */}
+                  {/* 操作行：开始编辑 + 复制靠左（同款文字样式），删除靠右 */}
                   <div className="mt-auto pt-3 flex items-center justify-between">
-                    <button
-                      onClick={() => handleEdit(resume)}
-                      className="inline-flex items-center gap-1 text-xs text-primary-600 font-medium hover:text-primary-700 active:scale-[0.98] transition-all"
-                    >
-                      开始编辑
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEdit(resume)}
+                        className="inline-flex items-center gap-1 text-xs text-primary-600 font-medium hover:text-primary-700 active:scale-[0.98] transition-all"
+                      >
+                        <EditIcon className="w-3.5 h-3.5" />
+                        开始编辑
+                      </button>
+                      <button
+                        onClick={(e) => handleCopy(e, resume)}
+                        disabled={copyingId === resume.id}
+                        className="inline-flex items-center gap-1 text-xs text-primary-600 font-medium hover:text-primary-700 active:scale-[0.98] transition-all disabled:cursor-wait disabled:opacity-60"
+                      >
+                        <CopyIcon className={`w-3.5 h-3.5 ${copyingId === resume.id ? 'animate-pulse' : ''}`} />
+                        {copyingId === resume.id ? '复制中...' : '复制'}
+                      </button>
+                    </div>
                     <HoverTip text="删除简历">
                       <button
                         onClick={(e) => handleDelete(e, resume.id)}
@@ -235,6 +317,13 @@ export function ResumesPage() {
           </div>
         )}
       </div>
+
+      {/* 页脚：固定底部，随机语录，每次刷新换一句 */}
+      <footer className="fixed bottom-0 inset-x-0 z-10 bg-white/90 backdrop-blur border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 py-3.5 text-center">
+          <p className="text-[13px] text-gray-400 tracking-wide">「 {quote} 」</p>
+        </div>
+      </footer>
     </div>
   );
 }

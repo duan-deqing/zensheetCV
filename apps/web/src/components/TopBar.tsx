@@ -9,9 +9,7 @@ import { A4_HEIGHT_MM, A4_WIDTH_MM, CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING,
 import { useResume } from '@/hooks/useResume';
 import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
-import { TemplateModal } from '@/components/TemplateModal';
-import { PhotoModal } from '@/components/PhotoModal';
-import { IconModal } from '@/components/IconModal';
+
 import { DocsDrawer } from '@/components/DocsDrawer';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
@@ -50,6 +48,64 @@ function BookIcon() {
     >
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  );
+}
+
+/** 星芒图标（AI 助手入口），颜色跟随 currentColor */
+function SparkleIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
+    </svg>
+  );
+}
+
+/** 导出线性图标（文件 + 下箭头），颜色跟随 currentColor */
+function ExportIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" x2="12" y1="15" y2="3" />
+    </svg>
+  );
+}
+
+/** 退出登录线性图标（开门 + 右箭头），颜色跟随 currentColor */
+function LogoutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" x2="9" y1="12" y2="12" />
     </svg>
   );
 }
@@ -309,7 +365,7 @@ export function TopBar() {
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer } = useUI();
+  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow } = useUI();
 
   const handleExportPDF = async () => {
     // 预览的隐藏排版源（模板/主题样式 + 以真实内容宽度排版的内容）
@@ -428,6 +484,22 @@ export function TopBar() {
               文档
             </button>
           </HoverTip>
+          {/* AI 助手入口：聊天窗口挤入预览右侧 */}
+          <HoverTip text="AI 助手">
+            <button
+              type="button"
+              onClick={toggleAIWindow}
+              aria-pressed={aiWindowOpen}
+              className={`px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+                aiWindowOpen
+                  ? 'text-primary-700 bg-primary-50'
+                  : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
+              }`}
+            >
+              <SparkleIcon />
+              AI 助手
+            </button>
+          </HoverTip>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -439,8 +511,9 @@ export function TopBar() {
           <button
           onClick={handleExportPDF}
           disabled={isExporting}
-          className="px-3.5 h-8 inline-flex items-center text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+          className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
         >
+          <ExportIcon />
           {isExporting ? '导出中...' : '导出 PDF'}
         </button>
         {user && (
@@ -473,17 +546,15 @@ export function TopBar() {
               </HoverTip>
               <button
                 onClick={logout}
-                className="text-[13px] text-gray-500 hover:text-primary-600 transition-colors"
+                className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
               >
+                <LogoutIcon />
                 退出
               </button>
             </div>
           )}
         </div>
       </div>
-      <TemplateModal />
-      <PhotoModal />
-      <IconModal />
       <DocsDrawer open={docsDrawerOpen} onClose={toggleDocsDrawer} />
     </header>
   );

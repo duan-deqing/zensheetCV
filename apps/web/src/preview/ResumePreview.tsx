@@ -18,6 +18,7 @@ import {
   SPACING_SCALE,
   resumeColsCss,
   resumeIconsCss,
+  resumeQuoteCss,
 } from './previewShared';
 import { ThemeConfigPanel } from '@/components/ThemeConfigPanel';
 import { PreviewToolbar } from './PreviewToolbar';
@@ -267,7 +268,7 @@ export function ResumePreview() {
   return (
     <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       <PreviewToolbar />
-      <div className="flex flex-1 min-h-0">
+      <div className="relative flex flex-1 min-h-0">
         {themeReady ? (
           <>
             <div ref={scrollRef} className="flex-1 min-w-0 overflow-auto p-4 px-20 bg-gray-50">
@@ -292,6 +293,7 @@ export function ResumePreview() {
                     }
                     ${resumeColsCss()}
                     ${resumeIconsCss()}
+                    ${resumeQuoteCss()}
                   `}</style>
                   <div
                     ref={sourceRef}
