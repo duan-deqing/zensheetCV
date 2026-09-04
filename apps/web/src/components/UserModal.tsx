@@ -785,7 +785,7 @@ export function UserModal() {
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       {tr({ zh: '当前版本', en: 'Version' })}
                     </dt>
-                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.2.0</dd>
+                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.3.0</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">

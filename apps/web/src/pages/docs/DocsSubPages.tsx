@@ -662,6 +662,19 @@ const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.3.0',
+    date: '2026-09-05',
+    title: { zh: '全站英语模式', en: 'Site-wide English Mode' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '全站英语模式：导航栏用户信息左侧新增中 / EN 切换按钮，语言偏好保存在本地浏览器', en: 'Site-wide English mode: a new 中 / EN toggle to the left of the user menu in the navbar, with the preference saved locally in your browser' },
+      { zh: '界面全量双语：首页、文档中心与全部子文档、更新日志、各弹窗、AI 助手、主题面板、编辑器工具栏与操作提示', en: 'Fully bilingual UI: home page, docs center and all sub-pages, changelog, modals, AI assistant, theme panel, editor toolbars and action toasts' },
+      { zh: '示例简历与新建简历默认骨架随语言切换，英文模式下直接展示英文内容', en: 'Sample resume and the default new-resume skeleton switch with the language — English content shown in English mode' },
+      { zh: '模板名称与描述、AI 供应商标签、工具栏插入示例随语言适配', en: 'Template names and descriptions, AI provider labels and toolbar insert examples adapt to the selected language' },
+      { zh: '错误提示双语化：AI 请求、简历操作等失败信息按当前语言显示', en: 'Bilingual error messages: AI request and resume operation failures are shown in the current language' },
+    ],
+  },
+  {
     version: 'v0.2.0',
     date: '2026-09-05',
     title: { zh: '交互打磨与请作者喝杯咖啡', en: 'Interaction Polish & Buy Me a Coffee' },
