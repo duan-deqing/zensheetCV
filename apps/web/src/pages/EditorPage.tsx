@@ -194,15 +194,21 @@ export function EditorPage() {
           to { opacity: 1; transform: translateY(0); }
         }
         .editor-fade-up { animation: editorFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        /* 全屏预览入场：淡入上浮，与编辑视图回到时的动画语言一致 */
+        @keyframes fullscreenIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fullscreen-in { animation: fullscreenIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @media (prefers-reduced-motion: reduce) {
-          .editor-fade-up { animation: none; }
+          .editor-fade-up, .fullscreen-in { animation: none; }
         }
       `}</style>
       {/* 全屏预览：隐藏顶栏与编辑器列，仅保留预览 */}
       {!isFullscreen && <TopBar />}
       <div className="flex flex-1 overflow-hidden">
         {isFullscreen ? (
-          <div className="flex flex-1 min-w-0 p-3">
+          <div className="fullscreen-in flex flex-1 min-w-0 p-3">
             <div className="flex-1 min-w-0">
               <ResumePreview />
             </div>
