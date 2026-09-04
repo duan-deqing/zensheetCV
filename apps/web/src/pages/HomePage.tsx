@@ -257,8 +257,8 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* 真实渲染的两张模板卡，正面 / 导出 视角 */}
-        <div className="relative h-[380px] hidden md:block" aria-hidden="true">
+        {/* 真实渲染的两张模板卡，正面 / 导出 视角（与分栏断点一致：lg 起显示，避免 768-1023 单列时悬挂在文字下方） */}
+        <div className="relative h-[380px] hidden lg:block" aria-hidden="true">
           <div className="fade-up absolute right-24 top-6 w-[300px] rotate-[3deg] rounded-xl border border-gray-200 shadow-[0_18px_50px_rgba(37,99,235,0.10)]">
             <ResumePaper templateId="modern" zoom={0.4} className="h-[320px] rounded-xl" />
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400 px-4 py-2 border-t border-gray-100">
@@ -345,11 +345,11 @@ export function HomePage() {
             ))}
           </div>
 
-          {/* 三栏布局示意（CSS mockup） */}
+          {/* 三栏布局示意（CSS mockup）：桌面横向三栏；<640px 纵向堆叠避免每栏仅 ~85px 过窄 */}
           <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-gray-100/70 p-4" aria-hidden="true">
-            <div className="flex gap-2.5">
+            <div className="flex gap-2.5 max-sm:flex-col">
               {/* 编辑器栏 */}
-              <div className="w-[30%] rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0">
+              <div className="w-[30%] max-sm:w-full rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 max-sm:shrink">
                 <div className="h-7 border-b border-gray-100 px-3 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-gray-300" />
                   <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gray-400">
@@ -366,7 +366,7 @@ export function HomePage() {
               </div>
 
               {/* 拖拽手柄 */}
-              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0" />
+              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0 max-sm:hidden" />
 
               {/* 预览栏：真实渲染 */}
               <div className="flex-1 rounded-xl border border-gray-200 bg-white overflow-hidden min-w-0">
@@ -380,10 +380,10 @@ export function HomePage() {
               </div>
 
               {/* 拖拽手柄 */}
-              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0" />
+              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0 max-sm:hidden" />
 
               {/* AI 聊天窗示意 */}
-              <div className="w-[27%] rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 flex flex-col">
+              <div className="w-[27%] max-sm:w-full rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 max-sm:shrink flex flex-col">
                 <div className="h-7 border-b border-gray-100 px-3 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-gray-300" />
                   <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gray-400">
