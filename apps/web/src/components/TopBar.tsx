@@ -9,6 +9,7 @@ import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 
 import { DocsDrawer } from '@/components/DocsDrawer';
+import { CoffeeModal, CoffeeIcon } from '@/components/CoffeeModal';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
 
@@ -343,7 +344,7 @@ export function TopBar() {
   const { user } = useAuth();
   const { exportPDF, isExporting } = usePDFExport();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow } = useUI();
+  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow, toggleCoffeeModal } = useUI();
 
   const handleExportPDF = async () => {
     // 纯前端导出：调起浏览器打印（预览分页 → 另存为 PDF）
@@ -420,6 +421,17 @@ export function TopBar() {
               AI 助手
             </button>
           </HoverTip>
+          {/* 请作者喝杯咖啡：收款码弹窗 */}
+          <HoverTip text="请作者喝杯咖啡">
+            <button
+              type="button"
+              onClick={toggleCoffeeModal}
+              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <CoffeeIcon />
+              Coffee
+            </button>
+          </HoverTip>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -467,6 +479,8 @@ export function TopBar() {
         </div>
       </div>
       <DocsDrawer open={docsDrawerOpen} onClose={toggleDocsDrawer} />
+      {/* 请作者喝杯咖啡（收款码）弹窗 */}
+      <CoffeeModal />
     </header>
   );
 }
