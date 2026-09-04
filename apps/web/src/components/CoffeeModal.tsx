@@ -209,9 +209,9 @@ export function CoffeeModal() {
           </button>
         </div>
 
-        {/* 内容：感谢卡片（已支持后）/ 收款码（可切换）+ 文案，两分支共用同一容器保证比例与对齐一致 */}
+        {/* 内容：感谢卡片（已支持后）/ 收款码（可切换）+ 文案；容器高度固定，保证切换前后弹窗大小一致 */}
         {celebrated ? (
-          <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
+          <div className="px-5 py-4 flex flex-col items-center justify-center overflow-y-auto h-[452px]">
             <div className="coffee-qr-in w-[270px] h-[330px] flex flex-col items-center justify-center">
               <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
                 <CheckIcon className="w-7 h-7 text-emerald-500" />
@@ -225,8 +225,8 @@ export function CoffeeModal() {
             </div>
           </div>
         ) : (
-          <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
-            <div className="coffee-qr-in w-[270px] h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
+          <div className="px-5 py-4 flex flex-col items-center justify-center overflow-y-auto h-[452px]">
+            <div className="coffee-qr-in w-[270px] flex-1 min-h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
               <img
                 src={QR_CODES[qrIdx].src}
                 alt={`${QR_CODES[qrIdx].label}收款码`}
