@@ -107,8 +107,10 @@ export function IconModal() {
         onClick={close}
         aria-hidden="true"
       />
-      {/* 面板：图标网格 + 底部提示区；宽高跟随容器内宽/高（100%），手机 p-2 / 桌面 p-6 下都不会溢出视口 */}
-      <div className={`${closing ? 'modal-out' : 'icon-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-[min(760px,100%)] max-h-[min(78vh,calc(100%-1rem))]`}>
+      {/* 面板：图标网格 + 底部提示区。
+          手机端：全宽 × (100dvh - 1rem) 固定高度（dvh 随地址栏收缩，网格区稳定滚动）；
+          sm 起：内容自适应宽度 + 78vh 上限 */}
+      <div className={`${closing ? 'modal-out' : 'icon-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-full h-[calc(100dvh-1rem)] sm:h-auto sm:w-[min(760px,100%)] sm:max-h-[78vh]`}>
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">
           <p
