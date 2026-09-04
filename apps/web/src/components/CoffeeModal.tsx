@@ -2,8 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useUI } from '@/store/UIContext';
 
-/** 收款码图片（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
-const QR_SRC = `${import.meta.env.BASE_URL}buy-me-a-coffee.png`;
+/** 收款码列表（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
+const QR_CODES = [
+  { id: 'wechat', label: '微信支付', src: `${import.meta.env.BASE_URL}buy-me-a-coffee.png` },
+  { id: 'alipay', label: '支付宝', src: `${import.meta.env.BASE_URL}buy-me-a-coffee-alipay.jpg` },
+] as const;
 
 /** 礼花配色：应用主题色系 */
 const CONFETTI_COLORS = ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
@@ -37,6 +40,8 @@ export function CoffeeModal() {
   const [celebrated, setCelebrated] = useState(false);
   // 屏幕中央致谢胶囊：in 显示 / out 淡出 / null 隐藏；独立于弹窗渲染，弹窗关闭后仍可停留
   const [thanks, setThanks] = useState<null | 'in' | 'out'>(null);
+  // 当前展示的收款码（微信 / 支付宝）
+  const [qrIdx, setQrIdx] = useState(0);
   // 关闭动画进行中：先播淡出，动画结束后再真正卸载
   const [closing, setClosing] = useState(false);
   const closingRef = useRef(false);
@@ -55,6 +60,7 @@ export function CoffeeModal() {
       toggleCoffeeModal();
       setClosing(false);
       setCelebrated(false);
+      setQrIdx(0);
       closingRef.current = false;
     }, 180);
     timersRef.current.push(t);
@@ -138,15 +144,20 @@ export function CoffeeModal() {
           from { opacity: 1; transform: translateY(0) scale(1); }
           to { opacity: 0; transform: translateY(-8px) scale(0.95); }
         }
+        @keyframes coffeeQrIn {
+          from { opacity: 0; transform: scale(0.96); }
+          to { opacity: 1; transform: scale(1); }
+        }
         .coffee-modal-in { animation: coffeeModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
         .coffee-backdrop-in { animation: coffeeBackdropIn 0.2s ease-out both; }
         .coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
         .coffee-pill-in { animation: coffeePillIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .coffee-pill-out { animation: coffeePillOut 0.3s ease-in both; }
+        .coffee-qr-in { animation: coffeeQrIn 0.22s ease-out both; }
         @media (prefers-reduced-motion: reduce) {
           .coffee-modal-in, .coffee-modal-out, .coffee-backdrop-in, .coffee-backdrop-out,
-          .coffee-pill-in, .coffee-pill-out { animation: none; }
+          .coffee-pill-in, .coffee-pill-out, .coffee-qr-in { animation: none; }
         }
       `}</style>
       {/* 遮罩：点击关闭（胶囊停留期间弹窗已卸载，遮罩不渲染且容器不拦截点击） */}
@@ -181,14 +192,38 @@ export function CoffeeModal() {
           </button>
         </div>
 
-        {/* 内容：收款码 + 文案 */}
+        {/* 内容：收款码（可切换）+ 文案 */}
         <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
-          <img
-            src={QR_SRC}
-            alt="赞赏收款码"
-            className="w-[270px] rounded-xl border border-gray-200"
-          />
-          <p className="mt-3 text-[13px] text-gray-500 text-center leading-relaxed">
+          <div className="coffee-qr-in w-[270px] h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
+            <img
+              src={QR_CODES[qrIdx].src}
+              alt={`${QR_CODES[qrIdx].label}收款码`}
+              className="max-w-full max-h-full rounded-xl border border-gray-200"
+            />
+          </div>
+          {/* 收款码切换：胶囊分段控件 */}
+          <div
+            className="mt-2.5 flex items-center rounded-full border border-gray-200 bg-gray-50 p-0.5"
+            role="tablist"
+            aria-label="切换收款码"
+          >
+            {QR_CODES.map((q, i) => (
+              <button
+                key={q.id}
+                role="tab"
+                aria-selected={i === qrIdx}
+                onClick={() => setQrIdx(i)}
+                className={`px-3.5 h-7 rounded-full text-[12px] font-medium transition-all ${
+                  i === qrIdx
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {q.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2.5 text-[13px] text-gray-500 text-center leading-relaxed">
             如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕
           </p>
         </div>
