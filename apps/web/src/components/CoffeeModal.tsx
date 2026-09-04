@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import confetti from 'canvas-confetti';
 import { useUI } from '@/store/UIContext';
 
 /** 收款码图片（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
@@ -26,9 +27,11 @@ export function CoffeeIcon() {
   );
 }
 
-/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」致谢关闭，「稍后支持」直接关闭 */
+/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」释放礼花后关闭，「稍后支持」直接关闭 */
 export function CoffeeModal() {
   const { coffeeModalOpen, toggleCoffeeModal, addToast } = useUI();
+  // 「已支持」触发礼花后延迟关闭；标记已触发，避免停留期间重复点击叠加多个关闭定时器
+  const [celebrated, setCelebrated] = useState(false);
 
   // Esc 关闭
   useEffect(() => {
@@ -43,8 +46,32 @@ export function CoffeeModal() {
   if (!coffeeModalOpen) return null;
 
   const handleSupported = () => {
+    if (celebrated) return;
+    setCelebrated(true);
+    // 礼花：从屏幕底部两角向中央喷射，绽放于弹窗两侧；
+    // canvas-confetti 默认画布 z-index 高于弹窗，彩带会飘过窗口上方
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      confetti({
+        particleCount: 90,
+        spread: 70,
+        angle: 60,
+        origin: { x: 0, y: 0.85 },
+        colors: ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'],
+      });
+      confetti({
+        particleCount: 90,
+        spread: 70,
+        angle: 120,
+        origin: { x: 1, y: 0.85 },
+        colors: ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'],
+      });
+    }
     addToast('感谢支持，祝你求职顺利！', 'success');
-    toggleCoffeeModal();
+    // 停留片刻让礼花可见，再关闭弹窗（礼花画布独立于弹窗，关闭后仍继续飘落）
+    window.setTimeout(() => {
+      toggleCoffeeModal();
+      setCelebrated(false);
+    }, 1000);
   };
 
   return (
@@ -111,9 +138,10 @@ export function CoffeeModal() {
         <div className="px-5 pb-4 pt-1 flex items-center gap-2.5">
           <button
             onClick={handleSupported}
-            className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all"
+            disabled={celebrated}
+            className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-default"
           >
-            已支持
+            {celebrated ? '感谢支持' : '已支持'}
           </button>
           <button
             onClick={toggleCoffeeModal}
