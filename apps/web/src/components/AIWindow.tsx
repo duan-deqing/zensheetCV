@@ -259,7 +259,7 @@ function AIStatus({ meta }: { meta: AIMeta }) {
  * 外观与编辑器/预览同为圆角卡片。多轮流式对话，BYOK 配置随请求携带；
  * Esc / 关闭按钮 / 再次点击 AI 按钮均可关闭。
  */
-export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; resumeId?: string; onClose?: () => void }) {
+export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeId?: string; onClose?: () => void }) {
   const { aiWindowOpen, toggleAIWindow } = useUI();
   // 统一关闭入口：由 EditorPage 的关闭流程驱动（滑出动画结束后卸载）
   const close = onClose ?? toggleAIWindow;
@@ -456,8 +456,8 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
 
   return (
     <aside
-      className="relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
-      style={{ width }}
+      className="relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col w-full"
+      style={width ? { width } : undefined}
       aria-label={tr({ zh: 'AI 助手', en: 'AI Assistant' })}
     >
       {/* 顶栏：与主题面板同构（mono 眉标 + 关闭按钮） */}

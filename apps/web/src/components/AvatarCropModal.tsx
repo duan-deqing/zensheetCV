@@ -99,7 +99,7 @@ export function AvatarCropModal({
         @media (prefers-reduced-motion: reduce) { .avatar-modal-in { animation: none; } }
       `}</style>
       <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[2px]" onClick={uploading ? undefined : onCancel} aria-hidden="true" />
-      <div className="avatar-modal-in relative w-[400px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+      <div className="avatar-modal-in relative w-[min(400px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
         {/* 顶栏：与其他弹窗同构 */}
         <div className="flex items-center gap-3 px-5 py-2 border-b border-gray-200">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0" aria-hidden="true">
@@ -173,7 +173,7 @@ export function AvatarCropModal({
           </div>
 
           {/* 缩放滑杆 */}
-          <div className="mt-4 w-[320px] flex items-center gap-3">
+          <div className="mt-4 w-[min(320px,calc(100vw-6rem))] flex items-center gap-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 shrink-0">
               {tr({ zh: '缩放', en: 'Zoom' })}
             </span>

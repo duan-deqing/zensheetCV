@@ -618,8 +618,9 @@ export function UserModal() {
         aria-hidden="true"
       />
       {/* 尺寸与屏幕等比：66vw × 66vh 的比值恒等于屏幕宽高比；
-          min/max 上限同样保持 16:9，保护极小/超大屏幕 */}
-      <div className={`${closing ? 'modal-out' : 'user-modal-in'} relative w-[66vw] h-[66vh] min-w-[512px] min-h-[288px] max-w-[960px] max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}>
+          min/max 上限同样保持 16:9，保护极小/超大屏幕；
+          手机端降级为 94vw × 85dvh 单列弹窗（md 起恢复等比尺寸） */}
+      <div className={`${closing ? 'modal-out' : 'user-modal-in'} relative w-[94vw] h-[85dvh] md:w-[66vw] md:h-[66vh] md:min-w-[512px] md:min-h-[288px] md:max-w-[960px] md:max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}>
         {/* 顶栏：与模板库/图标库弹窗同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p

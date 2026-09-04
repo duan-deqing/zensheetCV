@@ -180,7 +180,7 @@ export function CoffeeModal() {
       {coffeeModalOpen && (
         <div
           ref={cardRef}
-          className={`${closing ? 'coffee-modal-out' : 'coffee-modal-in'} relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col pointer-events-auto`}
+          className={`${closing ? 'coffee-modal-out' : 'coffee-modal-in'} relative w-[min(410px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col pointer-events-auto`}
         >
         {/* 顶栏：与应用其他弹窗同构（mono 眉标 + 关闭按钮） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">

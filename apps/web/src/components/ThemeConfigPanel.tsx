@@ -265,7 +265,7 @@ export function ThemeConfigPanel() {
 
   return (
     <aside
-      className={`${closing ? 'theme-side-out' : 'theme-side-in'} absolute right-2 top-2 bottom-2 z-10 w-96 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto`}
+      className={`${closing ? 'theme-side-out' : 'theme-side-in'} absolute right-2 top-2 bottom-2 z-10 w-[min(24rem,calc(100%-1rem))] rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto`}
       aria-label={tr({ zh: '主题配置', en: 'Theme settings' })}
     >
       <style>{`

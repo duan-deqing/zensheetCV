@@ -127,15 +127,15 @@ export function Navbar() {
       {/* 浮动胶囊不占文档流，用占位块避免遮挡页面内容 */}
       <div className="h-20" aria-hidden="true" />
       <nav
-        className={`fixed top-4 inset-x-0 z-40 flex justify-center px-6 will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+        className={`fixed top-4 inset-x-0 z-40 flex justify-center px-3 sm:px-6 will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
           hidden ? '-translate-y-[130%]' : 'translate-y-0'
         }`}
         aria-label={tr({ zh: '主导航', en: 'Main navigation' })}
         aria-hidden={hidden}
       >
         {/* 最大宽度与页面 section 一致（max-w-7xl），两侧留白对齐 */}
-        <div className="w-full max-w-7xl h-14 flex items-center justify-between rounded-full border border-gray-200/80 bg-white/85 backdrop-blur-md shadow-[0_16px_44px_rgba(17,24,39,0.10)] px-6">
-          <div className="flex items-center gap-8 min-w-0">
+        <div className="w-full max-w-7xl h-14 flex items-center justify-between rounded-full border border-gray-200/80 bg-white/85 backdrop-blur-md shadow-[0_16px_44px_rgba(17,24,39,0.10)] px-4 sm:px-6">
+          <div className="flex items-center gap-4 sm:gap-8 min-w-0">
             <Link
               to="/"
               className="text-[15px] font-extrabold uppercase tracking-tight text-gray-900 shrink-0"

@@ -16,6 +16,7 @@ import { useEditorDispatch } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
 import { useModalClose } from '@/hooks/useModalClose';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { getTemplateById, toApiTemplate } from '@/templates';
 import type { MarginOption, ThemeConfig } from '@stylan/shared-types';
 import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
@@ -62,6 +63,9 @@ export function EditorPage() {
   useAutoSave();
   useKeyboardShortcut();
   const tr = useTr();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  // 手机端「编辑 / 预览」单列切换（桌面为分栏，不使用该状态）
+  const [mobileTab, setMobileTab] = useState<'edit' | 'preview'>('edit');
 
   const { id } = useParams();
   const { fetchResume } = useResume();
@@ -192,7 +196,7 @@ export function EditorPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-[100dvh] bg-white">
       <style>{`
         @keyframes editorFadeUp {
           from { opacity: 0; transform: translateY(12px); }
@@ -222,6 +226,32 @@ export function EditorPage() {
       `}</style>
       {/* 全屏预览：隐藏顶栏与编辑器列，仅保留预览 */}
       {!isFullscreen && <TopBar />}
+      {/* 手机端视图切换（分段控件）：编辑 ↔ 预览；桌面分栏布局下隐藏 */}
+      {!isFullscreen && !isDesktop && (
+        <div className="shrink-0 px-3 pt-3">
+          <div
+            className="h-9 w-fit bg-gray-100 rounded-full p-1 flex items-center gap-1"
+            role="tablist"
+            aria-label={tr({ zh: '视图切换', en: 'View switch' })}
+          >
+            {(['edit', 'preview'] as const).map((t) => (
+              <button
+                key={t}
+                role="tab"
+                aria-selected={mobileTab === t}
+                onClick={() => setMobileTab(t)}
+                className={`h-7 px-4 text-[13px] rounded-full transition-colors ${
+                  mobileTab === t
+                    ? 'bg-white text-gray-900 shadow-sm font-medium'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {t === 'edit' ? tr({ zh: '编辑', en: 'Edit' }) : tr({ zh: '预览', en: 'Preview' })}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="flex flex-1 overflow-hidden">
         {isFullscreen ? (
           <div className="fullscreen-in flex flex-1 min-w-0 p-3">
@@ -231,27 +261,37 @@ export function EditorPage() {
           </div>
         ) : (
           <div ref={containerRef} className="flex flex-1 min-w-0 p-3">
-          {/* 左列：编辑器 */}
+          {/* 左列：编辑器（手机上仅 tab=edit 时占满整行，且不重新挂载以保留输入状态；
+              桌面为 flex + 拖拽宽度百分比，flex-1 的 basis:0 会覆盖 width，故桌面不可加） */}
           <div
-            className="editor-fade-up flex flex-col min-w-0 min-h-0"
-            style={{ width: editorWidth + '%' }}
+            className={`editor-fade-up flex-col min-w-0 min-h-0 ${
+              isDesktop ? 'flex' : mobileTab === 'edit' ? 'flex flex-1' : 'hidden'
+            }`}
+            style={isDesktop ? { width: editorWidth + '%' } : undefined}
           >
             <div className="flex-1 min-h-0">
               {themeReady ? <MarkdownEditor /> : <EditorSkeleton />}
             </div>
           </div>
-          <HoverTip text={tr({ zh: '拖拽调整编辑器宽度', en: 'Drag to resize editor' })}>
-            <div
-              className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
-              onMouseDown={startDrag}
-            />
-          </HoverTip>
-          <div className="editor-fade-up flex-1 min-w-0" style={{ animationDelay: '0.08s' }}>
+          {/* 拖拽手柄仅桌面渲染（触屏无 hover，直接隐藏） */}
+          {isDesktop && (
+            <HoverTip text={tr({ zh: '拖拽调整编辑器宽度', en: 'Drag to resize editor' })}>
+              <div
+                className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
+                onMouseDown={startDrag}
+              />
+            </HoverTip>
+          )}
+          {/* 右列：预览（手机上仅 tab=preview 时显示，用 hidden 保留渲染状态） */}
+          <div
+            className={`editor-fade-up flex-1 min-w-0 ${isDesktop || mobileTab === 'preview' ? '' : 'hidden'}`}
+            style={{ animationDelay: '0.08s' }}
+          >
             <ResumePreview />
           </div>
-          {/* AI 助手聊天窗口：与预览窗口同层级，打开时占据页面右侧；
+          {/* AI 助手聊天窗口：桌面为侧栏挤入预览右侧；手机为全屏覆盖层。
               关闭时 wrapper 先播滑出动画（携拖拽条整体），结束后再卸载 */}
-          {(aiWindowOpen || aiClosing) && (
+          {(aiWindowOpen || aiClosing) && (isDesktop ? (
             <div className={`${aiClosing ? 'ai-window-out' : 'ai-window-in'} flex items-stretch min-w-0 shrink-0`}>
               <HoverTip text={tr({ zh: '拖拽调整 AI 助手宽度', en: 'Drag to resize AI assistant' })}>
                 <div
@@ -261,7 +301,15 @@ export function EditorPage() {
               </HoverTip>
               <AIWindow width={aiWidth} resumeId={id} onClose={closeAIWindow} />
             </div>
-          )}
+          ) : (
+            <div
+              className={`fixed inset-0 z-50 p-3 bg-gray-900/30 backdrop-blur-[2px] ${
+                aiClosing ? 'ai-window-out' : 'ai-window-in'
+              }`}
+            >
+              <AIWindow resumeId={id} onClose={closeAIWindow} />
+            </div>
+          ))}
           </div>
         )}
       </div>

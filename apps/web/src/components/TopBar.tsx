@@ -155,10 +155,10 @@ function FileMenu() {
         onClick={() => setOpen((p) => !p)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+        className="px-2 sm:px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
       >
         <FileIcon />
-        {tr({ zh: '文件', en: 'File' })}
+        <span className="hidden sm:inline">{tr({ zh: '文件', en: 'File' })}</span>
       </button>
       <ButtonStatus status={status} exiting={exiting} />
       {open && (
@@ -409,16 +409,17 @@ export function TopBar() {
 
   return (
     <header className="shrink-0 px-3 pt-3">
-      {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住 */}
-      <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-6">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住；
+          手机端收纳：文字标签隐藏仅留图标，间距收紧 */}
+      <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-2.5 sm:px-6">
+        <div className="flex items-center gap-1 sm:gap-3 min-w-0">
           <HoverTip text={tr({ zh: '返回简历列表', en: 'Back to my resumes' })}>
             <Link
               to="/resumes"
               className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
             >
               <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
-              <span>{tr({ zh: '我的简历', en: 'My Resumes' })}</span>
+              <span className="hidden sm:inline">{tr({ zh: '我的简历', en: 'My Resumes' })}</span>
             </Link>
           </HoverTip>
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
@@ -429,10 +430,10 @@ export function TopBar() {
             <button
               type="button"
               onClick={toggleTemplateModal}
-              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <LayoutIcon />
-              {tr({ zh: '模板', en: 'Templates' })}
+              <span className="hidden sm:inline">{tr({ zh: '模板', en: 'Templates' })}</span>
             </button>
           </HoverTip>
           {/* 图标库入口：点击图标复制 icon:名称 语法 */}
@@ -440,10 +441,10 @@ export function TopBar() {
             <button
               type="button"
               onClick={toggleIconModal}
-              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <SmileIcon />
-              {tr({ zh: '图标', en: 'Icons' })}
+              <span className="hidden sm:inline">{tr({ zh: '图标', en: 'Icons' })}</span>
             </button>
           </HoverTip>
           {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
@@ -451,10 +452,10 @@ export function TopBar() {
             <button
               type="button"
               onClick={toggleDocsDrawer}
-              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <BookIcon />
-              {tr({ zh: '文档', en: 'Docs' })}
+              <span className="hidden sm:inline">{tr({ zh: '文档', en: 'Docs' })}</span>
             </button>
           </HoverTip>
           {/* AI 助手入口：聊天窗口挤入预览右侧 */}
@@ -463,14 +464,14 @@ export function TopBar() {
               type="button"
               onClick={toggleAIWindow}
               aria-pressed={aiWindowOpen}
-              className={`px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+              className={`px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
                 aiWindowOpen
                   ? 'text-primary-700 bg-primary-50'
                   : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
               }`}
             >
               <SparkleIcon />
-              {tr({ zh: 'AI 助手', en: 'AI Assistant' })}
+              <span className="hidden sm:inline">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
             </button>
           </HoverTip>
           {/* 请作者喝杯咖啡：收款码弹窗 */}
@@ -478,15 +479,15 @@ export function TopBar() {
             <button
               type="button"
               onClick={toggleCoffeeModal}
-              className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <CoffeeIcon />
-              Coffee
+              <span className="hidden sm:inline">Coffee</span>
             </button>
           </HoverTip>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5">
           <span className="relative inline-flex">
             <SaveButton />
             {/* 导出结果气泡与保存结果共用同一区域：保存按钮左侧 */}
@@ -498,9 +499,11 @@ export function TopBar() {
           className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
         >
           <ExportIcon />
-          {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
+          <span className="hidden sm:inline">
+            {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
+          </span>
         </button>
-        <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
+        <div className="flex items-center gap-2 ml-0.5 sm:ml-1.5 pl-2 sm:pl-3 border-l border-gray-200">
           {/* 头像 + 用户名，点击打开用户信息弹窗 */}
           <HoverTip text={tr({ zh: '用户信息', en: 'User info' })}>
             <button
@@ -522,7 +525,7 @@ export function TopBar() {
                   {user.name.slice(0, 1).toUpperCase()}
                 </span>
               )}
-              <span className="text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
+              <span className="hidden sm:inline text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
                 {user.name}
               </span>
             </button>

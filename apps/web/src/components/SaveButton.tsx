@@ -7,9 +7,9 @@ import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 import { useTr } from '@/i18n/LangContext';
 
 /** 保存线性图标，颜色跟随 currentColor */
-function SaveIcon() {
+function SaveIcon({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`w-3.5 h-3.5 ${className}`} aria-hidden="true">
       <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
       <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
       <path d="M7 3v4a1 1 0 0 0 1 1h7" />
@@ -72,14 +72,15 @@ export function SaveButton() {
       }`}
     >
       {saving ? (
-        tr({ zh: '保存中...', en: 'Saving…' })
+        // 手机端仅图标：保存中给图标加脉冲示意进行状态
+        <span className="hidden sm:inline">{tr({ zh: '保存中...', en: 'Saving…' })}</span>
       ) : (
         // key 变化触发文案重挂载：保存 ↔ 已保存 切换时淡入上浮
-        <span key={isDirty ? 'dirty' : 'clean'} className="save-label-in">
+        <span key={isDirty ? 'dirty' : 'clean'} className={`save-label-in hidden sm:inline ${saving ? 'animate-pulse' : ''}`}>
           {isDirty ? tr({ zh: '保存', en: 'Save' }) : tr({ zh: '已保存', en: 'Saved' })}
         </span>
       )}
-      <SaveIcon />
+      <SaveIcon className={saving ? 'animate-pulse' : ''} />
       <ButtonStatus status={status} exiting={exiting} placement="left" />
     </button>
   );

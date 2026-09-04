@@ -306,7 +306,7 @@ export function ResumesPage() {
                     <HoverTip text={tr({ zh: '删除简历', en: 'Delete resume' })}>
                       <button
                         onClick={(e) => handleDelete(e, resume.id)}
-                        className="p-1.5 -m-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                        className="p-1.5 -m-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all"
                         aria-label={tr({ zh: `删除 ${resume.title}`, en: `Delete ${resume.title}` })}
                       >
                         <TrashIcon className="w-4 h-4" />

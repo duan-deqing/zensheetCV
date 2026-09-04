@@ -35,38 +35,38 @@ export function PreviewToolbar() {
   const tr = useTr();
 
   return (
-    <div className="relative flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
+    <div className="relative flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-white border-b border-gray-200">
       <p
-        className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0"
+        className="hidden sm:block font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0"
         aria-hidden="true"
       >
         {'< PREVIEW />'}
       </p>
-      <div className="ml-auto flex items-center gap-1 shrink-0">
+      <div className="ml-auto flex items-center gap-0.5 sm:gap-1 shrink-0">
         <HoverTip text={tr({ zh: '上传照片（证件照比例，可在页面上拖动与缩放）', en: 'Upload photo (ID-photo ratio, drag & resize on the page)' })}>
           <button
             onClick={togglePhotoModal}
-            className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+            className={`h-8 px-2 sm:px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
               photoModalOpen
                 ? 'text-primary-700 bg-primary-50'
                 : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
             }`}
           >
             <PhotoIcon />
-            {tr({ zh: '照片', en: 'Photo' })}
+            <span className="hidden sm:inline">{tr({ zh: '照片', en: 'Photo' })}</span>
           </button>
         </HoverTip>
         <HoverTip text={tr({ zh: '主题配置', en: 'Theme settings' })}>
           <button
             onClick={toggleThemePanel}
-            className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+            className={`h-8 px-2 sm:px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
               themePanelOpen
                 ? 'text-primary-700 bg-primary-50'
                 : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
             }`}
           >
             <PaletteIcon />
-            {tr({ zh: '主题', en: 'Theme' })}
+            <span className="hidden sm:inline">{tr({ zh: '主题', en: 'Theme' })}</span>
           </button>
         </HoverTip>
         <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
