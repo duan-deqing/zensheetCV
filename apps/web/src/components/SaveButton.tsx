@@ -22,6 +22,8 @@ export function SaveButton() {
   const { updateResume } = useResume();
   const { status, exiting, show } = useButtonStatus();
   const [saving, setSaving] = useState(false);
+  // 保存成功后短暂触发「落定回弹」动画，随后复位
+  const [justSaved, setJustSaved] = useState(false);
 
   const handleSave = async () => {
     if (!currentResume) {
@@ -39,6 +41,8 @@ export function SaveButton() {
     if (result) {
       dispatch({ type: 'MARK_CLEAN' });
       show('success', '保存成功');
+      setJustSaved(true);
+      window.setTimeout(() => setJustSaved(false), 450);
     } else {
       show('error', '保存失败');
     }
@@ -49,13 +53,22 @@ export function SaveButton() {
     <button
       onClick={handleSave}
       disabled={!isDirty || saving}
-      className={`relative px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full transition-all ${
+      className={`relative px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full transition-all duration-300 ${
+        justSaved ? 'save-settle' : ''
+      } ${
         isDirty
           ? 'bg-primary-600 text-white hover:bg-primary-700 active:scale-[0.98]'
           : 'bg-gray-100 text-gray-400 cursor-not-allowed'
       }`}
     >
-      {saving ? '保存中...' : isDirty ? '保存' : '已保存'}
+      {saving ? (
+        '保存中...'
+      ) : (
+        // key 变化触发文案重挂载：保存 ↔ 已保存 切换时淡入上浮
+        <span key={isDirty ? 'dirty' : 'clean'} className="save-label-in">
+          {isDirty ? '保存' : '已保存'}
+        </span>
+      )}
       <SaveIcon />
       <ButtonStatus status={status} exiting={exiting} placement="left" />
     </button>

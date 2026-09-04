@@ -179,3 +179,44 @@
     animation: none;
   }
 }
+
+/* 保存按钮：文案切换淡入上浮（保存 → 已保存） */
+@keyframes save-label-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.save-label-in {
+  display: inline-flex;
+  animation: save-label-in 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 保存成功落定：按钮轻微回弹强调一次（justSaved 触发） */
+@keyframes save-settle {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.045);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.save-settle {
+  animation: save-settle 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .save-label-in,
+  .save-settle {
+    animation: none;
+  }
+}
