@@ -356,7 +356,7 @@ function AISettingsSection() {
         {'// '}
         {tr({ zh: '服务商', en: 'Provider' })}
       </p>
-      <div className="mt-2.5 grid grid-cols-3 gap-2" role="radiogroup" aria-label={tr({ zh: 'AI 服务商', en: 'AI providers' })}>
+      <div className="mt-2.5 grid grid-cols-2 md:grid-cols-3 gap-2" role="radiogroup" aria-label={tr({ zh: 'AI 服务商', en: 'AI providers' })}>
         {AI_PROVIDERS.map((p) => {
           const active = settings.provider === p.id;
           return (
@@ -591,7 +591,7 @@ export function UserModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={tr({ zh: '设置', en: 'Settings' })}
@@ -619,8 +619,8 @@ export function UserModal() {
       />
       {/* 尺寸与屏幕等比：66vw × 66vh 的比值恒等于屏幕宽高比；
           min/max 上限同样保持 16:9，保护极小/超大屏幕；
-          手机端降级为 94vw × 85dvh 单列弹窗（md 起恢复等比尺寸） */}
-      <div className={`${closing ? 'modal-out' : 'user-modal-in'} relative w-[94vw] h-[85dvh] md:w-[66vw] md:h-[66vh] md:min-w-[512px] md:min-h-[288px] md:max-w-[960px] md:max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}>
+          手机/小平板端降级为全宽 × 85dvh 单列弹窗（w-full 跟随容器内边距自适应，永不溢出；md 起恢复等比尺寸） */}
+      <div className={`${closing ? 'modal-out' : 'user-modal-in'} relative w-full h-[85dvh] md:w-[66vw] md:h-[66vh] md:min-w-[512px] md:min-h-[288px] md:max-w-[960px] md:max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}>
         {/* 顶栏：与模板库/图标库弹窗同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p
@@ -641,9 +641,12 @@ export function UserModal() {
           </HoverTip>
         </div>
 
-        <div className="flex flex-1 min-h-0">
-          {/* 左栏：分类卡片 */}
-          <nav className="w-36 shrink-0 bg-gray-50 border-r border-gray-200 p-2.5 flex flex-col gap-1.5" aria-label={tr({ zh: '分类', en: 'Categories' })}>
+        <div className="flex flex-1 min-h-0 flex-col md:flex-row">
+          {/* 分类导航：手机端顶部横排 tab（省出内容宽度），md 起恢复左侧竖排栏 */}
+          <nav
+            className="shrink-0 bg-gray-50 border-b border-gray-200 p-2 flex flex-row gap-1.5 overflow-x-auto md:w-36 md:border-b-0 md:border-r md:border-gray-200 md:p-2.5 md:flex-col md:overflow-visible"
+            aria-label={tr({ zh: '分类', en: 'Categories' })}
+          >
             {TABS.map((t) => {
               const active = tab === t.id;
               return (
@@ -651,7 +654,7 @@ export function UserModal() {
                   key={t.id}
                   onClick={() => setTab(t.id)}
                   aria-pressed={active}
-                  className={`flex items-center gap-2 h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors ${
+                  className={`flex items-center gap-2 h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors shrink-0 ${
                     active
                       ? 'bg-white border-primary-200 text-primary-700 shadow-sm'
                       : 'border-transparent text-gray-600 hover:bg-white hover:text-gray-900 hover:border-gray-200'
