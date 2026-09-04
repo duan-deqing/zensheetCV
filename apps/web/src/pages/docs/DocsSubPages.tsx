@@ -37,10 +37,10 @@ function DocPageLink({
 /* ============ 01 使用指南 ============ */
 
 const QUICK_STEPS = [
-  { no: 'STEP 1', title: '打开即用', desc: '免注册登录，打开网站即可使用；简历与配置仅保存在当前浏览器本地。可在导航栏点击用户名打开设置。' },
+  { no: 'STEP 1', title: '打开即用', desc: '免注册登录，打开网站即可使用，默认用户名为 ZENSHEET；简历与配置仅保存在当前浏览器本地。点击导航栏用户名打开设置，可自定义用户名。' },
   { no: 'STEP 2', title: '创建简历', desc: '进入「我的简历」页面，点击新建简历，会得到一份示例内容，随后在编辑器中替换为自己的经历。' },
   { no: 'STEP 3', title: '编辑内容', desc: '左侧为 Markdown 编辑器，右侧实时预览。使用标题、列表、分栏等语法组织内容，详见《Markdown 简历教程》。' },
-  { no: 'STEP 4', title: '调样式并导出', desc: '通过「主题」面板选择模板与视觉风格；完成后点击右上角「导出 PDF」即可下载，效果与预览逐页一致。' },
+  { no: 'STEP 4', title: '调样式并导出', desc: '通过「主题」面板选择模板与视觉风格；完成后点击右上角「导出 PDF」，在浏览器打印窗口中「另存为 PDF」即可，效果与预览逐页一致。' },
 ];
 
 const GUIDE_LINKS = [
@@ -77,6 +77,22 @@ export function GuideContent() {
             ['实时预览', 'A4 纸张逐页渲染，与导出 PDF 效果一致；顶栏可缩放与全屏'],
             ['主题面板', '点击预览顶栏「主题」打开，切换模板、配色、字体与页边距'],
             ['AI 聊天窗', '点击顶栏「AI 助手」在预览右侧展开，支持流式回复与历史记录'],
+          ].map(([t, d]) => (
+            <div key={t} className="rounded-xl border border-gray-200 p-4">
+              <p className="font-medium text-gray-900 text-sm">{t}</p>
+              <p className="text-[13px] text-gray-500 leading-relaxed mt-1">{d}</p>
+            </div>
+          ))}
+        </div>
+      </DocBlock>
+
+      <DocBlock title="数据保存与隐私" desc="免登录版不设账号体系，你的数据只属于你：">
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            ['本地存储', '简历与 AI 对话历史保存在浏览器的 IndexedDB 中，不经过任何服务器；模型密钥同样仅保存在本地。'],
+            ['隐私模式', '无痕 / 隐私模式下数据仅暂存在内存，关闭窗口后即清空，请注意提前导出 PDF 备份。'],
+            ['数量上限', '每个浏览器最多保存 15 份简历，超出后可删除不需要的简历再新建。'],
+            ['换设备提醒', '数据绑定当前浏览器，更换设备或浏览器后不会自动同步；建议养成定期导出 PDF 的习惯。'],
           ].map(([t, d]) => (
             <div key={t} className="rounded-xl border border-gray-200 p-4">
               <p className="font-medium text-gray-900 text-sm">{t}</p>

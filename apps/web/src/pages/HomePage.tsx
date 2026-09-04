@@ -152,7 +152,7 @@ const WORKSPACE_FEATURES = [
 /** AI 聊天窗卖点 */
 const AI_CHAT_FEATURES = [
   '独立聊天窗 · 流式回复 · Markdown 渲染',
-  '对话历史按「用户 + 简历」持久化，随时继续上次话题',
+  '对话历史保存在本地浏览器，随时继续上次话题',
   '自带 API KEY（BYOK），密钥仅保存在本地浏览器',
 ];
 
@@ -230,7 +230,8 @@ export function HomePage() {
             className="fade-up text-lg text-gray-600 leading-relaxed max-w-[32em] mb-8"
             style={{ animationDelay: '0.16s' }}
           >
-            内置多套模板实时预览，图标与照片自由排版，AI 润色与关键词优化，一键导出高质量 PDF。
+            无需注册登录，打开即用；简历数据保存在你自己的浏览器里。内置多套模板实时预览，
+            图标与照片自由排版，AI 润色与关键词优化，一键导出高质量 PDF。
           </p>
           <div
             className="fade-up flex flex-wrap items-center gap-3"
