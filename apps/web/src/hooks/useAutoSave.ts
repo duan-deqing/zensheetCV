@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { useResumeStore } from '@/store/ResumeContext';
+import { useUI } from '@/store/UIContext';
 import { useResume } from './useResume';
 
 const AUTOSAVE_DELAY = 2000;
@@ -10,6 +11,7 @@ export function useAutoSave() {
   const dispatch = useEditorDispatch();
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
+  const { pulseSaved } = useUI();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // 保存期间若用户继续输入，不应误标为已保存
   const markdownRef = useRef(markdown);
@@ -31,6 +33,8 @@ export function useAutoSave() {
       });
       if (result && markdownRef.current === savedMarkdown) {
         dispatch({ type: 'MARK_CLEAN' });
+        // 与手动保存一致，驱动保存按钮的落定回弹动画
+        pulseSaved();
       }
     }, AUTOSAVE_DELAY);
 
@@ -39,5 +43,5 @@ export function useAutoSave() {
         clearTimeout(timerRef.current);
       }
     };
-  }, [markdown, isDirty, currentResume, updateResume, dispatch]);
+  }, [markdown, isDirty, currentResume, updateResume, dispatch, pulseSaved]);
 }

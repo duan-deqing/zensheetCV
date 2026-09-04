@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { useResumeStore } from '@/store/ResumeContext';
+import { useUI } from '@/store/UIContext';
 import { useResume } from '@/hooks/useResume';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
 
@@ -21,9 +22,17 @@ export function SaveButton() {
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
   const { status, exiting, show } = useButtonStatus();
+  const { savedPulse, pulseSaved } = useUI();
   const [saving, setSaving] = useState(false);
-  // 保存成功后短暂触发「落定回弹」动画，随后复位
+  // 保存成功后短暂触发「落定回弹」动画，随后复位；手动与自动保存统一由 savedPulse 驱动
   const [justSaved, setJustSaved] = useState(false);
+
+  useEffect(() => {
+    if (savedPulse === 0) return;
+    setJustSaved(true);
+    const t = window.setTimeout(() => setJustSaved(false), 450);
+    return () => window.clearTimeout(t);
+  }, [savedPulse]);
 
   const handleSave = async () => {
     if (!currentResume) {
@@ -41,8 +50,7 @@ export function SaveButton() {
     if (result) {
       dispatch({ type: 'MARK_CLEAN' });
       show('success', '保存成功');
-      setJustSaved(true);
-      window.setTimeout(() => setJustSaved(false), 450);
+      pulseSaved();
     } else {
       show('error', '保存失败');
     }

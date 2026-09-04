@@ -19,6 +19,8 @@ interface UIContextType {
   coffeeModalOpen: boolean;
   /** 编辑器右侧文档抽屉 */
   docsDrawerOpen: boolean;
+  /** 保存成功脉冲计数：手动/自动保存落库成功后递增，驱动保存按钮落定回弹动画 */
+  savedPulse: number;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
   addedTemplates: string[];
   toasts: ToastMessage[];
@@ -31,6 +33,7 @@ interface UIContextType {
   toggleUserModal: () => void;
   toggleCoffeeModal: () => void;
   toggleDocsDrawer: () => void;
+  pulseSaved: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -52,6 +55,8 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
   const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
+  // 保存成功脉冲：手动与自动保存共用，保存按钮监听计数变化播放落定回弹
+  const [savedPulse, setSavedPulse] = useState(0);
   // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
   const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
     try {
@@ -72,6 +77,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const toggleUserModal = useCallback(() => setUserModalOpen((p) => !p), []);
   const toggleCoffeeModal = useCallback(() => setCoffeeModalOpen((p) => !p), []);
   const toggleDocsDrawer = useCallback(() => setDocsDrawerOpen((p) => !p), []);
+  const pulseSaved = useCallback(() => setSavedPulse((p) => p + 1), []);
 
   const addTemplate = useCallback((id: string) => {
     setAddedTemplates((prev) => {
@@ -134,6 +140,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         userModalOpen,
         coffeeModalOpen,
         docsDrawerOpen,
+        savedPulse,
         addedTemplates,
         toasts,
         toggleSidebar,
@@ -145,6 +152,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
         toggleUserModal,
         toggleCoffeeModal,
         toggleDocsDrawer,
+        pulseSaved,
         addTemplate,
         removeTemplate,
         addToast,
