@@ -30,27 +30,34 @@ export function CoffeeIcon() {
   );
 }
 
-/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」从窗口两端释放礼花后关闭，「稍后支持」直接关闭 */
+/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」从窗口两端释放礼花、屏幕中央弹出致谢胶囊后关闭，「稍后支持」直接关闭 */
 export function CoffeeModal() {
-  const { coffeeModalOpen, toggleCoffeeModal, addToast } = useUI();
+  const { coffeeModalOpen, toggleCoffeeModal } = useUI();
   // 「已支持」触发礼花后延迟关闭；标记已触发，避免停留期间重复点击叠加多个关闭定时器
   const [celebrated, setCelebrated] = useState(false);
+  // 屏幕中央致谢胶囊：in 显示 / out 淡出 / null 隐藏；独立于弹窗渲染，弹窗关闭后仍可停留
+  const [thanks, setThanks] = useState<null | 'in' | 'out'>(null);
   // 关闭动画进行中：先播淡出，动画结束后再真正卸载
   const [closing, setClosing] = useState(false);
   const closingRef = useRef(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const timersRef = useRef<number[]>([]);
+
+  // 卸载时清理胶囊/关闭相关定时器
+  useEffect(() => () => timersRef.current.forEach((t) => window.clearTimeout(t)), []);
 
   // 统一关闭入口：播淡出动画 → 卸载弹窗并复位状态
   const close = () => {
     if (closingRef.current) return;
     closingRef.current = true;
     setClosing(true);
-    window.setTimeout(() => {
+    const t = window.setTimeout(() => {
       toggleCoffeeModal();
       setClosing(false);
       setCelebrated(false);
       closingRef.current = false;
     }, 180);
+    timersRef.current.push(t);
   };
 
   // Esc 关闭
@@ -64,7 +71,7 @@ export function CoffeeModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coffeeModalOpen]);
 
-  if (!coffeeModalOpen) return null;
+  if (!coffeeModalOpen && !thanks) return null;
 
   const handleSupported = () => {
     if (celebrated) return;
@@ -92,14 +99,16 @@ export function CoffeeModal() {
         colors: CONFETTI_COLORS,
       });
     }
-    addToast('感谢支持，祝你求职顺利！', 'success');
-    // 停留片刻让礼花可见，再淡出关闭（礼花画布独立于弹窗，关闭后仍继续飘落）
-    window.setTimeout(close, 1000);
+    // 致谢胶囊：屏幕中央弹出，弹窗关闭后继续停留片刻再淡出
+    setThanks('in');
+    timersRef.current.push(window.setTimeout(() => close(), 1000));
+    timersRef.current.push(window.setTimeout(() => setThanks('out'), 2700));
+    timersRef.current.push(window.setTimeout(() => setThanks(null), 3000));
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-6 pointer-events-none"
       role="dialog"
       aria-modal="true"
       aria-label="请作者喝杯咖啡"
@@ -121,25 +130,39 @@ export function CoffeeModal() {
           from { opacity: 1; }
           to { opacity: 0; }
         }
+        @keyframes coffeePillIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.92); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes coffeePillOut {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+        }
         .coffee-modal-in { animation: coffeeModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
         .coffee-backdrop-in { animation: coffeeBackdropIn 0.2s ease-out both; }
         .coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
+        .coffee-pill-in { animation: coffeePillIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .coffee-pill-out { animation: coffeePillOut 0.3s ease-in both; }
         @media (prefers-reduced-motion: reduce) {
-          .coffee-modal-in, .coffee-modal-out, .coffee-backdrop-in, .coffee-backdrop-out { animation: none; }
+          .coffee-modal-in, .coffee-modal-out, .coffee-backdrop-in, .coffee-backdrop-out,
+          .coffee-pill-in, .coffee-pill-out { animation: none; }
         }
       `}</style>
-      {/* 遮罩：点击关闭 */}
-      <div
-        className={`${closing ? 'coffee-backdrop-out' : 'coffee-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}
-        onClick={close}
-        aria-hidden="true"
-      />
+      {/* 遮罩：点击关闭（胶囊停留期间弹窗已卸载，遮罩不渲染且容器不拦截点击） */}
+      {coffeeModalOpen && (
+        <div
+          className={`${closing ? 'coffee-backdrop-out' : 'coffee-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px] pointer-events-auto`}
+          onClick={close}
+          aria-hidden="true"
+        />
+      )}
       {/* 卡片 */}
-      <div
-        ref={cardRef}
-        className={`${closing ? 'coffee-modal-out' : 'coffee-modal-in'} relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}
-      >
+      {coffeeModalOpen && (
+        <div
+          ref={cardRef}
+          className={`${closing ? 'coffee-modal-out' : 'coffee-modal-in'} relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col pointer-events-auto`}
+        >
         {/* 顶栏：与应用其他弹窗同构（mono 眉标 + 关闭按钮） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p
@@ -186,7 +209,25 @@ export function CoffeeModal() {
             稍后支持
           </button>
         </div>
-      </div>
+        </div>
+      )}
+
+      {/* 致谢胶囊：屏幕正中，弹窗关闭后仍停留片刻；不拦截点击 */}
+      {thanks && (
+        <div
+          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] pointer-events-none"
+          role="status"
+          aria-live="polite"
+        >
+          <div
+            className={`${
+              thanks === 'out' ? 'coffee-pill-out' : 'coffee-pill-in'
+            } px-5 py-2.5 rounded-full bg-gray-900/90 text-white text-[13px] font-medium shadow-lg whitespace-nowrap`}
+          >
+            感谢支持，祝你求职顺利！
+          </div>
+        </div>
+      )}
     </div>
   );
 }
