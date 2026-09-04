@@ -10,6 +10,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
+import { SAMPLE_MARKDOWN } from '@/sampleResume';
 import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, elementFontSizeVars, fontScale, MARGIN_MM, rehypeWrapH2Text, spacingScale, resumeColsCss, resumeFontSizeCss } from '@/preview/previewShared';
 
 /** 每个浏览器最多可持有的简历份数 */
@@ -74,8 +75,6 @@ function EditIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-
-const DEFAULT_MARKDOWN = '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n';
 
 /** 页脚随缘语录：每次进入页面随机展示一句 */
 const QUOTES = [
@@ -188,7 +187,7 @@ export function ResumesPage() {
     setCreating(true);
     const resume = await createResume({
       title: '未命名简历',
-      markdown: DEFAULT_MARKDOWN,
+      markdown: SAMPLE_MARKDOWN,
     });
     setCreating(false);
     if (resume) {
