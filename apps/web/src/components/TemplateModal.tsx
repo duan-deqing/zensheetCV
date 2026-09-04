@@ -1,15 +1,35 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useUI } from '@/store/UIContext';
 import { usePreview } from '@/store/PreviewContext';
 import { builtinTemplates } from '@/templates';
 import { TemplatePreview } from '@/components/TemplatePreview';
 import { HoverTip } from '@/components/HoverTip';
 
+/** 屏幕顶部中央胶囊提示（与 Coffee 致谢胶囊同款样式） */
+type TopPill = { id: number; text: string; visible: boolean };
+
 /** 模板库弹窗：以卡片展示全部内置模板（实时预览 + 名称 + 标签 + 添加按钮）。
  *  「添加」后该模板进入主题面板的模板卡片列表可供切换 */
 export function TemplateModal() {
-  const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, removeTemplate, addToast } = useUI();
+  const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, removeTemplate } = useUI();
   const { currentTemplate } = usePreview();
+  // 添加/取消添加的顶部胶囊提示；id 递增用于连续操作时重播动画
+  const [pill, setPill] = useState<TopPill | null>(null);
+  const pillIdRef = useRef(0);
+  const pillTimersRef = useRef<number[]>([]);
+
+  const showPill = (text: string) => {
+    pillTimersRef.current.forEach((t) => window.clearTimeout(t));
+    pillIdRef.current += 1;
+    setPill({ id: pillIdRef.current, text, visible: true });
+    pillTimersRef.current = [
+      window.setTimeout(() => setPill((p) => (p ? { ...p, visible: false } : p)), 2400),
+      window.setTimeout(() => setPill(null), 2700),
+    ];
+  };
+
+  // 卸载时清理胶囊定时器
+  useEffect(() => () => pillTimersRef.current.forEach((t) => window.clearTimeout(t)), []);
 
   // Esc 关闭
   useEffect(() => {
@@ -40,10 +60,20 @@ export function TemplateModal() {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        @keyframes tplPillIn {
+          from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes tplPillOut {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        }
         .tpl-modal-in { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
         .tpl-backdrop-in { animation: backdropIn 0.2s ease-out both; }
+        .tpl-pill-in { animation: tplPillIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .tpl-pill-out { animation: tplPillOut 0.3s ease-in both; }
         @media (prefers-reduced-motion: reduce) {
-          .tpl-modal-in, .tpl-backdrop-in { animation: none; }
+          .tpl-modal-in, .tpl-backdrop-in, .tpl-pill-in, .tpl-pill-out { animation: none; }
         }
       `}</style>
       {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
@@ -116,7 +146,7 @@ export function TemplateModal() {
                     <button
                       onClick={() => {
                         removeTemplate(t.id);
-                        addToast(`已移除「${t.name}」`, 'info');
+                        showPill(`已移除「${t.name}」`);
                       }}
                       className="w-full h-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 text-[13px] font-medium transition-colors"
                       aria-label={`取消添加 ${t.name}`}
@@ -127,7 +157,7 @@ export function TemplateModal() {
                     <button
                       onClick={() => {
                         addTemplate(t.id);
-                        addToast(`已添加「${t.name}」，可在主题面板切换`, 'success');
+                        showPill(`已添加「${t.name}」，可在主题面板切换`);
                       }}
                       className="w-full h-8 rounded-md bg-primary-600 hover:bg-primary-700 text-white text-[13px] font-medium transition-colors"
                       aria-label={`添加 ${t.name}`}
@@ -140,6 +170,24 @@ export function TemplateModal() {
             );
           })}
         </div>
+
+        {/* 顶部中央胶囊提示：与 Coffee 致谢胶囊同款；不拦截点击 */}
+        {pill && (
+          <div
+            className="fixed left-1/2 top-6 -translate-x-1/2 z-[110] pointer-events-none"
+            role="status"
+            aria-live="polite"
+          >
+            <div
+              key={pill.id}
+              className={`${
+                pill.visible ? 'tpl-pill-in' : 'tpl-pill-out'
+              } px-5 py-2.5 rounded-full bg-gray-900/90 text-white text-[13px] font-medium shadow-lg whitespace-nowrap`}
+            >
+              {pill.text}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
