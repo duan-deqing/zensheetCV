@@ -5,7 +5,7 @@ import { useUI } from '@/store/UIContext';
 import { Dropdown } from '@/components/Dropdown';
 import { HoverTip } from '@/components/HoverTip';
 import { TemplatePreview } from '@/components/TemplatePreview';
-import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
+import { DEFAULT_CONTENT_PADDING, normalizeFontSize, normalizeLineHeight } from '@/preview/previewShared';
 import { builtinTemplates } from '@/templates';
 import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
 import type { ThemeConfig } from '@stylan/shared-types';
@@ -23,26 +23,23 @@ const colorPresets = [
 const fontPresets = [
   { label: 'Inter · 现代无衬线', value: "'Inter', 'Noto Sans SC', sans-serif" },
   { label: '思源黑体 · 简洁清晰', value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
-  { label: 'Georgia · 经典衬线', value: "'Georgia', 'Noto Serif SC', serif" },
+  { label: '苹方 · 苹果系统字体', value: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif" },
+  { label: '阿里惠普体 · 商务无衬线', value: "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif" },
+  { label: 'Times New Roman · 经典衬线', value: "'Times New Roman', 'Noto Serif SC', serif" },
   { label: '思源宋体 · 优雅正式', value: "'Noto Serif SC', 'SimSun', serif" },
-  { label: 'JetBrains Mono · 等宽技术', value: "'JetBrains Mono', 'Fira Code', monospace" },
 ];
 
-const sizeOptions = [
-  { value: 'xs', label: '特小' },
-  { value: 'sm', label: '偏小' },
-  { value: 'base', label: '标准' },
-  { value: 'lg', label: '偏大' },
-  { value: 'xl', label: '特大' },
-] as const;
+/** 字号下拉：10 ~ 30 px */
+const sizeOptions = Array.from({ length: 21 }, (_, i) => {
+  const px = 10 + i;
+  return { value: String(px), label: `${px} px` };
+});
 
-const spacingOptions = [
-  { value: 'tight', label: '极紧凑' },
-  { value: 'compact', label: '紧凑' },
-  { value: 'normal', label: '标准' },
-  { value: 'relaxed', label: '较宽松' },
-  { value: 'loose', label: '宽松' },
-] as const;
+/** 行距下拉：12 ~ 25 → 1.2 ~ 2.5 倍 */
+const lineHeightOptions = Array.from({ length: 14 }, (_, i) => {
+  const lh = ((12 + i) / 10).toFixed(1);
+  return { value: lh, label: `${lh} 倍` };
+});
 
 /** 页边距档位，mm 值与 previewShared.MARGIN_MM 一致，仅用于展示 */
 const marginOptions = [
@@ -215,7 +212,7 @@ export function ThemeConfigPanel() {
               ariaLabel="选择字体"
             />
           </div>
-          {/* 字号 / 间距 */}
+          {/* 字号 / 行距 */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
@@ -223,20 +220,22 @@ export function ThemeConfigPanel() {
               </label>
               <Dropdown
                 options={sizeOptions}
-                value={themeConfig.fontSize}
-                onChange={(v) => applyTheme({ fontSize: v })}
+                value={String(normalizeFontSize(themeConfig.fontSize))}
+                onChange={(v) => applyTheme({ fontSize: Number(v) })}
                 ariaLabel="选择字号"
               />
             </div>
             <div>
               <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-                间距
+                行距
               </label>
               <Dropdown
-                options={spacingOptions}
-                value={themeConfig.spacing}
-                onChange={(v) => applyTheme({ spacing: v })}
-                ariaLabel="选择间距"
+                options={lineHeightOptions}
+                value={normalizeLineHeight(
+                  themeConfig.lineHeight ?? (themeConfig as { spacing?: unknown }).spacing,
+                ).toFixed(1)}
+                onChange={(v) => applyTheme({ lineHeight: Number(v) })}
+                ariaLabel="选择行距"
               />
             </div>
           </div>

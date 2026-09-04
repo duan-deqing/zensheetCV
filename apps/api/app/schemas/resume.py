@@ -1,12 +1,12 @@
 from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 
 class ThemeConfigSchema(BaseModel):
     primaryColor: str = "#2563EB"
     fontFamily: str = "'Inter', 'Noto Sans SC', sans-serif"
-    fontSize: Literal['xs', 'sm', 'base', 'lg', 'xl'] = "base"
-    spacing: Literal['tight', 'compact', 'normal', 'relaxed', 'loose'] = "normal"
+    fontSize: float = Field(default=14, ge=10, le=30)
+    lineHeight: float = Field(default=1.6, ge=1.2, le=2.5)
 
 class ResumeBase(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)

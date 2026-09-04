@@ -1,11 +1,22 @@
 /** 全站共享的示例简历内容（人设：沈亦南 · 后端工程师）
-   完整版用于首页 Hero、模板展示区与模板卡片预览，全站内容同源 */
+   完整版用于首页 Hero、模板展示区与模板卡片预览，全站内容同源；
+   基本信息使用 :::left / :::mid / :::right 三栏语法，展示分栏排版能力 */
 
 export const SAMPLE_MARKDOWN = `# 沈亦南
 
-icon:info 后端工程师 · 6 年经验 · 杭州
+:::left
+icon:info 后端工程师
+:::
 
-icon:phone 139-0000-0000 · icon:email shen@mail.com · icon:github shenyinan · icon:blog shenyinan.dev
+:::mid
+6 年经验 · 杭州
+:::
+
+:::right
+icon:github shenyinan.dev
+:::
+
+icon:phone 139-0000-0000 · icon:email shen@mail.com
 
 ## 技能
 

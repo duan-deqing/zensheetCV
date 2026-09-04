@@ -25,6 +25,7 @@ export const carbonTemplate: TemplateDefinition = {
       color: #1A1A1A;
       line-height: calc(1.75 * var(--resume-sp, 1));
       background: #FFFFFF;
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(2.4rem * var(--resume-fs, 1));
@@ -96,7 +97,7 @@ export const carbonTemplate: TemplateDefinition = {
   defaultTheme: {
     primaryColor: '#1A1A1A',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
-    fontSize: 'base',
-    spacing: 'normal',
+    fontSize: 14,
+    lineHeight: 1.6,
   },
 };

@@ -76,7 +76,7 @@ export function Dropdown<T extends string>({
       {open && (
         <div
           role="listbox"
-          className="dropdown-pop absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30"
+          className="dropdown-pop absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30 max-h-60 overflow-y-auto"
         >
           <style>{`
             @keyframes dropdownIn {

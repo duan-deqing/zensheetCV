@@ -20,6 +20,7 @@ export const elegantTemplate: TemplateDefinition = {
       color: #2C2C2C;
       line-height: calc(1.7 * var(--resume-sp, 1));
       background: #FDFBF7;
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(2.5rem * var(--resume-fs, 1));
@@ -70,8 +71,8 @@ export const elegantTemplate: TemplateDefinition = {
   `,
   defaultTheme: {
     primaryColor: '#78350F',
-    fontFamily: "'Georgia', 'Noto Serif SC', serif",
-    fontSize: 'base',
-    spacing: 'relaxed',
+    fontFamily: "'Times New Roman', 'Noto Serif SC', serif",
+    fontSize: 14,
+    lineHeight: 1.85,
   },
 };

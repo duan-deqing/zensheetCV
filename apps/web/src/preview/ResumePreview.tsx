@@ -13,9 +13,9 @@ import {
   A4_WIDTH_MM,
   CONTENT_PADDING_MM,
   DEFAULT_CONTENT_PADDING,
-  FONT_SCALE,
+  fontScale,
   MARGIN_MM,
-  SPACING_SCALE,
+  spacingScale,
   resumeColsCss,
   resumeIconsCss,
   resumeQuoteCss,
@@ -133,8 +133,8 @@ export function ResumePreview() {
 
   const templateId = currentTemplate?.id || 'classic';
   const css = getTemplateCss(templateId);
-  const fs = FONT_SCALE[themeConfig.fontSize] ?? 1;
-  const sp = SPACING_SCALE[themeConfig.spacing] ?? 1;
+  const fs = fontScale(themeConfig);
+  const sp = spacingScale(themeConfig);
   const normalizedMarkdown = useMemo(() => normalizeColMarkers(markdown), [markdown]);
 
   // 图标渲染：内置图标 + 主题里的自定义图标，Markdown 中以 `icon:名称` 引用

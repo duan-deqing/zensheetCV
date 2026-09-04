@@ -24,6 +24,7 @@ export const mujiTemplate: TemplateDefinition = {
       color: #333333;
       line-height: calc(1.7 * var(--resume-sp, 1));
       background: #FFFFFF;
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(1.75rem * var(--resume-fs, 1));
@@ -99,7 +100,7 @@ export const mujiTemplate: TemplateDefinition = {
   defaultTheme: {
     primaryColor: '#39393A',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
-    fontSize: 'base',
-    spacing: 'normal',
+    fontSize: 14,
+    lineHeight: 1.6,
   },
 };

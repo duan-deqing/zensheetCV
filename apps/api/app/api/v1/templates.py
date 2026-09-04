@@ -13,7 +13,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* classic template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#111827", "fontFamily": "serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#111827", "fontFamily": "serif", "fontSize": 14, "lineHeight": 1.6},
     },
     {
         "id": "carbon",
@@ -23,7 +23,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* carbon template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#1A1A1A", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#1A1A1A", "fontFamily": "sans-serif", "fontSize": 14, "lineHeight": 1.6},
     },
     {
         "id": "modern",
@@ -33,7 +33,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* modern template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#2563EB", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#2563EB", "fontFamily": "sans-serif", "fontSize": 14, "lineHeight": 1.6},
     },
     {
         "id": "elegant",
@@ -43,7 +43,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* elegant template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#78350F", "fontFamily": "serif", "fontSize": "base", "spacing": "relaxed"},
+        "default_theme": {"primaryColor": "#78350F", "fontFamily": "'Times New Roman', 'Noto Serif SC', serif", "fontSize": 14, "lineHeight": 1.85},
     },
     {
         "id": "tech",
@@ -53,7 +53,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* tech template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#10B981", "fontFamily": "monospace", "fontSize": "sm", "spacing": "compact"},
+        "default_theme": {"primaryColor": "#10B981", "fontFamily": "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif", "fontSize": 13, "lineHeight": 1.45},
     },
     {
         "id": "muji",
@@ -63,7 +63,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* muji template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#39393A", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#39393A", "fontFamily": "sans-serif", "fontSize": 14, "lineHeight": 1.6},
     },
     {
         "id": "azure",
@@ -73,7 +73,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* azure template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#5974D4", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#5974D4", "fontFamily": "sans-serif", "fontSize": 14, "lineHeight": 1.6},
     },
     {
         "id": "sunrise",
@@ -83,7 +83,7 @@ BUILTIN_TEMPLATES = [
         "css_styles": "/* sunrise template css */",
         "block_mapping": {"h1": "name", "h2": "section-title", "h3": "item-title", "ul": "list", "p": "description"},
         "is_builtin": True,
-        "default_theme": {"primaryColor": "#F9855D", "fontFamily": "sans-serif", "fontSize": "base", "spacing": "normal"},
+        "default_theme": {"primaryColor": "#F9855D", "fontFamily": "sans-serif", "fontSize": 14, "lineHeight": 1.6},
     },
 ]
 

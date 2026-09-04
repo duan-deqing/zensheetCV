@@ -19,6 +19,7 @@ export const classicTemplate: TemplateDefinition = {
       font-family: 'Inter', 'Noto Sans SC', sans-serif;
       color: #111827;
       line-height: calc(1.6 * var(--resume-sp, 1));
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(2rem * var(--resume-fs, 1));
@@ -79,7 +80,7 @@ export const classicTemplate: TemplateDefinition = {
   defaultTheme: {
     primaryColor: '#111827',
     fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
-    fontSize: 'base',
-    spacing: 'normal',
+    fontSize: 14,
+    lineHeight: 1.6,
   },
 };

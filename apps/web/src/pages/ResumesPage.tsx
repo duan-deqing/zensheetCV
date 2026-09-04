@@ -10,7 +10,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
-import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, FONT_SCALE, MARGIN_MM, SPACING_SCALE, resumeColsCss } from '@/preview/previewShared';
+import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, fontScale, MARGIN_MM, spacingScale, resumeColsCss } from '@/preview/previewShared';
 
 /** 线性垃圾桶图标，颜色跟随 currentColor */
 function TrashIcon({ className }: { className?: string }) {
@@ -95,7 +95,7 @@ function pickQuote() {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
 
-/** 竖直简历纸面缩略图：按该简历保存的模板与主题（主色调/字体/字号/间距）渲染，
+/** 竖直简历纸面缩略图：按该简历保存的模板与主题（主色调/字体/字号/行距）渲染，
  * 与编辑页预览使用同一套 Markdown 管线与变量体系。
  * 注意：<style> 是全局的，每张卡片必须用唯一作用域类，
  * 否则多份模板 CSS 同指 .rp-thumb 会互相覆盖、全部变成最后一张的样式 */
@@ -108,8 +108,12 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
   const scopeClass = `rp-thumb-${resume.id}`;
   const scoped = getTemplateCss(templateId).replace(/\.resume-preview/g, `.${scopeClass}`);
   const zoom = 0.55;
-  const fs = FONT_SCALE[theme.fontSize ?? defaults.fontSize] ?? 1;
-  const sp = SPACING_SCALE[theme.spacing ?? defaults.spacing] ?? 1;
+  const fs = fontScale({ fontSize: theme.fontSize ?? defaults.fontSize });
+  const sp = spacingScale({
+    lineHeight: theme.lineHeight ?? defaults.lineHeight,
+    // 旧数据行距存于 spacing 档位字段
+    spacing: (theme as { spacing?: unknown }).spacing,
+  });
   const normalized = normalizeColMarkers(resume.markdown ?? '');
   return (
     <div className="h-56 overflow-hidden bg-white border-b border-gray-100" aria-hidden="true">

@@ -1,5 +1,3 @@
-export type FontSizeOption = 'xs' | 'sm' | 'base' | 'lg' | 'xl';
-export type SpacingOption = 'tight' | 'compact' | 'normal' | 'relaxed' | 'loose';
 export type MarginOption = 'none' | 'narrow' | 'normal' | 'wide';
 
 /** 简历照片：绝对定位在某页纸面上，坐标与宽度均为该页尺寸的百分比；
@@ -21,8 +19,10 @@ export interface ResumePhoto {
 export interface ThemeConfig {
   primaryColor: string;
   fontFamily: string;
-  fontSize: FontSizeOption;
-  spacing: SpacingOption;
+  /** 正文字号（px），10 ~ 30 */
+  fontSize: number;
+  /** 行距（倍数），1.2 ~ 2.5 */
+  lineHeight: number;
   /** 左右页边距（PDF 导出与预览共用） */
   marginX: MarginOption;
   /** 上下页边距（PDF 导出与预览共用） */
@@ -38,8 +38,8 @@ export interface ThemeConfig {
 export const defaultTheme: ThemeConfig = {
   primaryColor: '#2563EB',
   fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
-  fontSize: 'base',
-  spacing: 'normal',
+  fontSize: 14,
+  lineHeight: 1.6,
   marginX: 'none',
   marginY: 'none',
   contentPadding: 'normal',

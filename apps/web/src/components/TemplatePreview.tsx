@@ -4,14 +4,16 @@ import { getTemplateById, getTemplateCss } from '@/templates';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
 import {
   CONTENT_PADDING_MM,
-  FONT_SCALE,
+  fontScale,
   MARGIN_MM,
-  SPACING_SCALE,
+  spacingScale,
+  resumeColsCss,
   resumeIconsCss,
   resumeQuoteCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
 import { SAMPLE_MARKDOWN as PREVIEW_MARKDOWN } from '@/sampleResume';
+import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 
 /** A4 设计稿尺寸（px，96dpi），与预览/导出一致 */
 const PAGE_WIDTH = 794;
@@ -83,6 +85,7 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
       <style>{scoped}</style>
       <style>{resumeIconsCss(`.tpl-${templateId}`)}</style>
       <style>{resumeQuoteCss(`.tpl-${templateId}`)}</style>
+      <style>{resumeColsCss(`.tpl-${templateId}`)}</style>
       <div
         ref={pageRef}
         className={`tpl-${templateId} absolute top-0 origin-top-left bg-white`}
@@ -95,17 +98,17 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
             minHeight: PAGE_HEIGHT,
             '--resume-primary': theme.primaryColor,
             fontFamily: theme.fontFamily,
-            '--resume-fs': FONT_SCALE[theme.fontSize] ?? 1,
-            '--resume-sp': SPACING_SCALE[theme.spacing] ?? 1,
+            '--resume-fs': fontScale(theme),
+            '--resume-sp': spacingScale(theme),
           } as CSSProperties
         }
       >
         <div style={{ padding: `${padXMM}mm ${padXMM}mm` }}>
           <ReactMarkdown
-            remarkPlugins={[remarkResumeIcons(iconMap)]}
+            remarkPlugins={[remarkResumeCols, remarkResumeIcons(iconMap)]}
             components={components}
           >
-            {PREVIEW_MARKDOWN}
+            {normalizeColMarkers(PREVIEW_MARKDOWN)}
           </ReactMarkdown>
         </div>
       </div>

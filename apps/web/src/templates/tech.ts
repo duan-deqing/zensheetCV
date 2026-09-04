@@ -20,6 +20,7 @@ export const techTemplate: TemplateDefinition = {
       color: #E5E7EB;
       line-height: calc(1.6 * var(--resume-sp, 1));
       background: #111827;
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(1.75rem * var(--resume-fs, 1));
@@ -75,8 +76,8 @@ export const techTemplate: TemplateDefinition = {
   `,
   defaultTheme: {
     primaryColor: '#10B981',
-    fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-    fontSize: 'sm',
-    spacing: 'compact',
+    fontFamily: "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif",
+    fontSize: 13,
+    lineHeight: 1.45,
   },
 };

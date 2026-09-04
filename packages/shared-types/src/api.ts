@@ -1,3 +1,5 @@
+import type { ThemeConfig } from './resume';
+
 export interface Template {
   id: string;
   name: string;
@@ -6,7 +8,7 @@ export interface Template {
   css_styles: string;
   block_mapping: Record<string, string>;
   is_builtin: boolean;
-  default_theme: Record<string, string>;
+  default_theme: Partial<ThemeConfig>;
 }
 
 export interface PDFGenerateRequest {

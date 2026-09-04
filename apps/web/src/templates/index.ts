@@ -6,7 +6,7 @@ import { mujiTemplate } from './muji';
 import { azureTemplate } from './azure';
 import { sunriseTemplate } from './sunrise';
 import { carbonTemplate } from './carbon';
-import type { FontSizeOption, SpacingOption, Template } from '@stylan/shared-types';
+import type { Template } from '@stylan/shared-types';
 
 export interface TemplateDefinition {
   id: string;
@@ -20,8 +20,10 @@ export interface TemplateDefinition {
   defaultTheme: {
     primaryColor: string;
     fontFamily: string;
-    fontSize: FontSizeOption;
-    spacing: SpacingOption;
+    /** 正文字号（px，10 ~ 30） */
+    fontSize: number;
+    /** 行距（倍数，1.2 ~ 2.5） */
+    lineHeight: number;
   };
 }
 

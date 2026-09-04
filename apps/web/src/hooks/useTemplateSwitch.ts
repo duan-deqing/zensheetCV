@@ -19,7 +19,7 @@ export function useTemplateSwitch() {
         primaryColor: template.defaultTheme.primaryColor,
         fontFamily: template.defaultTheme.fontFamily,
         fontSize: template.defaultTheme.fontSize,
-        spacing: template.defaultTheme.spacing,
+        lineHeight: template.defaultTheme.lineHeight,
         marginX: themeConfig.marginX,
         marginY: themeConfig.marginY,
         contentPadding: themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING,

@@ -218,11 +218,11 @@ export function ThemeDocContent() {
         </div>
       </DocBlock>
 
-      <DocBlock title="视觉风格" desc="六种主色调、五种正文字体，以及字号与行距间距各五档微调：">
+      <DocBlock title="视觉风格" desc="六种主色调、五种正文字体，字号与行距自由选择：">
         <div className="rounded-xl border border-gray-200 p-4 text-[13px] text-gray-600 leading-relaxed">
           <ul className="list-disc pl-5 flex flex-col gap-1.5">
             <li>主色影响标题、分隔线、图标等强调元素的配色。</li>
-            <li>字号与间距为「紧凑 ↔ 舒适」的渐进档位，建议先选模板再微调。</li>
+            <li>字号在 10 ~ 30 px 间选择，行距在 1.2 ~ 2.5 倍间选择；行距同时影响段落与条目的垂直留白，建议先选模板再微调。</li>
           </ul>
         </div>
       </DocBlock>
@@ -456,7 +456,22 @@ export function AIDocPage() {
 
 const CHANGELOG = [
   {
+    version: 'v0.10.0',
+    date: '2026-09-04',
+    title: '排版体系数值化与模板精修',
+    items: [
+      '主题配置数值化：字号（10~30px）与行距（1.2~2.5 倍）改为下拉精调，旧档位数据自动兼容',
+      '字体选项调整：新增苹方、阿里惠普体、Times New Roman，优雅复古与技术极简默认字体同步更新',
+      '「现代蓝调」模板重做：蓝色双斜线章节标题、方块列表符、胶囊技术栈标签',
+      '全部模板正文两端对齐，列表符号与小节标题严格对齐',
+      '首页改版：新增工作台、主题与排版、文档导航板块，示例简历展示三栏分栏语法',
+      '修复首页与模板卡片分栏插件注册方式导致的崩溃',
+      '更新日志增加日期与最新版本 NEW 标识，下拉菜单支持滚动',
+    ],
+  },
+  {
     version: 'v0.9.0',
+    date: '2026-09-02',
     title: 'AI 聊天窗与文档系统重构',
     items: [
       'AI 助手重构为独立聊天窗：流式回复、Telegram 风格气泡、Markdown 渲染与执行状态展示',
@@ -470,6 +485,7 @@ const CHANGELOG = [
   },
   {
     version: 'v0.8.0',
+    date: '2026-09-01',
     title: '文档系统与 AI 聊天窗',
     items: [
       '编辑器新增右侧文档抽屉，文档内容全面重写',
@@ -480,6 +496,7 @@ const CHANGELOG = [
   },
   {
     version: 'v0.7.0',
+    date: '2026-09-01',
     title: '设置中心与账号体系完善',
     items: [
       '新增设置窗口：账号信息、AI 供应商配置、安全（改用户名 / 邮箱 / 密码）、关于',
@@ -489,6 +506,7 @@ const CHANGELOG = [
   },
   {
     version: 'v0.1.0',
+    date: '2026-08-19',
     title: '首个公开版本',
     items: [
       'Markdown 编辑器 + A4 实时分页预览',
@@ -506,10 +524,27 @@ export function ChangelogPage() {
       <DocSectionHeader no="CHANGELOG" title="更新日志" desc="ZENSHEET · 简历 的版本演进记录。" />
 
       <div className="flex flex-col gap-8">
-        {CHANGELOG.map((v) => (
-          <section key={v.version} data-docs-reveal className="relative pl-6 border-l-2 border-gray-100">
+        {CHANGELOG.map((v, i) => (
+          <section
+            key={v.version}
+            data-docs-reveal
+            className="relative sm:ml-28 pl-6 border-l-2 border-gray-100"
+          >
+            {/* 时间信息：置于时间线圆点左侧（窄屏时回退到版本号右侧） */}
+            <span className="hidden sm:block absolute top-0.5 -left-28 w-24 text-right font-mono text-sm text-gray-500 tabular-nums">
+              {v.date}
+            </span>
             <span className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-50" />
-            <p className="font-mono text-sm text-primary-600 font-medium">{v.version}</p>
+            <p className="font-mono text-sm text-primary-600 font-medium">
+              {v.version}
+              {/* 最新版本标记 NEW */}
+              {i === 0 && (
+                <span className="ml-2 inline-block align-[1px] rounded-full bg-primary-500 px-1.5 py-px font-sans text-[10px] font-semibold tracking-widest text-white">
+                  NEW
+                </span>
+              )}
+              <span className="sm:hidden ml-2.5 text-gray-500 font-normal">{v.date}</span>
+            </p>
             <p className="font-semibold text-gray-900 mt-1">{v.title}</p>
             <ul className="list-disc pl-5 mt-2 flex flex-col gap-1 text-[13px] text-gray-500 leading-relaxed">
               {v.items.map((it) => (

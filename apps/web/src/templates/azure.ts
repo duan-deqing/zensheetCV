@@ -24,6 +24,7 @@ export const azureTemplate: TemplateDefinition = {
       color: #333333;
       line-height: calc(1.7 * var(--resume-sp, 1));
       background: #FFFFFF;
+      text-align: justify;
     }
     .resume-preview h1 {
       font-size: calc(1.9rem * var(--resume-fs, 1));
@@ -87,7 +88,7 @@ export const azureTemplate: TemplateDefinition = {
   defaultTheme: {
     primaryColor: '#5974D4',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
-    fontSize: 'base',
-    spacing: 'normal',
+    fontSize: 14,
+    lineHeight: 1.6,
   },
 };

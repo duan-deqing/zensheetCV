@@ -101,7 +101,8 @@ export function EditorPage() {
               primaryColor: theme.primaryColor ?? template.defaultTheme.primaryColor,
               fontFamily: theme.fontFamily ?? template.defaultTheme.fontFamily,
               fontSize: theme.fontSize ?? template.defaultTheme.fontSize,
-              spacing: theme.spacing ?? template.defaultTheme.spacing,
+              // 旧数据行距存于 spacing 档位字段，优先取新字段 lineHeight
+              lineHeight: theme.lineHeight ?? (theme as { spacing?: unknown }).spacing ?? template.defaultTheme.lineHeight,
               // 旧数据只有 pageMargin（单值），左右/上下均回退到它；缺省为 0 边距
               marginX: theme.marginX ?? theme.pageMargin ?? 'none',
               marginY: theme.marginY ?? theme.pageMargin ?? 'none',

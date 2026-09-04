@@ -5,7 +5,7 @@ import { useAuth } from '@/store/AuthContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
-import { A4_HEIGHT_MM, A4_WIDTH_MM, CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, FONT_SCALE, MARGIN_MM, SPACING_SCALE } from '@/preview/previewShared';
+import { A4_HEIGHT_MM, A4_WIDTH_MM, CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, fontScale, MARGIN_MM, spacingScale } from '@/preview/previewShared';
 import { useResume } from '@/hooks/useResume';
 import { SaveButton } from '@/components/SaveButton';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
@@ -399,7 +399,7 @@ export function TopBar() {
           : '#FFFFFF';
     // 显式注入当前主题变量（间距/字号/主色/字体）：不依赖 DOM 克隆的 <style>，
     // 从机制上保证导出 PDF 与主题设置一致，避免克隆样式滞后或缺失
-    const themeOverride = `<style>.resume-preview{--resume-sp:${SPACING_SCALE[themeConfig.spacing] ?? 1};--resume-fs:${FONT_SCALE[themeConfig.fontSize] ?? 1};--resume-primary:${themeConfig.primaryColor};font-family:${themeConfig.fontFamily};}</style>`;
+    const themeOverride = `<style>.resume-preview{--resume-sp:${spacingScale(themeConfig)};--resume-fs:${fontScale(themeConfig)};--resume-primary:${themeConfig.primaryColor};font-family:${themeConfig.fontFamily};}</style>`;
     // 照片换算：预览中照片层锚定整张纸（含边距区域），x/y 是整页尺寸的百分比；
     // 导出中照片以内容盒为包含块（Playwright 页边距承担四周留白），
     // 因此先还原为页面毫米坐标，再减去每页留白得到内容盒内坐标
