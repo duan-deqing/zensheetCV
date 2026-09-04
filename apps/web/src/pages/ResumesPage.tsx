@@ -12,7 +12,7 @@ import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, elementFontSizeVars, fontScale, MARGIN_MM, rehypeWrapH2Text, spacingScale, resumeColsCss, resumeFontSizeCss } from '@/preview/previewShared';
 
-/** 每个用户最多可持有的简历份数（与后端 MAX_RESUMES_PER_USER 保持一致） */
+/** 每个浏览器最多可持有的简历份数 */
 const MAX_RESUMES = 15;
 
 /** 线性垃圾桶图标，颜色跟随 currentColor */
@@ -176,7 +176,7 @@ export function ResumesPage() {
   // 页脚随缘语录：仅组件挂载（进入/刷新页面）时随机取一次
   const [quote] = useState(pickQuote);
 
-  // 简历创建份数上限（后端同样强制校验，此处用于前置拦截与提示）
+  // 简历创建份数上限（本地存储版仅此前置拦截与提示）
   const atLimit = !isLoading && resumes.length >= MAX_RESUMES;
 
   useEffect(() => {

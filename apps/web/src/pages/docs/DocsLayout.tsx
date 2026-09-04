@@ -70,7 +70,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
         </p>
         <h1 className="docs-enter docs-enter-1 text-3xl md:text-4xl font-bold tracking-tight">使用文档</h1>
         <p className="docs-enter docs-enter-2 text-gray-600 mt-3 max-w-[36em] leading-relaxed">
-          从注册到导出 PDF 的完整指南。右侧目录可在各子文档间切换。
+          从创建简历到导出 PDF 的完整指南。右侧目录可在各子文档间切换。
         </p>
       </header>
 

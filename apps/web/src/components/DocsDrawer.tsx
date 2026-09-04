@@ -31,7 +31,7 @@ function CloseIcon() {
 
 /** 抽屉内的文档 Tab，与文档子页面一一对应 */
 const TABS = [
-  { id: 'guide', no: '01 · GUIDE', label: '使用指南', title: '使用指南', desc: '从注册到导出 PDF 的完整流程，并汇总其余教程入口。' },
+  { id: 'guide', no: '01 · GUIDE', label: '使用指南', title: '使用指南', desc: '从创建简历到导出 PDF 的完整流程，并汇总其余教程入口。' },
   { id: 'markdown', no: '02 · MARKDOWN', label: 'Markdown 教程', title: 'Markdown 简历教程', desc: '常用语法速查，附使用示例与实时渲染效果预览。' },
   { id: 'theme', no: '03 · THEME', label: '主题配置', title: '主题配置', desc: '模板、视觉风格与页面布局的设置详解与注意事项。' },
   { id: 'icons', no: '04 · ICONS', label: '图标库', title: '图标库', desc: 'icon: 语法、使用方式与常用内置图标一览。' },

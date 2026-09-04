@@ -117,7 +117,7 @@ const SPECS = [
   { value: 'A4', unit: 'REAL-TIME PREVIEW', label: '逐页实时预览，所见即所得' },
   { value: 'MD', unit: 'MARKDOWN FIRST', label: '专注内容，排版交给模板' },
   { value: 'AI', unit: 'BYOK ASSISTANT', label: '自带密钥，多供应商接入' },
-  { value: 'PDF', unit: 'SERVER RENDERED', label: '导出与预览完全一致' },
+  { value: 'PDF', unit: 'PRINT READY', label: '导出与预览完全一致' },
 ];
 
 const STEPS = [
@@ -137,7 +137,7 @@ const STEPS = [
     no: '03',
     tag: 'EXPORT',
     title: '一键导出 PDF',
-    desc: '服务端渲染，字距与分页与预览一致，直接投递。',
+    desc: '浏览器打印直出，字距与分页与预览一致，直接投递。',
   },
 ];
 
@@ -172,7 +172,7 @@ const HOME_ICONS = ['email', 'phone', 'github', 'blog', 'location', 'weixin', 'z
 
 /** 文档导航卡 */
 const DOC_CARDS = [
-  { no: '01', title: '使用指南', desc: '从注册到导出的完整流程', to: '/docs/guide' },
+  { no: '01', title: '使用指南', desc: '从创建简历到导出的完整流程', to: '/docs/guide' },
   { no: '02', title: 'Markdown 教程', desc: '常用语法与效果预览', to: '/docs/markdown' },
   { no: '03', title: '主题配置', desc: '模板与排版设置详解', to: '/docs/theme' },
   { no: '04', title: '图标库', desc: 'icon: 语法与内置图标', to: '/docs/icons' },
@@ -256,7 +256,7 @@ export function HomePage() {
           >
             <ResumePaper templateId="classic" zoom={0.4} className="h-[320px] rounded-xl" />
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400 px-4 py-2 border-t border-gray-100">
-              PDF / SERVER RENDERED
+              PDF / PRINT READY
             </p>
           </div>
         </div>

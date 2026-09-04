@@ -1,4 +1,3 @@
-import { apiClient } from '@/api/client';
 import { AI_PROVIDERS } from './providers';
 
 /** AI 设置：自带 Key（BYOK），全部保存在本地浏览器，仅用于当前设备。
@@ -79,18 +78,18 @@ export function resolveAISettings(settings: AISettings): {
   return { apiKey, baseUrl: preset.baseUrl, model: settings.model };
 }
 
-/** 通过后端代理转发供应商 GET /models（OpenAI 兼容协议）。
- *  浏览器直连会被供应商 CORS 策略拦截（Failed to fetch），故经服务端转发 */
+/** 浏览器直连供应商 GET /models（OpenAI 兼容协议）。
+ *  供应商未开放 CORS 时会抛出网络错误，此时可手动输入模型名称 */
 export async function fetchProviderModels(baseUrl: string, apiKey: string): Promise<string[]> {
-  try {
-    const { data } = await apiClient.post('/ai/models', {
-      base_url: baseUrl,
-      api_key: apiKey,
-    });
-    const models: unknown[] = Array.isArray(data?.models) ? data.models : [];
-    return models.filter((m): m is string => typeof m === 'string' && m.length > 0);
-  } catch (e) {
-    const detail = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-    throw new Error(detail || '网络请求失败');
-  }
+  const url = `${baseUrl.replace(/\/+$/, '')}/models`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+  if (!res.ok) throw new Error(`请求失败 (HTTP ${res.status})`);
+  const data = await res.json();
+  // OpenAI 协议返回 { data: [{ id }] }，兼容直接返回字符串数组或对象数组
+  const raw: unknown[] = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+  return raw
+    .map((m) => (typeof m === 'string' ? m : (m as { id?: unknown })?.id))
+    .filter((m): m is string => typeof m === 'string' && m.length > 0);
 }

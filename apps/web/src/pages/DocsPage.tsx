@@ -19,11 +19,11 @@ const FEATURES = [
   { title: '主题微调', desc: '主色、字体、字号间距、页边距独立可调，与导出 PDF 严格一致' },
   { title: 'AI 助手', desc: '润色全文、关键词分析、要点成段，支持自定义 OpenAI 兼容模型' },
   { title: '照片与图标', desc: '证件照自由拖放缩放，19 个内置矢量图标随文字变色' },
-  { title: 'PDF 导出', desc: '服务端渲染导出，所见即所得，逐页排版与预览完全相同' },
+  { title: 'PDF 导出', desc: '浏览器打印直出，所见即所得，逐页排版与预览完全相同' },
 ];
 
 const SUB_DOCS = [
-  { to: '/docs/guide', no: '01', title: '使用指南', desc: '从注册到导出 PDF 的基础流程，以及其余教程的索引' },
+  { to: '/docs/guide', no: '01', title: '使用指南', desc: '从创建简历到导出 PDF 的基础流程，以及其余教程的索引' },
   { to: '/docs/markdown', no: '02', title: 'Markdown 简历教程', desc: '标题、强调、列表、引用、分栏等语法示例与效果预览' },
   { to: '/docs/theme', no: '03', title: '主题配置', desc: '模板切换、视觉风格、页面布局的详细说明与注意事项' },
   { to: '/docs/icons', no: '04', title: '图标库', desc: 'icon: 语法、图标库使用方式与全部内置图标一览' },
@@ -77,7 +77,7 @@ export function DocsPage() {
       <section data-docs-reveal className="mb-14">
         <h2 className="text-2xl font-bold tracking-tight">如何使用？</h2>
         <p className="text-gray-600 mt-3 max-w-[46em] leading-relaxed">
-          注册登录后新建简历 → 在编辑器中用 Markdown 替换示例内容 →
+          新建简历 → 在编辑器中用 Markdown 替换示例内容 →
           通过主题面板挑选模板与样式 → 导出 PDF。
           详细流程见
           <Link to="/docs/guide" className="text-primary-600 hover:text-primary-700 font-medium mx-1">

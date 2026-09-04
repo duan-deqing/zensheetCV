@@ -37,7 +37,7 @@ function DocPageLink({
 /* ============ 01 使用指南 ============ */
 
 const QUICK_STEPS = [
-  { no: 'STEP 1', title: '注册登录', desc: '首页点击「注册」创建账号；已有账号直接登录。登录后可在导航栏点击用户名打开设置。' },
+  { no: 'STEP 1', title: '打开即用', desc: '免注册登录，打开网站即可使用；简历与配置仅保存在当前浏览器本地。可在导航栏点击用户名打开设置。' },
   { no: 'STEP 2', title: '创建简历', desc: '进入「我的简历」页面，点击新建简历，会得到一份示例内容，随后在编辑器中替换为自己的经历。' },
   { no: 'STEP 3', title: '编辑内容', desc: '左侧为 Markdown 编辑器，右侧实时预览。使用标题、列表、分栏等语法组织内容，详见《Markdown 简历教程》。' },
   { no: 'STEP 4', title: '调样式并导出', desc: '通过「主题」面板选择模板与视觉风格；完成后点击右上角「导出 PDF」即可下载，效果与预览逐页一致。' },
@@ -115,7 +115,7 @@ export function GuidePage() {
       <DocSectionHeader
         no="01 · GUIDE"
         title="使用指南"
-        desc="本页介绍从注册到导出 PDF 的完整使用流程，并汇总其余教程文档的入口。"
+        desc="本页介绍从创建简历到导出 PDF 的完整使用流程，并汇总其余教程文档的入口。"
       />
       <GuideContent />
     </DocsLayout>
@@ -436,8 +436,9 @@ export function AIDocContent() {
       <DocBlock title="注意事项">
         <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-[13px] text-amber-800 leading-relaxed">
           <ul className="list-disc pl-5 flex flex-col gap-1.5">
-            <li>API KEY 仅保存在你自己的浏览器中，请求经本站后端代理转发以规避跨域限制，不会上传到第三方。</li>
-            <li>对话记录按「用户 + 简历」双维度保存，切换简历互不串扰，关闭窗口后重新打开可继续。</li>
+            <li>API KEY 仅保存在你自己的浏览器中，对话请求由浏览器直连你选择的供应商，本站不经手、不存储任何数据。</li>
+            <li>对话记录按简历维度保存在本地浏览器，切换简历互不串扰，关闭窗口后重新打开可继续。</li>
+            <li>部分供应商未开放浏览器跨域访问时「获取模型」会失败，此时可手动输入模型名称；对话请求不受影响。</li>
             <li>生成中可点击「停止」中断；未配置模型时会给出明确提示。</li>
           </ul>
         </div>

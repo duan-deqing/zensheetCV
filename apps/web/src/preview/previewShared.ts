@@ -105,7 +105,7 @@ export function spacingScale(theme?: { lineHeight?: unknown; spacing?: unknown }
   return normalizeLineHeight(theme?.lineHeight ?? theme?.spacing) / BASE_LINE_HEIGHT;
 }
 
-/** 页边距档位 → mm（预览内边距与 PDF 导出 Playwright margin 共用同一映射） */
+/** 页边距档位 → mm（预览内边距与打印导出的每页 padding 共用同一映射） */
 export const MARGIN_MM: Record<MarginOption, number> = {
   none: 0, narrow: 8, normal: 12, wide: 20,
 };

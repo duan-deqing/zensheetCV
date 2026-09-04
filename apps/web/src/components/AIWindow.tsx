@@ -4,7 +4,8 @@ import remarkGfm from 'remark-gfm';
 import { useEditor } from '@/store/EditorContext';
 import { useUI } from '@/store/UIContext';
 import { useAuth } from '@/store/AuthContext';
-import { apiClient } from '@/api/client';
+import { streamChat } from '@/api/chatClient';
+import { getAiHistory, putAiHistory } from '@/storage/aiHistoryStore';
 import { HoverTip } from '@/components/HoverTip';
 import { loadAISettings, resolveAISettings } from '@/settings/aiSettings';
 
@@ -36,7 +37,7 @@ function nowTime(): string {
   return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-/** 规范化从服务端载入的历史：中断的流式消息标记为「已停止」 */
+/** 规范化从本地载入的历史：中断的流式消息标记为「已停止」 */
 function normalizeHistory(msgs: ChatMessage[]): ChatMessage[] {
   if (!Array.isArray(msgs)) return [];
   return msgs.map((m) =>
@@ -99,8 +100,6 @@ function AIMarkdown({ content }: { content: string }) {
     </div>
   );
 }
-
-const API_BASE = import.meta.env.VITE_API_URL || '';
 
 /** 预填快捷指令：点击后写入输入框，用户可补充后发送 */
 const QUICK_PROMPTS = [
@@ -232,21 +231,20 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
-  // 对话记录持久化（数据库）：按「用户 + 简历」隔离，打开窗口时从服务端载入；
+  // 对话记录持久化（IndexedDB）：按简历隔离，打开窗口时从本地载入；
   // 流式期间与载入完成前不回写，避免覆盖
   const [historyReady, setHistoryReady] = useState(false);
   useEffect(() => {
-    if (!user?.id || !resumeId) {
+    if (!resumeId) {
       setMessages([]);
       setHistoryReady(false);
       return;
     }
     let cancelled = false;
     setHistoryReady(false);
-    apiClient
-      .get('/ai/history', { params: { resume_id: resumeId } })
-      .then(({ data }) => {
-        if (!cancelled) setMessages(normalizeHistory(data?.messages));
+    getAiHistory(resumeId)
+      .then((record) => {
+        if (!cancelled) setMessages(normalizeHistory((record?.messages ?? []) as ChatMessage[]));
       })
       .catch(() => {
         if (!cancelled) setMessages([]);
@@ -257,12 +255,11 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
     return () => {
       cancelled = true;
     };
-  }, [user?.id, resumeId]);
+  }, [resumeId]);
   useEffect(() => {
     if (!historyReady || isStreaming || !resumeId) return;
     const t = setTimeout(() => {
-      apiClient
-        .put('/ai/history', { resume_id: resumeId, messages })
+      putAiHistory({ resume_id: resumeId, messages, updated_at: new Date().toISOString() })
         .catch(() => { /* 保存失败静默，下次消息变化时重试 */ });
     }, 500);
     return () => clearTimeout(t);
@@ -354,55 +351,18 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
         patchLast(() => '尚未配置 AI 模型：点击右上角用户名，在「设置 → AI」中配置供应商与 API KEY 后重试。');
         return;
       }
-      const response = await fetch(`${API_BASE}/api/v1/ai/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-        body: JSON.stringify({
-          messages: history.map((m, i) => ({
-            role: m.role,
-            content: i === 0 ? contextPrefix : m.content,
-          })),
-          api_key: cfg.apiKey,
-          base_url: cfg.baseUrl,
-          model: cfg.model,
-        }),
+      // 浏览器直连供应商（OpenAI 兼容协议，SSE 流式）
+      for await (const delta of streamChat({
+        baseUrl: cfg.baseUrl,
+        apiKey: cfg.apiKey,
+        model: cfg.model,
+        messages: history.map((m, i) => ({
+          role: m.role,
+          content: i === 0 ? contextPrefix : m.content,
+        })),
         signal: controller.signal,
-      });
-      if (!response.ok) {
-        outcome = 'error';
-        // 尽量读取后端返回的具体错误内容，便于定位（如路由 404、鉴权 401 等）
-        let detail = `请求失败 (HTTP ${response.status})`;
-        try {
-          const body = await response.text();
-          if (body) detail += `: ${body.slice(0, 300)}`;
-        } catch { /* 忽略读取失败 */ }
-        setLastError(detail);
-        patchLast(() => FAIL_HINT);
-        return;
-      }
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          // SSE 事件可能被 chunk 边界截断，先缓存不完整的行
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split('\n');
-          buffer = lines.pop() ?? '';
-          for (const line of lines) {
-            if (!line.startsWith('data: ')) continue;
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.error) { outcome = 'error'; setLastError(data.error); patchLast(() => FAIL_HINT); return; }
-              if (data.delta) patchLast((prev) => prev + data.delta);
-            } catch {}
-          }
-        }
+      })) {
+        patchLast((prev) => prev + delta);
       }
     } catch (err: unknown) {
       if ((err as { name?: string }).name === 'AbortError') {

@@ -162,7 +162,7 @@ export function ResumePreview() {
   );
 
   // 每页四周总留白 = 页边距 + 内容边距（mm）：
-  // 预览作为每页纸张的 padding，导出作为 Playwright 页边距，两者数值一致、逐页生效
+  // 预览作为每页纸张的 padding，打印导出时由每页自带 padding 生效，两者数值一致、逐页生效
   const marginXMM = MARGIN_MM[themeConfig.marginX] ?? 0;
   const marginYMM = MARGIN_MM[themeConfig.marginY] ?? 0;
   const contentPadMM = CONTENT_PADDING_MM[themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING] ?? 0;

@@ -47,7 +47,7 @@ export function getTemplateCss(templateId: string): string {
   return template.css;
 }
 
-/** 将本地模板定义转换为与后端 API 一致的 Template 结构 */
+/** 将本地模板定义转换为共享 Template 类型结构 */
 export function toApiTemplate(template: TemplateDefinition): Template {
   return {
     id: template.id,

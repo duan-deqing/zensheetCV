@@ -30,7 +30,7 @@ export function SaveButton() {
     }
     setSaving(true);
     // 与自动保存保持一致，一并提交 template_id / theme_config，
-    // 避免后端部分更新时丢失未随请求发送的模板与主题变更
+    // 确保模板与主题变更随保存完整落库
     const result = await updateResume(currentResume.id, {
       markdown,
       template_id: currentResume.template_id,
