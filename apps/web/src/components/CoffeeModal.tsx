@@ -1,9 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useUI } from '@/store/UIContext';
 
 /** 收款码图片（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
 const QR_SRC = `${import.meta.env.BASE_URL}buy-me-a-coffee.png`;
+
+/** 礼花配色：应用主题色系 */
+const CONFETTI_COLORS = ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
 
 /** 线性咖啡杯图标：顶栏入口按钮使用，颜色跟随 currentColor */
 export function CoffeeIcon() {
@@ -27,51 +30,71 @@ export function CoffeeIcon() {
   );
 }
 
-/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」释放礼花后关闭，「稍后支持」直接关闭 */
+/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」从窗口两端释放礼花后关闭，「稍后支持」直接关闭 */
 export function CoffeeModal() {
   const { coffeeModalOpen, toggleCoffeeModal, addToast } = useUI();
   // 「已支持」触发礼花后延迟关闭；标记已触发，避免停留期间重复点击叠加多个关闭定时器
   const [celebrated, setCelebrated] = useState(false);
+  // 关闭动画进行中：先播淡出，动画结束后再真正卸载
+  const [closing, setClosing] = useState(false);
+  const closingRef = useRef(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // 统一关闭入口：播淡出动画 → 卸载弹窗并复位状态
+  const close = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    setClosing(true);
+    window.setTimeout(() => {
+      toggleCoffeeModal();
+      setClosing(false);
+      setCelebrated(false);
+      closingRef.current = false;
+    }, 180);
+  };
 
   // Esc 关闭
   useEffect(() => {
     if (!coffeeModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleCoffeeModal();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [coffeeModalOpen, toggleCoffeeModal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coffeeModalOpen]);
 
   if (!coffeeModalOpen) return null;
 
   const handleSupported = () => {
     if (celebrated) return;
     setCelebrated(true);
-    // 礼花：从屏幕底部两角向中央喷射，绽放于弹窗两侧；
+    // 礼花：以弹窗卡片为参照，从其左右两端的下角向上方内侧喷射，
     // canvas-confetti 默认画布 z-index 高于弹窗，彩带会飘过窗口上方
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
       confetti({
         particleCount: 90,
-        spread: 70,
-        angle: 60,
-        origin: { x: 0, y: 0.85 },
-        colors: ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'],
+        spread: 65,
+        angle: 55,
+        startVelocity: 45,
+        origin: { x: rect.left / vw, y: rect.bottom / vh },
+        colors: CONFETTI_COLORS,
       });
       confetti({
         particleCount: 90,
-        spread: 70,
-        angle: 120,
-        origin: { x: 1, y: 0.85 },
-        colors: ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'],
+        spread: 65,
+        angle: 125,
+        startVelocity: 45,
+        origin: { x: rect.right / vw, y: rect.bottom / vh },
+        colors: CONFETTI_COLORS,
       });
     }
     addToast('感谢支持，祝你求职顺利！', 'success');
-    // 停留片刻让礼花可见，再关闭弹窗（礼花画布独立于弹窗，关闭后仍继续飘落）
-    window.setTimeout(() => {
-      toggleCoffeeModal();
-      setCelebrated(false);
-    }, 1000);
+    // 停留片刻让礼花可见，再淡出关闭（礼花画布独立于弹窗，关闭后仍继续飘落）
+    window.setTimeout(close, 1000);
   };
 
   return (
@@ -86,24 +109,37 @@ export function CoffeeModal() {
           from { opacity: 0; transform: translateY(12px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes coffeeModalOut {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(10px) scale(0.97); }
+        }
         @keyframes coffeeBackdropIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
+        @keyframes coffeeBackdropOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
         .coffee-modal-in { animation: coffeeModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
         .coffee-backdrop-in { animation: coffeeBackdropIn 0.2s ease-out both; }
+        .coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
         @media (prefers-reduced-motion: reduce) {
-          .coffee-modal-in, .coffee-backdrop-in { animation: none; }
+          .coffee-modal-in, .coffee-modal-out, .coffee-backdrop-in, .coffee-backdrop-out { animation: none; }
         }
       `}</style>
       {/* 遮罩：点击关闭 */}
       <div
-        className="coffee-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
-        onClick={toggleCoffeeModal}
+        className={`${closing ? 'coffee-backdrop-out' : 'coffee-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}
+        onClick={close}
         aria-hidden="true"
       />
       {/* 卡片 */}
-      <div className="coffee-modal-in relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+      <div
+        ref={cardRef}
+        className={`${closing ? 'coffee-modal-out' : 'coffee-modal-in'} relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}
+      >
         {/* 顶栏：与应用其他弹窗同构（mono 眉标 + 关闭按钮） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p
@@ -114,7 +150,7 @@ export function CoffeeModal() {
           </p>
           <h3 className="text-sm font-semibold text-gray-900">请作者喝杯咖啡</h3>
           <button
-            onClick={toggleCoffeeModal}
+            onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
             aria-label="关闭"
           >
@@ -144,7 +180,7 @@ export function CoffeeModal() {
             {celebrated ? '感谢支持' : '已支持'}
           </button>
           <button
-            onClick={toggleCoffeeModal}
+            onClick={close}
             className="flex-1 h-9 rounded-full border border-gray-200 bg-white text-gray-600 text-[13px] font-medium hover:bg-gray-50 active:scale-[0.98] transition-all"
           >
             稍后支持
