@@ -17,6 +17,7 @@ import {
 import { defaultTheme } from '@stylan/shared-types';
 import { SAMPLE_MARKDOWN } from '@/sampleResume';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
+import { DocsFooter } from '@/pages/docs/DocsFooter';
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
    （react-markdown + 各模板真实 CSS），非静态截图，内容见 @/sampleResume */
@@ -635,26 +636,8 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className="font-mono text-xs tracking-[0.18em] text-gray-400">
-            ZENSHEET · 简历
-          </p>
-          <p className="text-sm text-gray-500">
-            在线 Markdown 简历编辑器 · 模板 · AI · PDF · 由{' '}
-            <a
-              href="https://duan-deqing.github.io/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-primary-600 underline decoration-primary-300 decoration-1 underline-offset-4 transition-colors hover:text-primary-700 hover:decoration-primary-600"
-            >
-              STYLAN
-            </a>{' '}
-            &amp; GLM-5.3-flash 打造
-          </p>
-        </div>
-      </footer>
+      {/* Footer：与文档页同一套三栏页脚（相关资源 / 文档 / 联系 + QQ 群二维码） */}
+      <DocsFooter />
     </div>
   );
 }

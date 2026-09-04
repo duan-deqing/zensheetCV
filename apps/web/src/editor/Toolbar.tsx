@@ -80,8 +80,8 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-/** 功能按钮分组：同组内紧凑排列，组间以细分隔线区隔 */
-const BUTTON_GROUPS: {
+/** 功能按钮分组：同组内紧凑排列，组间以细分隔线区隔（编辑器工具栏与选中文字悬浮工具栏共用） */
+export const BUTTON_GROUPS: {
   buttons: { label: string; title: string; before?: string; after?: string; atLineStart?: boolean; fontWeight?: 'bold'; fontStyle?: 'italic' }[];
 }[] = [
   {
@@ -127,6 +127,16 @@ const BUTTON_GROUPS: {
     ],
   },
 ];
+
+/** 按钮内容渲染：link/列表/布局用图标，其余显示文字标签（两个工具栏共用） */
+export function ToolbarButtonIcon({ label }: { label: string }) {
+  if (label === 'link') return <LinkIcon />;
+  if (label === 'cols2') return <TwoColsIcon />;
+  if (label === 'cols3') return <ThreeColsIcon />;
+  if (label === 'ul') return <UlIcon />;
+  if (label === 'ol') return <OlIcon />;
+  return <>{label}</>;
+}
 
 const BUTTON_CLASSES =
   'px-1.5 h-6 font-mono text-[12px] font-medium text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors flex items-center shrink-0';
@@ -223,19 +233,7 @@ export function ToolbarActions() {
           className={BUTTON_CLASSES}
           style={{ fontWeight: btn.fontWeight, fontStyle: btn.fontStyle }}
         >
-          {btn.label === 'link' ? (
-            <LinkIcon />
-          ) : btn.label === 'cols2' ? (
-            <TwoColsIcon />
-          ) : btn.label === 'cols3' ? (
-            <ThreeColsIcon />
-          ) : btn.label === 'ul' ? (
-            <UlIcon />
-          ) : btn.label === 'ol' ? (
-            <OlIcon />
-          ) : (
-            btn.label
-          )}
+          <ToolbarButtonIcon label={btn.label} />
         </button>
       ))}
     </div>

@@ -106,7 +106,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
         </nav>
       </div>
 
-      <DocsFooter />
+      <DocsFooter dark />
     </div>
   );
 }

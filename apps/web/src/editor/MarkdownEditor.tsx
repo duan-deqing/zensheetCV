@@ -7,6 +7,7 @@ import { tags as t } from '@lezer/highlight';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { ToolbarActions, ToolbarHeader } from './Toolbar';
 import { editorViewRef } from './insertMarkdown';
+import { SelectionToolbar } from './SelectionToolbar';
 
 // 与主页一致的白底 + 蓝色 accent 外观
 const editorBaseTheme = EditorView.theme(
@@ -115,6 +116,8 @@ export function MarkdownEditor() {
           />
         </div>
       </div>
+      {/* 选中文字时悬浮在选区上方的快捷工具栏（与工具栏按钮一致） */}
+      <SelectionToolbar />
     </div>
   );
 }

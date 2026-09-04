@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePreview } from '@/store/PreviewContext';
 import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
@@ -18,6 +18,11 @@ const colorPresets = [
   { label: '玫瑰红', value: '#E11D48' },
   { label: '紫罗兰', value: '#7C3AED' },
   { label: '石墨黑', value: '#111827' },
+  { label: '亮黄', value: '#FFD335' },
+  { label: '珊瑚红', value: '#FF6B6B' },
+  { label: '玫粉', value: '#FF6EA9' },
+  { label: '青蓝', value: '#00A8E8' },
+  { label: '湖水绿', value: '#00C2A8' },
 ];
 
 /** 简历常用字体选项，前三个与内置模板默认值一致，保证旧数据可回显 */
@@ -152,6 +157,44 @@ function GroupTitle({ children }: { children: string }) {
   );
 }
 
+/** HEX 颜色 → HSV（调色盘二维选色区坐标），非法输入回退黑色 */
+function hexToHsv(hex: string): { h: number; s: number; v: number } {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return { h: 0, s: 0, v: 0 };
+  const n = parseInt(m[1], 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d > 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = Math.round(h * 60);
+    if (h < 0) h += 360;
+  }
+  return { h, s: max === 0 ? 0 : d / max, v: max };
+}
+
+/** HSV → HEX 颜色 */
+function hsvToHex(h: number, s: number, v: number): string {
+  const c = v * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = v - c;
+  let rgb: [number, number, number];
+  if (h < 60) rgb = [c, x, 0];
+  else if (h < 120) rgb = [x, c, 0];
+  else if (h < 180) rgb = [0, c, x];
+  else if (h < 240) rgb = [0, x, c];
+  else if (h < 300) rgb = [x, 0, c];
+  else rgb = [c, 0, x];
+  const to = (n: number) => Math.round((n + m) * 255).toString(16).padStart(2, '0');
+  return `#${to(rgb[0])}${to(rgb[1])}${to(rgb[2])}`;
+}
+
 /** 预览窗口内的主题设置侧边栏，随 themePanelOpen 滑入/移除 */
 export function ThemeConfigPanel() {
   const { currentTemplate, themeConfig, setThemeConfig } = usePreview();
@@ -165,6 +208,11 @@ export function ThemeConfigPanel() {
   useEffect(() => {
     currentCardRef.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
   }, [currentId, themePanelOpen]);
+
+  // —— 自定义调色盘（圆角矩形弹层）：二维选色区 + 色相滑杆 + HEX 输入（Hooks 需在早退前调用） ——
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [hsv, setHsv] = useState({ h: 0, s: 0, v: 0 });
+  const [hexText, setHexText] = useState('');
 
   if (!themePanelOpen) return null;
 
@@ -182,6 +230,39 @@ export function ThemeConfigPanel() {
     (t) => t.id === currentId || addedTemplates.includes(t.id),
   );
 
+  // 当前主色不在预设色板中 → 视为自定义色，「自定义」圆点高亮
+  const isCustomColor = !colorPresets.some((c) => c.value === themeConfig.primaryColor);
+
+  const openPicker = () => {
+    setHsv(hexToHsv(themeConfig.primaryColor));
+    setHexText(themeConfig.primaryColor.toUpperCase());
+    setPickerOpen(true);
+  };
+
+  /** HSV → 应用到主题（实时预览） */
+  const applyHsv = (next: { h: number; s: number; v: number }) => {
+    setHsv(next);
+    applyTheme({ primaryColor: hsvToHex(next.h, next.s, next.v) });
+  };
+
+  /** 二维选色区取色（按下/拖动），x → 饱和度，y → 明度 */
+  const pickFromPad = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const s = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    const v = 1 - Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+    applyHsv({ ...hsv, s, v });
+  };
+
+  /** HEX 输入：合法 6 位值实时应用，失焦时回显当前生效色 */
+  const onHexChange = (raw: string) => {
+    const t = raw.startsWith('#') ? raw : `#${raw}`;
+    setHexText(t.toUpperCase());
+    if (/^#[0-9a-fA-F]{6}$/.test(t)) {
+      setHsv(hexToHsv(t));
+      applyTheme({ primaryColor: t.toLowerCase() });
+    }
+  };
+
   return (
     <aside
       className="theme-side-in absolute right-2 top-2 bottom-2 z-10 w-96 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto"
@@ -195,6 +276,39 @@ export function ThemeConfigPanel() {
         .theme-side-in { animation: themeSideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @media (prefers-reduced-motion: reduce) {
           .theme-side-in { animation: none; }
+        }
+        /* 自定义调色盘弹层入场动画 */
+        @keyframes colorPickerIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .color-picker-pop { animation: colorPickerIn 0.16s ease-out; }
+        /* 色相滑杆：胶囊彩虹轨道 + 白色圆点滑块 */
+        .hue-slider {
+          -webkit-appearance: none;
+          appearance: none;
+          display: block;
+          height: 10px;
+          border-radius: 999px;
+          background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+          outline: none;
+          cursor: pointer;
+        }
+        .hue-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
+        }
+        .hue-slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          border: none;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
         }
       `}</style>
 
@@ -263,7 +377,7 @@ export function ThemeConfigPanel() {
         <section className="flex flex-col gap-4">
           <GroupTitle>视觉风格</GroupTitle>
           {/* 主色调 */}
-          <div>
+          <div className="relative">
             <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
               主色调
             </label>
@@ -282,7 +396,98 @@ export function ThemeConfigPanel() {
                   />
                 </HoverTip>
               ))}
+              {/* 自定义颜色：点击展开圆角矩形调色盘弹层（二维选色区 + 色相滑杆 + HEX 输入），
+                  当前主色不在预设中时视为自定义色并高亮 */}
+              <HoverTip text="自定义">
+                <button
+                  type="button"
+                  onClick={openPicker}
+                  aria-label="自定义颜色"
+                  aria-expanded={pickerOpen}
+                  className={`relative block w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer bg-gray-100 ${
+                    isCustomColor ? 'border-gray-900 scale-110' : 'border-transparent'
+                  }`}
+                >
+                  <span
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none text-gray-500"
+                    aria-hidden="true"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="w-3.5 h-3.5"
+                    >
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                      <path d="m15 5 4 4" />
+                    </svg>
+                  </span>
+                </button>
+              </HoverTip>
             </div>
+
+            {/* 自定义调色盘弹层：圆角矩形窗口（overflow-hidden 让通栏选色区跟随窗口圆角裁切） */}
+            {pickerOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-20"
+                  onClick={() => setPickerOpen(false)}
+                  aria-hidden="true"
+                />
+                <div className="color-picker-pop absolute -left-4 -right-4 top-full mt-2 z-30 rounded-xl border border-gray-200 bg-white shadow-[0_8px_24px_rgba(0,0,0,0.14)] overflow-hidden">
+                  {/* 二维选色区：横向饱和度，纵向明度（上亮下暗），底色随色相变化，通栏铺满窗口顶部 */}
+                  <div
+                    className="relative h-40 cursor-crosshair touch-none select-none"
+                    style={{
+                      background: `linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(${hsv.h} 100% 50%))`,
+                    }}
+                    onPointerDown={(e) => {
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                      pickFromPad(e);
+                    }}
+                    onPointerMove={(e) => {
+                      if (e.buttons & 1) pickFromPad(e);
+                    }}
+                  >
+                    <span
+                      className="absolute w-3.5 h-3.5 rounded-full border-2 border-white shadow ring-1 ring-black/20 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                      style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%` }}
+                    />
+                  </div>
+                  {/* 控制区：色相滑杆（胶囊轨道）+ 当前色预览 + HEX 输入，与窗口边缘留出内边距 */}
+                  <div className="px-3 pt-3 pb-3 flex flex-col gap-2.5">
+                    <input
+                      type="range"
+                      min={0}
+                      max={360}
+                      value={hsv.h}
+                      onChange={(e) => applyHsv({ ...hsv, h: Number(e.target.value) })}
+                      className="hue-slider w-full"
+                      aria-label="色相"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="w-8 h-8 rounded-lg border border-gray-200 shrink-0"
+                        style={{ backgroundColor: themeConfig.primaryColor }}
+                        aria-hidden="true"
+                      />
+                      <input
+                        value={hexText}
+                        onChange={(e) => onHexChange(e.target.value)}
+                        onBlur={() => setHexText(themeConfig.primaryColor.toUpperCase())}
+                        maxLength={7}
+                        spellCheck={false}
+                        className="flex-1 h-8 rounded-md border border-gray-200 px-2 font-mono text-[13px] uppercase text-gray-700 focus:outline-none focus:border-primary-400"
+                        aria-label="十六进制颜色值"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           {/* 字体：下拉选择 */}
           <div>
