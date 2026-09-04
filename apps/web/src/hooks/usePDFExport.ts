@@ -40,6 +40,16 @@ export function usePDFExport() {
     document.body.classList.add('print-mode');
 
     try {
+      // 等待克隆节点中的图片完成解码：克隆的 <img> 是全新节点，data URL
+      // 也要重新异步解析，若立即打印，排版渲染时照片尚未就绪会输出空白。
+      // decode() 独立于可见状态（#print-root 平时 display:none 也能解码）；
+      // 3s 兜底超时防止个别图片异常时导出被永久卡住。
+      const images = Array.from(printRoot.querySelectorAll('img'));
+      await Promise.race([
+        Promise.all(images.map((img) => img.decode().catch(() => {}))),
+        new Promise((resolve) => window.setTimeout(resolve, 3_000)),
+      ]);
+
       // 打印结束后清理（对话框关闭时触发 afterprint；个别浏览器不触发则兜底移除）
       let cleaned = false;
       const cleanup = () => {
