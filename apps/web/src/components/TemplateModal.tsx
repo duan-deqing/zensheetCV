@@ -124,10 +124,10 @@ export function TemplateModal() {
         aria-hidden="true"
       />
       {/* 面板：顶栏固定、滚动区限制在其下方。
-          手机端：全宽 × (100dvh - 1rem) 固定高度（dvh 随地址栏收缩，网格区稳定滚动）；
+          手机端：全宽 × (100dvh - 1rem) 固定高度（注意 calc 减号需空格：Tailwind 用 _ 转义）；
           sm 起：16:9 比例宽度 + 85vh 上限（flex-1 + min-h-0 网格滚动） */}
       <div
-        className={`${closing ? 'modal-out' : 'tpl-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-full h-[calc(100dvh-1rem)] sm:h-auto sm:w-[min(1600px,100%,calc(82vh*16/9))] sm:max-h-[85vh]`}
+        className={`${closing ? 'modal-out' : 'tpl-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-full h-[calc(100dvh_-_1rem)] sm:h-auto sm:w-[min(1600px,100%,calc(82vh*16/9))] sm:max-h-[85vh]`}
       >
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">
@@ -159,7 +159,7 @@ export function TemplateModal() {
             return (
               <div
                 key={t.id}
-                className={`rounded-xl border overflow-hidden flex flex-col ${
+                className={`rounded-xl border overflow-hidden flex flex-col min-h-[320px] ${
                   isCurrent ? 'border-primary-400 ring-1 ring-primary-200' : 'border-gray-200'
                 }`}
               >
