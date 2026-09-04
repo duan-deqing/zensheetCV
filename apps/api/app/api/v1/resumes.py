@@ -7,6 +7,9 @@ from app.services.resume_service import ResumeService
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
 
+# 每个用户最多可持有的简历份数（新建与复制共用该上限）
+MAX_RESUMES_PER_USER = 15
+
 
 @router.get("", response_model=ResumeListSchema)
 async def list_resumes(
@@ -27,6 +30,11 @@ async def create_resume(
     user_id: str = Depends(get_current_user_id),
 ):
     service = ResumeService(db)
+    if await service.count_by_user(user_id) >= MAX_RESUMES_PER_USER:
+        raise HTTPException(
+            status_code=400,
+            detail=f"最多可创建 {MAX_RESUMES_PER_USER} 份简历，请删除不需要的简历后再试",
+        )
     resume = await service.create(user_id, data)
     return resume
 

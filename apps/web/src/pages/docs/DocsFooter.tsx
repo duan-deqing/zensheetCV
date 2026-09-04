@@ -24,11 +24,11 @@ const DOC_LINKS: { label: string; to: string }[] = [
 export function DocsFooter({ dark = false }: { dark?: boolean }) {
   const tone = {
     footer: dark ? 'border-zinc-800 bg-zinc-950' : 'border-gray-100 bg-gray-50/60',
-    title: dark ? 'text-zinc-500' : 'text-gray-400',
+    title: dark ? 'text-white' : 'text-gray-400',
     link: dark ? 'text-zinc-400 hover:text-primary-400' : 'text-gray-500 hover:text-primary-600',
     muted: dark ? 'text-zinc-500' : 'text-gray-400',
     divider: dark ? 'border-zinc-800' : 'border-gray-100',
-    brand: dark ? 'text-zinc-500' : 'text-gray-400',
+    brand: dark ? 'text-white' : 'text-gray-400',
     credit: dark ? 'text-zinc-400' : 'text-gray-500',
     creditLink: dark
       ? 'text-primary-400 decoration-primary-700 hover:text-primary-300 hover:decoration-primary-400'
@@ -38,10 +38,10 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
   };
   return (
     <footer className={`border-t ${tone.footer}`}>
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-10">
+      <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* 相关资源 */}
         <div>
-          <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${tone.title} mb-4`}>
+          <p className={`font-mono text-sm font-bold tracking-[0.18em] ${tone.title} mb-4`}>
             相关资源
           </p>
           <ul className="flex flex-col gap-2.5">
@@ -62,7 +62,7 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
 
         {/* 文档 */}
         <div>
-          <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${tone.title} mb-4`}>
+          <p className={`font-mono text-sm font-bold tracking-[0.18em] ${tone.title} mb-4`}>
             文档
           </p>
           <ul className="flex flex-col gap-2.5">
@@ -81,7 +81,7 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
 
         {/* 联系 */}
         <div>
-          <p className={`font-mono text-[10px] uppercase tracking-[0.18em] ${tone.title} mb-4`}>
+          <p className={`font-mono text-sm font-bold tracking-[0.18em] ${tone.title} mb-4`}>
             联系
           </p>
           <a
@@ -112,7 +112,7 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
       <div className={`border-t ${tone.divider}`}>
         {/* 底栏：品牌 + 署名（沿用原首页页脚内容） */}
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-2">
-          <p className={`font-mono text-xs tracking-[0.18em] ${tone.brand}`}>
+          <p className={`font-mono text-sm tracking-[0.18em] ${tone.brand}`}>
             ZENSHEET · 简历
           </p>
           <p className={`text-sm ${tone.credit}`}>

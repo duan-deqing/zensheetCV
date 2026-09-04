@@ -12,6 +12,9 @@ import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, elementFontSizeVars, fontScale, MARGIN_MM, rehypeWrapH2Text, spacingScale, resumeColsCss, resumeFontSizeCss } from '@/preview/previewShared';
 
+/** 每个用户最多可持有的简历份数（与后端 MAX_RESUMES_PER_USER 保持一致） */
+const MAX_RESUMES = 15;
+
 /** 线性垃圾桶图标，颜色跟随 currentColor */
 function TrashIcon({ className }: { className?: string }) {
   return (
@@ -173,11 +176,15 @@ export function ResumesPage() {
   // 页脚随缘语录：仅组件挂载（进入/刷新页面）时随机取一次
   const [quote] = useState(pickQuote);
 
+  // 简历创建份数上限（后端同样强制校验，此处用于前置拦截与提示）
+  const atLimit = !isLoading && resumes.length >= MAX_RESUMES;
+
   useEffect(() => {
     fetchResumes();
   }, [fetchResumes]);
 
   const handleCreate = async () => {
+    if (atLimit) return;
     setCreating(true);
     const resume = await createResume({
       title: '未命名简历',
@@ -198,6 +205,7 @@ export function ResumesPage() {
 
   const handleCopy = async (e: React.MouseEvent, resume: Resume) => {
     e.stopPropagation();
+    if (atLimit) return;
     setCopyingId(resume.id);
     const copy = await copyResume(resume);
     setCopyingId(null);
@@ -233,6 +241,15 @@ export function ResumesPage() {
         {error && (
           <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">加载简历失败：{error}</p>
+          </div>
+        )}
+
+        {/* 创建份数已达上限提示（新建与复制均被拦截） */}
+        {atLimit && (
+          <div className="mb-6 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <p className="text-sm text-amber-600">
+              最多可创建 {MAX_RESUMES} 份简历，已达上限；删除不需要的简历后可继续新建或复制。
+            </p>
           </div>
         )}
 
@@ -295,16 +312,16 @@ export function ResumesPage() {
               </div>
             ))}
 
-            {/* 新建入口：与简历卡同宽同高，虚线边框 + 图标文字提示 */}
+            {/* 新建入口：与简历卡同宽同高，虚线边框 + 图标文字提示；达上限时禁用 */}
             <button
               onClick={handleCreate}
-              disabled={creating}
-              className="card p-5 min-h-[118px] flex flex-col items-center justify-center gap-3 cursor-pointer border-dashed border-gray-300 bg-gray-50/50 hover:border-primary-400 hover:bg-primary-50/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 fade-up disabled:cursor-wait disabled:opacity-60"
+              disabled={creating || atLimit}
+              className="card p-5 min-h-[118px] flex flex-col items-center justify-center gap-3 cursor-pointer border-dashed border-gray-300 bg-gray-50/50 hover:border-primary-400 hover:bg-primary-50/30 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 fade-up disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:shadow-none disabled:hover:translate-y-0"
               style={{ animationDelay: `${0.08 + resumes.length * 0.05}s` }}
             >
               {/* mono 标记眉标，与站内 < LIBRARY /> 等语言呼应 */}
               <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-gray-400 group-hover:text-primary-500 transition-colors">
-                {'// NEW'}
+                {atLimit ? '// FULL' : '// NEW'}
               </span>
               <span
                 className={`w-11 h-11 rounded-xl flex items-center justify-center font-mono text-2xl leading-none transition-colors ${
@@ -318,11 +335,19 @@ export function ResumesPage() {
               </span>
               <span className="flex flex-col items-center gap-1">
                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
-                  {creating ? '创建中...' : resumes.length === 0 ? '新建你的第一份简历' : '新建简历'}
+                  {creating
+                    ? '创建中...'
+                    : atLimit
+                      ? `已达创建上限（${MAX_RESUMES} 份）`
+                      : resumes.length === 0
+                        ? '新建你的第一份简历'
+                        : '新建简历'}
                 </span>
-                {resumes.length === 0 && !creating && (
+                {atLimit && !creating ? (
+                  <span className="text-xs text-gray-400">删除不需要的简历后可继续创建</span>
+                ) : resumes.length === 0 && !creating ? (
                   <span className="text-xs text-gray-400">写下姓名与经历，其余交给模板</span>
-                )}
+                ) : null}
               </span>
             </button>
           </div>

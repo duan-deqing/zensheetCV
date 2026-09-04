@@ -42,7 +42,8 @@ export function useResume() {
       setCurrentResume(response.data);
       return response.data as Resume;
     } catch (err: any) {
-      setError(err.message || 'Failed to create resume');
+      // 后端业务校验（如创建份数上限）的 detail 优先展示
+      setError(err.response?.data?.detail || err.message || 'Failed to create resume');
       return null;
     } finally {
       setLoading(false);

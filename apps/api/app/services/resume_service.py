@@ -31,11 +31,14 @@ class ResumeService:
         )
         return result.scalar_one_or_none()
 
-    async def list_by_user(self, user_id: str, skip: int = 0, limit: int = 20) -> tuple[list[ResumeModel], int]:
-        count_result = await self.db.execute(
+    async def count_by_user(self, user_id: str) -> int:
+        result = await self.db.execute(
             select(func.count()).where(ResumeModel.user_id == user_id)
         )
-        total = count_result.scalar()
+        return result.scalar()
+
+    async def list_by_user(self, user_id: str, skip: int = 0, limit: int = 20) -> tuple[list[ResumeModel], int]:
+        total = await self.count_by_user(user_id)
 
         result = await self.db.execute(
             select(ResumeModel)
