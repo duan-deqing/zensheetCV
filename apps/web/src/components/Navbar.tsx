@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/store/AuthContext';
 import { useUI } from '@/store/UIContext';
 import { useLang, useTr } from '@/i18n/LangContext';
+import { HoverTip } from '@/components/HoverTip';
 
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
@@ -159,18 +160,19 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* 语言切换：中 / EN，位于用户信息左侧 */}
-            <button
-              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2 h-8 rounded-full hover:bg-gray-100"
-              aria-label={lang === 'zh' ? 'Switch to English' : '切换为中文'}
-              title={lang === 'zh' ? 'Switch to English' : '切换为中文'}
-            >
-              <GlobeIcon />
-              <span className="hidden sm:inline font-mono text-[12px] tracking-wide">
-                {lang === 'zh' ? 'EN' : '中'}
-              </span>
-            </button>
+            {/* 语言切换：中 / EN，位于用户信息左侧；悬浮提示与编辑器页面统一（HoverTip 气泡） */}
+            <HoverTip text={lang === 'zh' ? 'Switch to English' : '切换为中文'}>
+              <button
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2 h-8 rounded-full hover:bg-gray-100"
+                aria-label={lang === 'zh' ? 'Switch to English' : '切换为中文'}
+              >
+                <GlobeIcon />
+                <span className="hidden sm:inline font-mono text-[12px] tracking-wide">
+                  {lang === 'zh' ? 'EN' : '中'}
+                </span>
+              </button>
+            </HoverTip>
             {/* 头像 + 用户名，点击打开设置弹窗，与编辑页 TopBar 同构 */}
             <button
               onClick={toggleUserModal}
