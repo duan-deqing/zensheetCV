@@ -99,7 +99,7 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
           <div className="mt-5 flex">
             <div className="flex flex-col items-center gap-2.5">
             <img
-              src="/QR-Code.png"
+              src={`${import.meta.env.BASE_URL}QR-Code.png`}
               alt="QQ群二维码"
               className={`w-24 rounded-xl border-[3px] ${tone.qrBorder} bg-white p-0.5`}
               loading="lazy"

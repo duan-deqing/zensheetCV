@@ -1,0 +1,55 @@
+name: Deploy to GitHub Pages
+
+# 免登录在线版（static 分支，纯前端）部署到 GitHub Pages：
+# https://duan-deqing.github.io/zensheetCV/
+on:
+  push:
+    branches: [static]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Build
+        working-directory: apps/web
+        run: pnpm run build
+        env:
+          # 子路径挂载：https://duan-deqing.github.io/zensheetCV/
+          VITE_BASE_PATH: /zensheetCV/
+      - uses: actions/configure-pages@v5
+        with:
+          # 首次部署自动启用 GitHub Pages
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
