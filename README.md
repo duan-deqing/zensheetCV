@@ -1,65 +1,112 @@
-# ZENSHEET · 简历 (Zensheet) - 在线 Markdown 简历编辑器
+# ZENSHEET · 简历
 
-> 静下心来，写好一份简历。通过 Markdown 编辑简历，选择定制模板，导出高质量 PDF
+<p align="center">
+  <a href="https://github.com/duan-deqing/zensheetCV" target="_blank" rel="noopener noreferrer">
+    <strong>ZENSHEET · 简历</strong>
+  </a>
+  <br />
+  <em>静下心来，写好一份简历。</em>
+</p>
 
-## 关于
+<p align="center">
+  <img src="https://img.shields.io/badge/version-v0.12.0-2563EB?style=flat-square" alt="Version" />
+  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" />
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/FastAPI-0.1xx-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js" />
+  <img src="https://github.com/duan-deqing/zensheetCV/actions/workflows/ci.yml/badge.svg" alt="CI" />
+</p>
 
-| 项目     | 内容                                       |
-| -------- | ------------------------------------------ |
-| 项目名称 | ZENSHEET · 简历 — 在线 Markdown 简历编辑器 |
-| 当前版本 | v0.7.0                                     |
-| 作者     | STYLAN & GLM-5.3-flash                     |
-| 许可证   | MIT                                        |
+---
 
-## 功能
+ZENSHEET · 简历是一款基于 Markdown 的在线简历编辑器。左侧书写 Markdown，右侧逐页实时预览 A4 纸面效果，8 套内置模板与细粒度主题配置自由组合，AI 辅助打磨表达，最终通过服务端 Playwright 渲染导出与预览完全一致的 PDF。
 
-- Markdown 实时编辑与预览（左右分栏，所见即所得）
-- 8 套精美简历模板（经典简洁 / 现代蓝调 / 优雅酒红 / 科技墨绿 / 墨纸极简 / 青线极简 / 朝阳暖橙 / 碳黑章标）
-- 主题配置（颜色、字体、字号、间距、页边距自定义，模板切换预览卡片）
-- 图标与照片（内置图标库一键插入、简历照片上传与自由摆放）
-- 服务端 PDF 导出（Playwright 高质量渲染，分页与预览一致）
-- 用户系统（注册 / 登录 / JWT 认证、头像上传与裁剪、账号资料与密码修改）
-- AI 辅助写作（经历润色 / 关键词匹配 / 要点成段，支持 OpenAI、DeepSeek、GLM、LongCat 等多家 OpenAI 兼容供应商，用户可配置自己的 API Key）
-- 多简历管理（CRUD、分页）
-- 内置使用文档页面
-- 响应式布局
+## 目录
+
+- [功能特性](#功能特性)
+- [技术栈](#技术栈)
+- [快速开始](#快速开始)
+- [环境变量](#环境变量)
+- [测试](#测试)
+- [构建与部署](#构建与部署)
+- [API 概览](#api-概览)
+- [项目结构](#项目结构)
+- [相关文档](#相关文档)
+- [参与贡献](#参与贡献)
+- [交流与反馈](#交流与反馈)
+- [许可证](#许可证)
+
+## 功能特性
+
+### 编辑与预览
+
+- **Markdown 实时编辑**：CodeMirror 6 编辑器，工具栏与快捷键齐全，选中文字时浮现上下文工具栏
+- **逐页实时预览**：A4 纸面逐页分页渲染，所见即所得
+- **分栏布局语法**：`:::left / :::mid / :::right` 容器实现页眉三栏排版
+- **图标系统**：Markdown 中以 `icon:名称` 引用内置图标，提供图标库弹窗浏览
+
+### 模板与主题
+
+- **8 套内置模板**：经典简洁 / 现代蓝调 / 优雅酒红 / 科技墨绿 / 墨纸极简 / 青线极简 / 朝阳暖橙 / 碳黑章标
+- **主题配置面板**：主色调（预设色板 + 自定义调色盘）、正文字体、分类字号（H1 ~ H5 / 段落 / 列表）、行距、页边距与内容边距
+- **模板联动**：多数模板的强调色、章节条、列表符号随主色调自动变化
+- **照片排版**：简历照片上传与圆形裁剪，页眉或正文任意位置自由摆放
+
+### AI 辅助写作（BYOK）
+
+- **经历润色 / 关键词匹配 / 要点成段**：独立聊天窗，SSE 流式回复，Markdown 渲染
+- **自带 API Key**：支持 OpenAI / DeepSeek / GLM / Qwen / LongCat / MiMo 等 OpenAI 兼容供应商，密钥仅保存在用户浏览器本地
+- **对话持久化**：聊天记录按「用户 + 简历」双维度存储，可继续历史话题
+
+### 平台能力
+
+- **PDF 导出**：服务端 Playwright 渲染，分页、字距与预览严格一致
+- **多简历管理**：列表、复制、删除；单用户上限 15 份
+- **账号系统**：注册 / 登录（JWT）、头像裁剪上传、资料与安全设置
+- **文档中心**：使用指南 / Markdown 教程 / 主题配置 / 图标库 / AI 助手 / 更新日志
+- **响应式布局**，适配桌面与移动端
 
 ## 技术栈
 
-| 层级       | 技术                                                                     |
-| ---------- | ------------------------------------------------------------------------ |
-| **前端**   | React 18 + TypeScript + Vite + Tailwind CSS + CodeMirror 6               |
-| **后端**   | Python + FastAPI + SQLAlchemy (async) + Pydantic v2                      |
-| **数据库** | SQLite (aiosqlite)                                                       |
-| **PDF**    | Playwright + Jinja2                                                      |
-| **AI**     | OpenAI 兼容协议（支持 OpenAI / DeepSeek / GLM / LongCat / 自定义供应商） |
-| **认证**   | JWT (python-jose) + bcrypt                                               |
-| **包管理** | pnpm (前端) + Poetry (后端)                                              |
-| **CI**     | GitHub Actions                                                           |
+| 层级     | 技术                                                                     |
+| -------- | ------------------------------------------------------------------------ |
+| 前端     | React 18 + TypeScript + Vite + Tailwind CSS + CodeMirror 6               |
+| 后端     | Python + FastAPI + SQLAlchemy (async) + Pydantic v2                      |
+| 数据库   | SQLite (aiosqlite)                                                       |
+| PDF 渲染 | Playwright + Jinja2                                                      |
+| AI       | OpenAI 兼容协议（OpenAI / DeepSeek / GLM / Qwen / LongCat / 自定义）     |
+| 认证     | JWT (python-jose) + bcrypt                                               |
+| 包管理   | pnpm (前端) + Poetry (后端)                                              |
+| CI       | GitHub Actions                                                           |
 
 ## 快速开始
 
 ### 前置要求
 
-- Node.js ≥ 18
-- pnpm ≥ 9.0
-- Python ≥ 3.11
-- Poetry ≥ 1.8
+- Node.js >= 18
+- pnpm >= 9.0
+- Python >= 3.11
+- Poetry >= 1.8
 
 ### 安装
 
 ```bash
-# 安装前端依赖 (monorepo root)
+# 克隆仓库
+git clone https://github.com/duan-deqing/zensheetCV.git
+cd zensheetCV
+
+# 安装前端依赖（monorepo 根目录）
 pnpm install
 
 # 安装后端依赖
 cd apps/api && poetry install
 ```
 
-### 开发
+### 启动开发
 
 ```bash
-# 同时启动前后端 (从项目根目录)
+# 同时启动前后端（项目根目录）
 pnpm run dev
 
 # 或分别启动
@@ -67,54 +114,35 @@ pnpm run dev:web      # 前端: http://localhost:5173
 pnpm run dev:api      # 后端: http://localhost:8000
 ```
 
+启动后访问 <http://localhost:5173> 注册账号即可使用。
+
 ### API 文档
 
-后端启动后访问: <http://localhost:8000/docs> (Swagger UI)
-ReDoc: <http://localhost:8000/redoc>
+后端启动后可访问交互式 API 文档：
 
----
-
-## 手动部署
-
-**前端构建:**
-
-```bash
-pnpm run build:web
-# 产物输出到 apps/web/dist，可托管到任意静态文件服务器
-```
-
-**后端启动:**
-
-```bash
-cd apps/api
-poetry install --no-root
-poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
-```
-
-> 部署前请确保已正确配置环境变量 (见下方)。
-
----
+- Swagger UI: <http://localhost:8000/docs>
+- ReDoc: <http://localhost:8000/redoc>
 
 ## 环境变量
 
-后端通过 `pydantic-settings` 从 `.env` 文件读取配置。创建 `apps/api/.env` 或在部署环境中导出变量。
+后端通过 `pydantic-settings` 从 `apps/api/.env` 读取配置（或直接在部署环境中导出变量）。
 
-| 变量                          | 说明                                      | 默认值                                              | 必填             |
-| ----------------------------- | ----------------------------------------- | --------------------------------------------------- | ---------------- |
-| `APP_NAME`                    | 应用名称                                  | `Zensheet API · 简历`                               | 否               |
-| `APP_VERSION`                 | 应用版本                                  | `0.7.0`                                             | 否               |
-| `DEBUG`                       | 调试模式                                  | `True`                                              | 否               |
-| `DATABASE_URL`                | 数据库连接字符串                          | `sqlite+aiosqlite:///./app.db`                      | 否               |
-| `SECRET_KEY`                  | JWT 签名密钥 (生产环境必须修改)           | `change-me-in-production`                           | **是**           |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token 过期时间 (分钟)                     | `10080` (7 天)                                      | 否               |
-| `OPENAI_API_KEY`              | 服务端默认 OpenAI 兼容 API 密钥 (AI 功能) | (空)                                                | **是** (AI 功能) |
-| `OPENAI_MODEL`                | 服务端默认模型                            | `gpt-4o-mini`                                       | 否               |
-| `UPLOAD_DIR`                  | 上传文件目录 (头像等)                     | `uploads`                                           | 否               |
-| `CORS_ORIGINS`                | 允许的 CORS 来源 (JSON 数组)              | `["http://localhost:5173","http://localhost:3000"]` | 否               |
+| 变量                            | 说明                                      | 默认值                                              | 必填             |
+| ------------------------------- | ----------------------------------------- | --------------------------------------------------- | ---------------- |
+| `APP_NAME`                      | 应用名称                                  | `Zensheet API · 简历`                               | 否               |
+| `APP_VERSION`                   | 应用版本                                  | `0.7.0`                                             | 否               |
+| `DEBUG`                         | 调试模式                                  | `True`                                              | 否               |
+| `DATABASE_URL`                  | 数据库连接字符串                          | `sqlite+aiosqlite:///./app.db`                      | 否               |
+| `SECRET_KEY`                    | JWT 签名密钥（生产环境必须修改）          | `change-me-in-production`                           | **是**           |
+| `ACCESS_TOKEN_EXPIRE_MINUTES`   | Token 过期时间（分钟）                    | `10080`（7 天）                                     | 否               |
+| `OPENAI_API_KEY`                | 服务端默认 OpenAI 兼容 API 密钥（AI 功能）| （空）                                              | **是**（AI 功能）|
+| `OPENAI_MODEL`                  | 服务端默认模型                            | `gpt-4o-mini`                                       | 否               |
+| `UPLOAD_DIR`                    | 上传文件目录（头像等）                    | `uploads`                                           | 否               |
+| `CORS_ORIGINS`                  | 允许的 CORS 来源（JSON 数组）             | `["http://localhost:5173","http://localhost:3000"]` | 否               |
 
-> 除服务端默认密钥外，AI 功能支持用户在「设置 → AI」中为不同供应商（OpenAI / DeepSeek / GLM / LongCat / 自定义）单独配置 API Key，密钥仅存储于用户浏览器本地。
+> 除服务端默认密钥外，AI 功能支持用户在「设置 → AI」中为不同供应商单独配置 API Key（BYOK），密钥仅存储于用户浏览器本地，不经过服务端持久化。
 
-**最小生产配置 (`.env`):**
+最小生产配置示例（`apps/api/.env`）：
 
 ```env
 SECRET_KEY=your-strong-random-secret-key
@@ -123,131 +151,153 @@ DEBUG=False
 CORS_ORIGINS=["https://your-domain.com"]
 ```
 
----
-
 ## 测试
 
 ```bash
-# 前端测试 (Vitest)
+# 前端测试（Vitest）
 pnpm run test:web
 
-# 前端代码检查
+# 前端代码检查（ESLint）
 pnpm run lint:web
 
-# 后端测试 (Pytest + pytest-asyncio)
-cd apps/api && poetry run pytest
+# 后端测试（Pytest + pytest-asyncio）
+pnpm run test:api
 ```
 
-CI 流水线 (`.github/workflows/ci.yml`) 在每次 push / PR 时自动运行前端构建、后端测试 (含覆盖率)。
+CI 流水线（`.github/workflows/ci.yml`）在每次 push / PR 时自动运行前端构建与后端测试（含覆盖率）。
 
----
+## 构建与部署
 
-## API 路由
+**前端构建：**
 
-所有 API 前缀为 `/api/v1`。
+```bash
+pnpm run build:web
+# 产物输出到 apps/web/dist，可托管到任意静态文件服务器
+```
 
-| 模块     | 路由                          | 说明                                         |
-| -------- | ----------------------------- | -------------------------------------------- |
-| **认证** | `POST /auth/register`         | 用户注册                                     |
-|          | `POST /auth/login`            | 用户登录，返回 JWT                           |
-|          | `GET /auth/me`                | 获取当前用户信息                             |
-|          | `PUT /auth/me`                | 更新用户名 / 邮箱                            |
-|          | `PUT /auth/password`          | 修改密码                                     |
-|          | `POST /auth/avatar`           | 上传头像                                     |
-| **简历** | `GET /resumes`                | 获取当前用户简历列表 (分页)                  |
-|          | `POST /resumes`               | 创建简历                                     |
-|          | `GET /resumes/{id}`           | 获取简历详情                                 |
-|          | `PUT /resumes/{id}`           | 更新简历                                     |
-|          | `DELETE /resumes/{id}`        | 删除简历                                     |
-| **模板** | `GET /templates`              | 获取内置模板列表                             |
-| **PDF**  | `POST /pdf/generate`          | 生成 PDF (返回下载链接)                      |
-|          | `GET /pdf/download/{file_id}` | 下载生成的 PDF                               |
-| **AI**   | `POST /ai/polish`             | 润色文本 (SSE 流式)                          |
-|          | `POST /ai/keywords`           | 分析 JD 关键词匹配                           |
-|          | `POST /ai/generate`           | 智能生成内容 (SSE 流式)                      |
-|          | `POST /ai/models`             | 拉取供应商可用模型列表 (代理转发，规避 CORS) |
+**后端启动：**
 
----
+```bash
+cd apps/api
+poetry install --no-root
+poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+> 部署前请确保已正确配置环境变量（见[环境变量](#环境变量)），并将前端静态资源与后端 API 通过反向代理（Nginx 等）组合到同一域名下。
+
+## API 概览
+
+所有 API 前缀为 `/api/v1`，完整定义以后端 Swagger 文档为准。
+
+| 模块 | 路由                          | 说明                                         |
+| ---- | ----------------------------- | -------------------------------------------- |
+| 认证 | `POST /auth/register`         | 用户注册                                     |
+|      | `POST /auth/login`            | 用户登录，返回 JWT                           |
+|      | `GET /auth/me`                | 获取当前用户信息                             |
+|      | `PUT /auth/me`                | 更新用户名 / 邮箱                            |
+|      | `PUT /auth/password`          | 修改密码                                     |
+|      | `POST /auth/avatar`           | 上传头像                                     |
+| 简历 | `GET /resumes`                | 获取当前用户简历列表（分页）                 |
+|      | `POST /resumes`               | 创建简历（单用户上限 15 份）                 |
+|      | `GET /resumes/{id}`           | 获取简历详情                                 |
+|      | `PUT /resumes/{id}`           | 更新简历                                     |
+|      | `DELETE /resumes/{id}`        | 删除简历                                     |
+| 模板 | `GET /templates`              | 获取内置模板列表                             |
+| PDF  | `POST /pdf/generate`          | 生成 PDF（返回下载链接）                     |
+|      | `GET /pdf/download/{file_id}` | 下载生成的 PDF                               |
+| AI   | `POST /ai/polish`             | 润色文本（SSE 流式）                         |
+|      | `POST /ai/keywords`           | 分析 JD 关键词匹配                           |
+|      | `POST /ai/generate`           | 智能生成内容（SSE 流式）                     |
+|      | `POST /ai/models`             | 拉取供应商可用模型列表（代理转发，规避 CORS）|
 
 ## 项目结构
 
 ```
-stylan_resume/
+zensheetCV/
 ├── apps/
 │   ├── web/                       # React 前端 (Vite)
 │   │   ├── src/
 │   │   │   ├── api/               # API 请求客户端 (axios)
 │   │   │   ├── components/        # 通用 UI 组件
-│   │   │   │   ├── AIPanel.tsx            # AI 辅助写作面板
+│   │   │   │   ├── AIPanel.tsx            # AI 聊天窗
 │   │   │   │   ├── AvatarCropModal.tsx    # 头像裁剪上传弹窗
+│   │   │   │   ├── Dropdown.tsx           # 通用下拉组件
+│   │   │   │   ├── HoverTip.tsx           # 全站悬停提示
 │   │   │   │   ├── IconModal.tsx          # 图标库弹窗
 │   │   │   │   ├── PhotoModal.tsx         # 照片上传弹窗
 │   │   │   │   ├── TemplateModal.tsx      # 模板库弹窗
 │   │   │   │   ├── TemplatePreview.tsx    # 模板预览卡片
 │   │   │   │   ├── ThemeConfigPanel.tsx   # 主题配置面板
 │   │   │   │   ├── UserModal.tsx          # 设置窗口（账号 / AI / 安全 / 关于）
-│   │   │   │   ├── Navbar.tsx             # 首页导航栏
-│   │   │   │   ├── TopBar.tsx             # 编辑器工具栏
 │   │   │   │   └── ...
 │   │   │   ├── editor/            # Markdown 编辑器模块
 │   │   │   │   ├── MarkdownEditor.tsx
+│   │   │   │   ├── SelectionToolbar.tsx   # 选中文字悬浮工具栏
 │   │   │   │   ├── Toolbar.tsx
 │   │   │   │   └── shortcuts.ts
 │   │   │   ├── hooks/             # 自定义 Hooks
 │   │   │   ├── pages/             # 页面组件
-│   │   │   │   ├── DocsPage.tsx           # 使用文档页
+│   │   │   │   ├── docs/                  # 文档中心（多子页面 + 更新日志）
 │   │   │   │   ├── EditorPage.tsx
 │   │   │   │   ├── HomePage.tsx
 │   │   │   │   ├── LoginPage.tsx
 │   │   │   │   ├── RegisterPage.tsx
 │   │   │   │   └── ResumesPage.tsx
-│   │   │   ├── preview/           # 简历预览模块
-│   │   │   │   ├── PreviewToolbar.tsx
-│   │   │   │   ├── ResumePhotos.tsx
-│   │   │   │   └── ResumePreview.tsx
+│   │   │   ├── preview/           # 简历预览模块（分页 / 图标 / 分栏 / 字号）
 │   │   │   ├── settings/          # AI 供应商与密钥设置（浏览器本地存储）
 │   │   │   ├── store/             # 状态管理 (React Context)
-│   │   │   ├── templates/         # 8 套简历模板定义
-│   │   │   │   ├── classic.ts  modern.ts  elegant.ts  tech.ts
-│   │   │   │   ├── muji.ts     azure.ts   sunrise.ts   carbon.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── sampleResume.ts    # 共享示例简历内容
-│   │   │   ├── App.tsx            # 应用入口与路由
-│   │   │   └── main.tsx           # React DOM 挂载
-│   │   ├── tests/                 # Vitest 测试
-│   │   ├── package.json
-│   │   └── vite.config.ts
+│   │   │   └── templates/         # 8 套简历模板定义
+│   │   └── tests/                 # Vitest 测试
 │   │
 │   └── api/                       # FastAPI 后端
 │       ├── app/
-│       │   ├── api/v1/            # API 路由层
-│       │   │   ├── ai.py          # AI 辅助写作接口
-│       │   │   ├── auth.py        # 认证 / 资料 / 头像接口
-│       │   │   ├── pdf.py         # PDF 生成接口
-│       │   │   ├── resumes.py     # 简历 CRUD 接口
-│       │   │   └── templates.py   # 模板接口
+│       │   ├── api/v1/            # API 路由层（auth / resumes / templates / pdf / ai）
 │       │   ├── core/              # 核心配置
 │       │   ├── db/                # 数据库
 │       │   ├── models/            # SQLAlchemy 模型
 │       │   ├── schemas/           # Pydantic 模型
 │       │   ├── services/          # 业务逻辑
 │       │   └── main.py            # FastAPI 应用入口
-│       ├── uploads/               # 运行时上传目录（头像等，不入库）
-│       ├── tests/
+│       ├── tests/                 # Pytest 集成测试
 │       └── pyproject.toml
 │
 ├── packages/
-│   └── shared-types/              # 前后端共享类型
+│   └── shared-types/              # 前后端共享类型定义
 │
-├── docs/
-│   └── superpowers/               # 实施计划与设计规格
+├── docs/                          # 设计规格与实施文档
 │
 ├── .github/workflows/ci.yml       # CI 配置
 ├── pnpm-workspace.yaml            # pnpm workspace 配置
-├── package.json                   # Monorepo 根配置
-└── README.md
+└── package.json                   # Monorepo 根配置
 ```
+
+## 相关文档
+
+- 应用内文档中心：登录后访问 `/#/docs`（使用指南 / Markdown 教程 / 主题配置 / 图标库 / AI 助手）
+- 应用内更新日志：`/#/docs/changelog`，完整记录 v0.1.0 至今的版本演进
+
+## 参与贡献
+
+欢迎提交 Issue 与 Pull Request：
+
+1. Fork 本仓库并创建特性分支（`git checkout -b feature/your-feature`）
+2. 提交前请确保 `pnpm run lint:web`、`pnpm run test:web` 与 `pnpm run test:api` 通过
+3. 提交 Pull Request 并描述变更内容与动机
+
+## 交流与反馈
+
+欢迎加入 QQ 交流群：
+
+<p align="left">
+  <img src="apps/web/public/QR-Code.png" alt="QQ 群二维码" width="120" />
+</p>
 
 ## 许可证
 
-MIT
+本项目基于 [MIT License](LICENSE) 开源。
+
+---
+
+<p align="center">
+  由 <a href="https://duan-deqing.github.io/" target="_blank" rel="noopener noreferrer">STYLAN</a> &amp; GLM-5.3-flash 打造
+</p>
