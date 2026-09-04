@@ -23,13 +23,13 @@ export const techTemplate: TemplateDefinition = {
       text-align: justify;
     }
     .resume-preview h1 {
-      font-size: calc(1.75rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 700;
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
       color: var(--resume-primary, #10B981);
     }
     .resume-preview h2 {
-      font-size: calc(0.875rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 600;
       margin-top: calc(1.5rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
@@ -40,20 +40,17 @@ export const techTemplate: TemplateDefinition = {
       padding-bottom: 0.375rem;
     }
     .resume-preview h3 {
-      font-size: calc(0.9375rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 600;
       margin-top: calc(0.75rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
       color: #D1D5DB;
     }
-    .resume-preview ul { padding-left: 1rem; list-style: none; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ul { padding-left: 1.1rem; list-style: disc; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol li { margin-bottom: calc(0.25rem * var(--resume-sp, 1)); color: #9CA3AF; }
-    .resume-preview ul li { position: relative; padding-left: 1rem; margin-bottom: calc(0.25rem * var(--resume-sp, 1)); color: #9CA3AF; }
-    .resume-preview ul li::before {
-      content: '>'; position: absolute; left: 0;
-      color: var(--resume-primary, #10B981);
-    }
+    .resume-preview ul li { margin-bottom: calc(0.25rem * var(--resume-sp, 1)); color: #9CA3AF; }
+    .resume-preview ul li::marker { color: var(--resume-primary, #10B981); }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #9CA3AF; }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
@@ -78,6 +75,6 @@ export const techTemplate: TemplateDefinition = {
     primaryColor: '#10B981',
     fontFamily: "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif",
     fontSize: 13,
-    lineHeight: 1.45,
+    lineHeight: 1.4,
   },
 };

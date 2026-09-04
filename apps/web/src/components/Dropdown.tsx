@@ -1,11 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface DropdownOption<T extends string> {
   value: T;
-  label: string;
+  /** 选项文案：支持 ReactNode（如「默认」徽章标签） */
+  label: ReactNode;
 }
 
-/** 通用下拉选择：白色圆角卡片弹层 + 主色 hover + 选中打勾，与全站风格一致 */
+/** 通用下拉选择：白色圆角卡片弹层 + 主色 hover + 选中打勾，与全站风格一致；
+ *  弹层方向自适应：默认向下展开，下方空间不足且上方更充裕时自动改为向上展开 */
 export function Dropdown<T extends string>({
   options,
   value,
@@ -22,8 +24,24 @@ export function Dropdown<T extends string>({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [dir, setDir] = useState<'down' | 'up'>('down');
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const current = options.find((o) => o.value === value);
+
+  // 展开时按可视区剩余空间决定弹层方向（useLayoutEffect 在绘制前翻转，无闪烁）
+  useLayoutEffect(() => {
+    if (!open) return;
+    const root = rootRef.current;
+    const menu = menuRef.current;
+    if (!root || !menu) return;
+    const rect = root.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    setDir(
+      spaceBelow < menu.offsetHeight + 8 && spaceAbove > spaceBelow ? 'up' : 'down',
+    );
+  }, [open, options.length]);
 
   // 点击外部 / Escape 关闭
   useEffect(() => {
@@ -75,17 +93,25 @@ export function Dropdown<T extends string>({
 
       {open && (
         <div
+          ref={menuRef}
           role="listbox"
-          className="dropdown-pop absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30 max-h-60 overflow-y-auto"
+          className={`dropdown-pop absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30 max-h-60 overflow-y-auto ${
+            dir === 'up' ? 'bottom-full mb-1 dropdown-up' : 'top-full mt-1 dropdown-down'
+          }`}
         >
           <style>{`
             @keyframes dropdownIn {
               from { opacity: 0; transform: translateY(-4px); }
               to { opacity: 1; transform: translateY(0); }
             }
-            .dropdown-pop { animation: dropdownIn 0.15s ease-out both; }
+            @keyframes dropdownInUp {
+              from { opacity: 0; transform: translateY(4px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            .dropdown-pop.dropdown-down { animation: dropdownIn 0.15s ease-out both; }
+            .dropdown-pop.dropdown-up { animation: dropdownInUp 0.15s ease-out both; }
             @media (prefers-reduced-motion: reduce) {
-              .dropdown-pop { animation: none; }
+              .dropdown-pop.dropdown-down, .dropdown-pop.dropdown-up { animation: none; }
             }
           `}</style>
           {options.map((opt) => {
@@ -100,7 +126,7 @@ export function Dropdown<T extends string>({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center justify-between gap-2 text-left text-[13px] px-3 py-2 transition-colors ${
+                className={`w-full flex items-center justify-between gap-2 text-left text-[14px] px-3 py-2 transition-colors ${
                   selected
                     ? 'bg-primary-50 text-primary-700 font-medium'
                     : 'text-gray-600 hover:bg-primary-50 hover:text-primary-600'

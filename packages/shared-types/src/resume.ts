@@ -16,11 +16,37 @@ export interface ResumePhoto {
   width: number;
 }
 
+/** 分类字号（px）：标题 / 段落 / 列表分别设置，取值 10 ~ 30（H1 默认 30，可调至 40） */
+export interface ElementFontSizes {
+  h1: number;
+  h2: number;
+  h3: number;
+  h4: number;
+  h5: number;
+  /** 段落字号 */
+  p: number;
+  /** 列表字号（ul / ol 的 li） */
+  list: number;
+}
+
+/** 分类字号默认值：未单独设置时按此渲染（下拉中带「默认」标识） */
+export const defaultElementFontSizes: ElementFontSizes = {
+  h1: 30,
+  h2: 20,
+  h3: 14,
+  h4: 14,
+  h5: 14,
+  p: 14,
+  list: 14,
+};
+
 export interface ThemeConfig {
   primaryColor: string;
   fontFamily: string;
   /** 正文字号（px），10 ~ 30 */
   fontSize: number;
+  /** 分类字号：H1~H5 / 段落 / 列表分别设置；未设置的字段回退 defaultElementFontSizes */
+  elementFontSizes?: Partial<ElementFontSizes>;
   /** 行距（倍数），1.2 ~ 2.5 */
   lineHeight: number;
   /** 左右页边距（PDF 导出与预览共用） */
@@ -39,7 +65,7 @@ export const defaultTheme: ThemeConfig = {
   primaryColor: '#2563EB',
   fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
   fontSize: 14,
-  lineHeight: 1.6,
+  lineHeight: 1.4,
   marginX: 'none',
   marginY: 'none',
   contentPadding: 'normal',

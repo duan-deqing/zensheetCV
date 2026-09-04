@@ -63,8 +63,11 @@ describe('editor restores saved template & theme on re-enter', () => {
       const styles = preview!.querySelectorAll('style');
       const all = Array.from(styles).map((s) => s.textContent || '').join('\n');
       expect(all).toContain('--resume-primary: #10B981');
-      expect(all).toContain('--resume-fs: 1.1'); // fontSize lg
+      expect(all).toContain('--resume-fs: 1.07'); // fontSize lg（15 / 14 ≈ 1.0714）
       expect(all).toContain('--resume-sp: 1.3'); // spacing loose
+      // 分类字号（H1~H5 / 段落 / 列表）：未设置时注入默认值
+      expect(all).toContain('--resume-fs-h1:30px');
+      expect(all).toContain('--resume-fs-p:14px');
     }, { timeout: 15000 });
   }, 30000);
 });

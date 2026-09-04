@@ -1,9 +1,16 @@
-import type { MarginOption } from '@stylan/shared-types';
+import type {
+  ElementFontSizes,
+  MarginOption,
+} from '@stylan/shared-types';
+import { defaultElementFontSizes } from '@stylan/shared-types';
 
 /** 字号/行距缩放基准：--resume-fs / --resume-sp 为 1.0 时对应 14px 字号与 1.6 倍行距，
  * 模板内所有字号与垂直留白均通过 calc(var() * 基准值) 等比缩放 */
 export const BASE_FONT_SIZE = 14;
 export const BASE_LINE_HEIGHT = 1.6;
+
+/** 行距默认值：未设置时按 1.4 倍渲染（BASE_LINE_HEIGHT 仅作缩放基准，保证旧数据渲染不变） */
+export const DEFAULT_LINE_HEIGHT = 1.4;
 
 const clampNum = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
@@ -21,7 +28,7 @@ export function normalizeFontSize(v: unknown, fallback = BASE_FONT_SIZE): number
 }
 
 /** 归一化行距：数值限定 1.2 ~ 2.5 倍，旧档位字符串按就近倍数映射 */
-export function normalizeLineHeight(v: unknown, fallback = BASE_LINE_HEIGHT): number {
+export function normalizeLineHeight(v: unknown, fallback = DEFAULT_LINE_HEIGHT): number {
   if (typeof v === 'number' && Number.isFinite(v)) return clampNum(Math.round(v * 10) / 10, 1.2, 2.5);
   if (typeof v === 'string' && LEGACY_LINE_HEIGHT[v] != null) return LEGACY_LINE_HEIGHT[v];
   return fallback;
@@ -31,6 +38,67 @@ export function normalizeLineHeight(v: unknown, fallback = BASE_LINE_HEIGHT): nu
 export function fontScale(theme?: { fontSize?: unknown } | null): number {
   return normalizeFontSize(theme?.fontSize) / BASE_FONT_SIZE;
 }
+
+/** 分类字号（H1~H5 / 段落 / 列表）→ CSS 变量名映射 */
+export const ELEMENT_FONT_SIZE_VAR: Record<keyof ElementFontSizes, string> = {
+  h1: '--resume-fs-h1',
+  h2: '--resume-fs-h2',
+  h3: '--resume-fs-h3',
+  h4: '--resume-fs-h4',
+  h5: '--resume-fs-h5',
+  p: '--resume-fs-p',
+  list: '--resume-fs-list',
+};
+
+/** 各分类字号上限（px）：与主题面板下拉选项一致 —— 10 ~ 30，H1 默认 30 可调至 40 */
+const ELEMENT_FONT_SIZE_MAX: Record<keyof ElementFontSizes, number> = {
+  h1: 40, h2: 30, h3: 30, h4: 30, h5: 30, p: 30, list: 30,
+};
+
+/** 归一化分类字号：逐项限定取值范围，未设置/非法值回退默认值 */
+export function normalizeElementFontSizes(
+  v?: Partial<ElementFontSizes> | null,
+): ElementFontSizes {
+  const pick = (raw: unknown, key: keyof ElementFontSizes) =>
+    typeof raw === 'number' && Number.isFinite(raw)
+      ? clampNum(Math.round(raw), 10, ELEMENT_FONT_SIZE_MAX[key])
+      : defaultElementFontSizes[key];
+  return {
+    h1: pick(v?.h1, 'h1'),
+    h2: pick(v?.h2, 'h2'),
+    h3: pick(v?.h3, 'h3'),
+    h4: pick(v?.h4, 'h4'),
+    h5: pick(v?.h5, 'h5'),
+    p: pick(v?.p, 'p'),
+    list: pick(v?.list, 'list'),
+  };
+}
+
+/** 主题 → 分类字号 CSS 变量声明（注入到 .resume-preview），
+ *  模板 CSS 与共享样式通过 var(--resume-fs-*) 消费 */
+export function elementFontSizeVars(
+  theme?: { elementFontSizes?: Partial<ElementFontSizes> } | null,
+): string {
+  const sizes = normalizeElementFontSizes(theme?.elementFontSizes);
+  return (Object.keys(ELEMENT_FONT_SIZE_VAR) as Array<keyof ElementFontSizes>)
+    .map((k) => `${ELEMENT_FONT_SIZE_VAR[k]}:${sizes[k]}px`)
+    .join(';');
+}
+
+/** h4/h5/段落/列表字号规则：模板 CSS 未定义这些元素的 font-size，由共享规则统一提供；
+ *  h1~h3 的 font-size 在各模板 CSS 中定义（fallback 同为默认值）。
+ *  选择器覆盖 ul li / ol li / h1~h5 + p 等复合形式（与模板潜在规则同特异性），
+ *  且本规则注入顺序在模板 CSS 之后，可稳定压过模板历史硬编码，保证分类字号在所有模板生效。
+ *  scope 为空时作用于 .resume-preview，传入容器选择器时仅作用于该容器内 */
+export const resumeFontSizeCss = (scope = '') => {
+  const root = scope || '.resume-preview';
+  return `
+    ${root} h4, ${root} ul h4, ${root} ol h4 { font-size: var(--resume-fs-h4, ${defaultElementFontSizes.h4}px); }
+    ${root} h5, ${root} ul h5, ${root} ol h5 { font-size: var(--resume-fs-h5, ${defaultElementFontSizes.h5}px); }
+    ${root} p, ${root} h1 + p, ${root} h2 + p, ${root} h3 + p, ${root} h4 + p, ${root} h5 + p { font-size: var(--resume-fs-p, ${defaultElementFontSizes.p}px); }
+    ${root} li, ${root} ul li, ${root} ol li { font-size: var(--resume-fs-list, ${defaultElementFontSizes.list}px); }
+  `;
+};
 
 /** 主题 → --resume-sp 行距缩放系数；旧版 spacing 档位字段同样兼容 */
 export function spacingScale(theme?: { lineHeight?: unknown; spacing?: unknown } | null): number {
@@ -98,3 +166,35 @@ export const resumeIconsCss = (scope = '') => `
     fill: currentColor;
   }
 `;
+
+/** 最小 hast 节点结构（仅遍历所需字段，避免依赖 hast 类型包） */
+interface MinimalHastNode {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: MinimalHastNode[];
+}
+
+/** rehype 插件：把 h2 的子节点包进 `<span class="h2-text">`。
+ *  「墨纸极简」模板的居中胶囊章节标题需要给标题文字设置深色底 +
+ *  白字 + 全圆角，而纯 CSS 无法为 flex 匿名文本项设置背景，必须以真实
+ *  元素作为样式载体；其余模板不引用 .h2-text，包装后渲染不受影响 */
+export function rehypeWrapH2Text() {
+  return (tree: MinimalHastNode): void => {
+    const visit = (node: MinimalHastNode): void => {
+      if (!node.children || node.children.length === 0) return;
+      if (node.type === 'element' && node.tagName === 'h2') {
+        node.children = [
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: { className: ['h2-text'] },
+            children: node.children,
+          },
+        ];
+      }
+      node.children.forEach(visit);
+    };
+    visit(tree);
+  };
+}

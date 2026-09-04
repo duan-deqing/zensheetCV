@@ -27,7 +27,7 @@ export const sunriseTemplate: TemplateDefinition = {
       text-align: justify;
     }
     .resume-preview h1 {
-      font-size: calc(1.75rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 800;
       color: #FFFFFF;
       text-shadow: 0 1px 2px rgba(180, 90, 20, 0.35);
@@ -41,7 +41,7 @@ export const sunriseTemplate: TemplateDefinition = {
       display: flex;
       align-items: center;
       gap: 0.875rem;
-      font-size: calc(1.05rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 700;
       color: var(--resume-primary, #F9855D);
       margin-top: calc(1.75rem * var(--resume-sp, 1));
@@ -55,27 +55,25 @@ export const sunriseTemplate: TemplateDefinition = {
       background: #FDD288;
     }
     .resume-preview h3 {
-      font-size: calc(0.95rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 600;
       margin-top: calc(1rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
       color: #4A3B2E;
     }
-    .resume-preview ul { padding-left: 1.1rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
+    .resume-preview ul { padding-left: 1.1rem; list-style: disc; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol { padding-left: 1.4rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol li {
-      font-size: 0.9em;
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));
       color: #5C4F42;
     }
     .resume-preview ol li::marker { color: #F9855D; }
     .resume-preview ul li {
-      font-size: 0.9em;
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));
       color: #5C4F42;
     }
-    .resume-preview ul li::marker { color: #F9855D; }
-    .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #5C4F42; font-size: 0.95em; }
+    .resume-preview ul li::marker { color: var(--resume-primary, #F9855D); }
+    .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #5C4F42; }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -101,6 +99,6 @@ export const sunriseTemplate: TemplateDefinition = {
     primaryColor: '#F9855D',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.6,
+    lineHeight: 1.4,
   },
 };

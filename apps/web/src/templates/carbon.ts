@@ -28,10 +28,11 @@ export const carbonTemplate: TemplateDefinition = {
       text-align: justify;
     }
     .resume-preview h1 {
-      font-size: calc(2.4rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 900;
       letter-spacing: 0.02em;
-      color: var(--resume-primary, #1A1A1A);
+      /* 姓名颜色固定碳黑，不随主色调联动 */
+      color: #1A1A1A;
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
     }
     .resume-preview h1 + p {
@@ -39,18 +40,19 @@ export const carbonTemplate: TemplateDefinition = {
       color: #1A1A1A;
     }
     .resume-preview h2 {
-      /* 灰底章节条 + 左侧主题色粗竖标（参考图最鲜明特征） */
+      /* 章节条底色随主色调联动：主色 8% 混白（默认碳黑 ≈ #ECECEC 灰底），左侧主题色粗竖标（参考图最鲜明特征） */
       background: #ECECEC;
+      background: color-mix(in srgb, var(--resume-primary, #1A1A1A) 8%, #ffffff);
       border-left: 5px solid var(--resume-primary, #1A1A1A);
       padding: 0.4rem 0.9rem;
-      font-size: calc(1.2rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 800;
-      color: #111111;
+      color: var(--resume-primary, #1A1A1A);
       margin-top: calc(2rem * var(--resume-sp, 1));
       margin-bottom: calc(1rem * var(--resume-sp, 1));
     }
     .resume-preview h3 {
-      font-size: calc(1rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 700;
       color: #1A1A1A;
       margin-top: calc(1.25rem * var(--resume-sp, 1));
@@ -59,19 +61,17 @@ export const carbonTemplate: TemplateDefinition = {
     .resume-preview ul { padding-left: 1.2rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol { padding-left: 1.4rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol li {
-      font-size: 0.92em;
       margin-bottom: calc(0.45rem * var(--resume-sp, 1));
       color: #222222;
     }
     .resume-preview ol li::marker { color: #1A1A1A; }
     .resume-preview ul li {
       list-style: square;
-      font-size: 0.92em;
       margin-bottom: calc(0.45rem * var(--resume-sp, 1));
       color: #222222;
     }
     .resume-preview ul li::marker { color: #1A1A1A; }
-    .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #333333; font-size: 0.95em; }
+    .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #333333; }
     .resume-preview code {
       font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
       font-size: 0.85em;
@@ -98,6 +98,6 @@ export const carbonTemplate: TemplateDefinition = {
     primaryColor: '#1A1A1A',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.6,
+    lineHeight: 1.4,
   },
 };

@@ -24,7 +24,7 @@ export const modernTemplate: TemplateDefinition = {
     }
     /* 姓名：大号加粗，黑色 */
     .resume-preview h1 {
-      font-size: calc(2.25rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 700;
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
       color: #111827;
@@ -33,7 +33,7 @@ export const modernTemplate: TemplateDefinition = {
     /* 章节标题：蓝色双斜线装饰 + 黑色标题 */
     .resume-preview h2 {
       position: relative;
-      font-size: calc(1.125rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 700;
       margin-top: calc(1.75rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
@@ -59,7 +59,7 @@ export const modernTemplate: TemplateDefinition = {
     .resume-preview h2::after { left: 0.36em; }
     /* 条目标题：黑色加粗 */
     .resume-preview h3 {
-      font-size: calc(1rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 700;
       margin-top: calc(1rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
@@ -104,6 +104,6 @@ export const modernTemplate: TemplateDefinition = {
     primaryColor: '#2563EB',
     fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.6,
+    lineHeight: 1.4,
   },
 };

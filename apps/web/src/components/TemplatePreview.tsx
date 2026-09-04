@@ -6,8 +6,10 @@ import {
   CONTENT_PADDING_MM,
   fontScale,
   MARGIN_MM,
+  rehypeWrapH2Text,
   spacingScale,
   resumeColsCss,
+  resumeFontSizeCss,
   resumeIconsCss,
   resumeQuoteCss,
 } from '@/preview/previewShared';
@@ -86,6 +88,7 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
       <style>{resumeIconsCss(`.tpl-${templateId}`)}</style>
       <style>{resumeQuoteCss(`.tpl-${templateId}`)}</style>
       <style>{resumeColsCss(`.tpl-${templateId}`)}</style>
+      <style>{resumeFontSizeCss(`.tpl-${templateId}`)}</style>
       <div
         ref={pageRef}
         className={`tpl-${templateId} absolute top-0 origin-top-left bg-white`}
@@ -106,6 +109,7 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
         <div style={{ padding: `${padXMM}mm ${padXMM}mm` }}>
           <ReactMarkdown
             remarkPlugins={[remarkResumeCols, remarkResumeIcons(iconMap)]}
+            rehypePlugins={[rehypeWrapH2Text]}
             components={components}
           >
             {normalizeColMarkers(PREVIEW_MARKDOWN)}

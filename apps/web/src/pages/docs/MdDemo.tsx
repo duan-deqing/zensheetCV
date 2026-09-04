@@ -3,7 +3,7 @@ import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 import { BUILTIN_ICONS, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
-import { resumeColsCss, resumeIconsCss, resumeQuoteCss } from '@/preview/previewShared';
+import { resumeColsCss, resumeFontSizeCss, resumeIconsCss, resumeQuoteCss } from '@/preview/previewShared';
 import { getTemplateCss } from '@/templates';
 
 /** 演示预览使用「碳黑章标」模板的默认样式（主色 / 字体与其模板一致） */
@@ -28,6 +28,7 @@ function CarbonTemplateStyles() {
       ${resumeColsCss(DEMO_SCOPE)}
       ${resumeIconsCss(DEMO_SCOPE)}
       ${resumeQuoteCss(DEMO_SCOPE)}
+      ${resumeFontSizeCss(DEMO_SCOPE)}
     `}</style>
   );
 }

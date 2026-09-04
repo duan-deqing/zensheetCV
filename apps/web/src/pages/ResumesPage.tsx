@@ -10,7 +10,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
-import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, fontScale, MARGIN_MM, spacingScale, resumeColsCss } from '@/preview/previewShared';
+import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, elementFontSizeVars, fontScale, MARGIN_MM, rehypeWrapH2Text, spacingScale, resumeColsCss, resumeFontSizeCss } from '@/preview/previewShared';
 
 /** 线性垃圾桶图标，颜色跟随 currentColor */
 function TrashIcon({ className }: { className?: string }) {
@@ -119,6 +119,8 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
     <div className="h-56 overflow-hidden bg-white border-b border-gray-100" aria-hidden="true">
       <style>{scoped}</style>
       <style>{resumeColsCss(`.${scopeClass}`)}</style>
+      <style>{resumeFontSizeCss(`.${scopeClass}`)}</style>
+      <style>{`.${scopeClass}{${elementFontSizeVars(theme)}}`}</style>
       <div
         className="origin-top-left"
         style={{ transform: `scale(${zoom})`, width: `${100 / zoom}%` }}
@@ -147,7 +149,12 @@ function ResumePaperPreview({ resume }: { resume: Resume }) {
               }mm`,
             }}
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkResumeCols]}>{normalized}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm, remarkResumeCols]}
+              rehypePlugins={[rehypeWrapH2Text]}
+            >
+              {normalized}
+            </ReactMarkdown>
           </div>
         </div>
       </div>

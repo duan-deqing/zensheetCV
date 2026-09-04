@@ -22,13 +22,13 @@ export const classicTemplate: TemplateDefinition = {
       text-align: justify;
     }
     .resume-preview h1 {
-      font-size: calc(2rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 700;
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
       color: var(--resume-primary, #111827);
     }
     .resume-preview h2 {
-      font-size: calc(1.25rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 600;
       margin-top: calc(1.5rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
@@ -37,7 +37,7 @@ export const classicTemplate: TemplateDefinition = {
       color: var(--resume-primary, #111827);
     }
     .resume-preview h3 {
-      font-size: calc(1rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 600;
       margin-top: calc(1rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
@@ -81,6 +81,6 @@ export const classicTemplate: TemplateDefinition = {
     primaryColor: '#111827',
     fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.6,
+    lineHeight: 1.4,
   },
 };

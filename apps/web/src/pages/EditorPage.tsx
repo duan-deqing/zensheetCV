@@ -103,6 +103,8 @@ export function EditorPage() {
               fontSize: theme.fontSize ?? template.defaultTheme.fontSize,
               // 旧数据行距存于 spacing 档位字段，优先取新字段 lineHeight
               lineHeight: theme.lineHeight ?? (theme as { spacing?: unknown }).spacing ?? template.defaultTheme.lineHeight,
+              // 分类字号（H1~H5/段落/列表）随 theme_config 恢复，未设置时按默认值渲染
+              elementFontSizes: theme.elementFontSizes,
               // 旧数据只有 pageMargin（单值），左右/上下均回退到它；缺省为 0 边距
               marginX: theme.marginX ?? theme.pageMargin ?? 'none',
               marginY: theme.marginY ?? theme.pageMargin ?? 'none',

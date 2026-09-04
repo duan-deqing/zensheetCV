@@ -20,6 +20,8 @@ export function useTemplateSwitch() {
         fontFamily: template.defaultTheme.fontFamily,
         fontSize: template.defaultTheme.fontSize,
         lineHeight: template.defaultTheme.lineHeight,
+        // 分类字号同步到所有模板：用户手动设置的 H1~H5/段落/列表字号在切换模板后继续生效
+        elementFontSizes: themeConfig.elementFontSizes,
         marginX: themeConfig.marginX,
         marginY: themeConfig.marginY,
         contentPadding: themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING,

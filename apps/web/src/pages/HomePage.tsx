@@ -8,8 +8,10 @@ import {
   CONTENT_PADDING_MM,
   fontScale,
   MARGIN_MM,
+  rehypeWrapH2Text,
   spacingScale,
   resumeColsCss,
+  resumeFontSizeCss,
   resumeIconsCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
@@ -51,6 +53,7 @@ function MiniResume({
       <style>{scoped}</style>
       <style>{resumeIconsCss(`.rp-${templateId}`)}</style>
       <style>{resumeColsCss(`.rp-${templateId}`)}</style>
+      <style>{resumeFontSizeCss(`.rp-${templateId}`)}</style>
       <div
         className={`rp-${templateId}`}
         style={
@@ -65,6 +68,7 @@ function MiniResume({
         <div style={{ padding: `${padYMM}mm ${padXMM}mm` }}>
           <ReactMarkdown
             remarkPlugins={[remarkResumeCols, remarkResumeIcons(iconMap)]}
+            rehypePlugins={[rehypeWrapH2Text]}
             components={components}
           >
             {normalizeColMarkers(SAMPLE_MARKDOWN)}

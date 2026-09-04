@@ -218,11 +218,18 @@ export function ThemeDocContent() {
         </div>
       </DocBlock>
 
-      <DocBlock title="视觉风格" desc="六种主色调、五种正文字体，字号与行距自由选择：">
+      <DocBlock title="视觉风格" desc="六种主色调与五种正文字体，奠定简历的第一印象：">
         <div className="rounded-xl border border-gray-200 p-4 text-[13px] text-gray-600 leading-relaxed">
           <ul className="list-disc pl-5 flex flex-col gap-1.5">
             <li>主色影响标题、分隔线、图标等强调元素的配色。</li>
-            <li>字号在 10 ~ 30 px 间选择，行距在 1.2 ~ 2.5 倍间选择；行距同时影响段落与条目的垂直留白，建议先选模板再微调。</li>
+          </ul>
+        </div>
+      </DocBlock>
+
+      <DocBlock title="字号与行距" desc="独立分组精调排版：H1~H5、段落与列表字号分别可调，行距自由选择：">
+        <div className="rounded-xl border border-gray-200 p-4 text-[13px] text-gray-600 leading-relaxed">
+          <ul className="list-disc pl-5 flex flex-col gap-1.5">
+            <li>字号按 H1 ~ H5、段落、列表分别设置（10 ~ 30 px，H1 可调至 40 px）：未调整的类别按默认字号渲染（H1 30 px、H2 20 px，其余 14 px），下拉中带「默认」标识；行距在 1.2 ~ 2.5 倍间选择，同时影响段落与条目的垂直留白，建议先选模板再微调。</li>
           </ul>
         </div>
       </DocBlock>
@@ -455,6 +462,19 @@ export function AIDocPage() {
 /* ============ 更新日志 ============ */
 
 const CHANGELOG = [
+  {
+    version: 'v0.11.0',
+    date: '2026-09-04',
+    title: '字号分类设置与模板主题联动',
+    items: [
+      '主题配置新增独立「字号与行距」分组，H1 ~ H5、段落、列表字号分别设置（10 ~ 30 px，H1 可调至 40 px），默认字号以「默认」徽章标识，支持一键重置',
+      '分类字号默认值：H1 30 px、H2 20 px、H3/H4/H5 与段落列表 14 px，预览、模板卡片与 PDF 导出三端一致',
+      '主题面板精修：顶栏固定不随滚动、重置按钮胶囊化并优化配色、模板预览放大适应卡片',
+      '全站下拉菜单方向自适应：下方空间不足时自动向上展开',
+      '多模板主色调联动增强：碳黑章标章节条底色与文字、朝阳暖橙列表圆点 / H2 侧线 / H1 渐变、优雅复古 H2 下划线均随主题色变化',
+      '模板细节修复：青线极简 / 朝阳暖橙 / 技术极简列表符号缺失，技术极简列表符号改为圆点并修正对齐，墨纸极简 H2 改浅灰胶囊并去除姓名白线，优雅复古 H1 去斜体',
+    ],
+  },
   {
     version: 'v0.10.0',
     date: '2026-09-04',

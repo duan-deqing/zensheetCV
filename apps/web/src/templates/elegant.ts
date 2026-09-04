@@ -23,24 +23,25 @@ export const elegantTemplate: TemplateDefinition = {
       text-align: justify;
     }
     .resume-preview h1 {
-      font-size: calc(2.5rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h1, 30px);
       font-weight: 400;
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
       color: var(--resume-primary, #78350F);
-      font-style: italic;
       letter-spacing: 0.02em;
     }
     .resume-preview h2 {
-      font-size: calc(1.25rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h2, 20px);
       font-weight: 600;
       margin-top: calc(2rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
       color: var(--resume-primary, #78350F);
+      /* 下划线随主色调联动：主色 45% 混白的浅调 */
       border-bottom: 1px solid #D4A574;
+      border-bottom: 1px solid color-mix(in srgb, var(--resume-primary, #78350F) 45%, #FFFFFF);
       padding-bottom: 0.375rem;
     }
     .resume-preview h3 {
-      font-size: calc(1.0625rem * var(--resume-fs, 1));
+      font-size: var(--resume-fs-h3, 14px);
       font-weight: 600;
       margin-top: calc(1rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
@@ -73,6 +74,6 @@ export const elegantTemplate: TemplateDefinition = {
     primaryColor: '#78350F',
     fontFamily: "'Times New Roman', 'Noto Serif SC', serif",
     fontSize: 14,
-    lineHeight: 1.85,
+    lineHeight: 1.4,
   },
 };

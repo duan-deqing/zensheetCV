@@ -13,10 +13,13 @@ import {
   A4_WIDTH_MM,
   CONTENT_PADDING_MM,
   DEFAULT_CONTENT_PADDING,
+  elementFontSizeVars,
   fontScale,
   MARGIN_MM,
+  rehypeWrapH2Text,
   spacingScale,
   resumeColsCss,
+  resumeFontSizeCss,
   resumeIconsCss,
   resumeQuoteCss,
 } from './previewShared';
@@ -290,17 +293,23 @@ export function ResumePreview() {
                       font-family: ${themeConfig.fontFamily};
                       --resume-fs: ${fs};
                       --resume-sp: ${sp};
+                      ${elementFontSizeVars(themeConfig)};
                     }
                     ${resumeColsCss()}
                     ${resumeIconsCss()}
                     ${resumeQuoteCss()}
+                    ${resumeFontSizeCss()}
                   `}</style>
                   <div
                     ref={sourceRef}
                     className="resume-preview resume-export-source bg-white"
                     style={{ width: `${contentWMM}mm`, display: 'flow-root' }}
                   >
-                    <ReactMarkdown remarkPlugins={remarkPlugins} components={markdownComponents}>
+                    <ReactMarkdown
+                      remarkPlugins={remarkPlugins}
+                      rehypePlugins={[rehypeWrapH2Text]}
+                      components={markdownComponents}
+                    >
                       {normalizedMarkdown}
                     </ReactMarkdown>
                   </div>
