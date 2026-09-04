@@ -614,7 +614,7 @@ const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
-    version: 'v1.0.0',
+    version: 'v0.1.0',
     date: '2026-09-05',
     title: '免登录在线版首发',
     tag: '免登录版',
