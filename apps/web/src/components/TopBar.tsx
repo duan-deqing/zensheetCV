@@ -523,8 +523,12 @@ export function TopBar() {
   return (
     <header className="shrink-0 px-3 pt-3">
       {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住；
-          手机端收纳：文字标签隐藏仅留图标，间距收紧 */}
-      <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-2.5 sm:px-6">
+          手机端收纳：文字标签隐藏仅留图标，间距收紧；
+          barRef：手机折叠菜单的「点击外部关闭」以整个胶囊为边界，未命中时才收起 */}
+      <div
+        ref={barRef}
+        className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-2.5 sm:px-6"
+      >
         <div className="flex items-center gap-1 sm:gap-3 min-w-0">
           <HoverTip text={tr({ zh: '返回简历列表', en: 'Back to my resumes' })}>
             <Link
