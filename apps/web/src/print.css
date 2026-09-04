@@ -1,0 +1,53 @@
+/* 浏览器打印导出样式（纯前端 PDF 导出，配合 usePDFExport 使用）：
+   导出时把分页预览的每张 A4 克隆进 #print-root，隐藏应用其余部分后 window.print() */
+
+#print-root {
+  display: none;
+}
+
+@media print {
+  /* A4 纸、零页边距：分页预览的每页已自带 mm 级 padding */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  /* 只保留打印容器（#root 为应用挂载点的直接子元素） */
+  body.print-mode > *:not(#print-root) {
+    display: none !important;
+  }
+
+  #print-root {
+    display: block !important;
+  }
+
+  /* 页与页之间强制分页；末页不再分页避免尾部空白页 */
+  #print-root [data-resume-page] {
+    box-shadow: none !important;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  #print-root [data-resume-page]:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* 隐藏照片交互控件（删除按钮 / 缩放手柄） */
+  #print-root .resume-photo button,
+  #print-root .cursor-nwse-resize {
+    display: none !important;
+  }
+
+  /* 保留主题背景与主色（深色模板、色块、图标配色） */
+  #print-root,
+  #print-root * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
