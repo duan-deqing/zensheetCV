@@ -52,39 +52,8 @@ function BookIcon() {
   );
 }
 
-function LoginIcon() {
-  return (
-    <NavIcon>
-      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-      <polyline points="10 17 15 12 10 7" />
-      <line x1="15" x2="3" y1="12" y2="12" />
-    </NavIcon>
-  );
-}
-
-function UserPlusIcon() {
-  return (
-    <NavIcon>
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <line x1="19" x2="19" y1="8" y2="14" />
-      <line x1="22" x2="16" y1="11" y2="11" />
-    </NavIcon>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <NavIcon>
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" x2="9" y1="12" y2="12" />
-    </NavIcon>
-  );
-}
-
 export function Navbar() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user } = useAuth();
   const { toggleUserModal } = useUI();
   const { pathname } = useLocation();
   const [hidden, setHidden] = useState(false);
@@ -165,12 +134,10 @@ export function Navbar() {
                 <HomeIcon />
                 首页
               </Link>
-              {isAuthenticated && (
-                <Link to="/resumes" className={linkClass('/resumes')}>
-                  <FileTextIcon />
-                  我的简历
-                </Link>
-              )}
+              <Link to="/resumes" className={linkClass('/resumes')}>
+                <FileTextIcon />
+                我的简历
+              </Link>
               <Link to="/docs" className={linkClass('/docs')}>
                 <BookIcon />
                 文档
@@ -179,61 +146,31 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {isAuthenticated ? (
-              <>
-                {/* 头像 + 用户名，点击打开设置弹窗，与编辑页 TopBar 同构 */}
-                <button
-                  onClick={toggleUserModal}
-                  className="flex items-center gap-2 group px-1"
-                  aria-haspopup="dialog"
-                  aria-label="用户信息"
+            {/* 头像 + 用户名，点击打开设置弹窗，与编辑页 TopBar 同构 */}
+            <button
+              onClick={toggleUserModal}
+              className="flex items-center gap-2 group px-1"
+              aria-haspopup="dialog"
+              aria-label="用户信息"
+            >
+              {user?.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={`${user?.name ?? '用户'} 的头像`}
+                  className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                />
+              ) : (
+                <span
+                  className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                  aria-hidden="true"
                 >
-                  {user?.avatar ? (
-                    <img
-                      src={`${import.meta.env.VITE_API_URL || ''}${user.avatar}`}
-                      alt={`${user?.name ?? '用户'} 的头像`}
-                      className="w-6 h-6 rounded-full object-cover border border-gray-200"
-                    />
-                  ) : (
-                    <span
-                      className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
-                      aria-hidden="true"
-                    >
-                      {(user?.name ?? '?').slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-[10rem]">
-                    {user?.name}
-                  </span>
-                </button>
-                <button
-                  onClick={logout}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2"
-                >
-                  <LogoutIcon />
-                  退出
-                </button>
-              </>
-            ) : (
-              <>
-                <span className="hidden sm:block w-px h-5 bg-gray-200" aria-hidden="true" />
-                <Link to="/login" className={`${linkClass('/login')} px-2`}>
-                  <LoginIcon />
-                  登录
-                </Link>
-                <Link
-                  to="/register"
-                  className={`h-9 inline-flex items-center gap-1.5 px-4 rounded-full border font-semibold text-sm active:scale-[0.98] transition-all ${
-                    isActive('/register')
-                      ? 'bg-primary-600 border-primary-600 text-white'
-                      : 'bg-white border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white'
-                  }`}
-                >
-                  <UserPlusIcon />
-                  注册
-                </Link>
-              </>
-            )}
+                  {(user?.name ?? '?').slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-[10rem]">
+                {user?.name}
+              </span>
+            </button>
           </div>
         </div>
       </nav>

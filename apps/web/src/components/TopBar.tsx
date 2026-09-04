@@ -90,25 +90,6 @@ function ExportIcon() {
   );
 }
 
-/** 退出登录线性图标（开门 + 右箭头），颜色跟随 currentColor */
-function LogoutIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="w-3.5 h-3.5"
-      aria-hidden="true"
-    >
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" x2="9" y1="12" y2="12" />
-    </svg>
-  );
-}
 
 /** 文件菜单：导入 / 导出 Markdown，弹层与全站下拉风格一致，结果气泡显示在按钮上方 */
 function FileMenu() {
@@ -361,7 +342,7 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
 }
 
 export function TopBar() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { exportPDF, isExporting } = usePDFExport();
   const { themeConfig } = usePreview();
   const { status, exiting, show } = useButtonStatus();
@@ -516,43 +497,34 @@ export function TopBar() {
           <ExportIcon />
           {isExporting ? '导出中...' : '导出 PDF'}
         </button>
-        {user && (
-            <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
-              {/* 头像 + 用户名，点击打开用户信息弹窗 */}
-              <HoverTip text="用户信息">
-                <button
-                  onClick={toggleUserModal}
-                  className="flex items-center gap-2 group"
-                  aria-haspopup="dialog"
+        <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
+          {/* 头像 + 用户名，点击打开用户信息弹窗 */}
+          <HoverTip text="用户信息">
+            <button
+              onClick={toggleUserModal}
+              className="flex items-center gap-2 group"
+              aria-haspopup="dialog"
+            >
+              {user.avatar ? (
+                <img
+                  src={user.avatar}
+                  alt={`${user.name} 的头像`}
+                  className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                />
+              ) : (
+                <span
+                  className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                  aria-hidden="true"
                 >
-                  {user.avatar ? (
-                    <img
-                      src={`${import.meta.env.VITE_API_URL || ''}${user.avatar}`}
-                      alt={`${user.name} 的头像`}
-                      className="w-6 h-6 rounded-full object-cover border border-gray-200"
-                    />
-                  ) : (
-                    <span
-                      className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
-                      aria-hidden="true"
-                    >
-                      {user.name.slice(0, 1).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
-                    {user.name}
-                  </span>
-                </button>
-              </HoverTip>
-              <button
-                onClick={logout}
-                className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <LogoutIcon />
-                退出
-              </button>
-            </div>
-          )}
+                  {user.name.slice(0, 1).toUpperCase()}
+                </span>
+              )}
+              <span className="text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
+                {user.name}
+              </span>
+            </button>
+          </HoverTip>
+        </div>
         </div>
       </div>
       <DocsDrawer open={docsDrawerOpen} onClose={toggleDocsDrawer} />

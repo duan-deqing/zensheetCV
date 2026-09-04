@@ -3,8 +3,7 @@ import { useUI } from '@/store/UIContext';
 import { useAuth } from '@/store/AuthContext';
 import { HoverTip } from '@/components/HoverTip';
 import { AvatarCropModal } from '@/components/AvatarCropModal';
-import { apiClient } from '@/api/client';
-import type { User } from '@stylan/shared-types';
+import { listResumes } from '@/storage/resumeStore';
 import {
   loadAISettings,
   saveAISettings,
@@ -13,7 +12,7 @@ import {
 } from '@/settings/aiSettings';
 import { AI_PROVIDERS } from '@/settings/providers';
 
-type UserTab = 'account' | 'ai' | 'security' | 'about';
+type UserTab = 'account' | 'ai' | 'about';
 
 /** 分类线性图标，颜色跟随 currentColor */
 function TabIcon({ tab }: { tab: UserTab }) {
@@ -32,13 +31,6 @@ function TabIcon({ tab }: { tab: UserTab }) {
       <svg {...common}>
         <circle cx="12" cy="8" r="4" />
         <path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" />
-      </svg>
-    );
-  }
-  if (tab === 'security') {
-    return (
-      <svg {...common}>
-        <path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5l8-3z" />
       </svg>
     );
   }
@@ -62,7 +54,6 @@ function TabIcon({ tab }: { tab: UserTab }) {
 const TABS: { id: UserTab; label: string }[] = [
   { id: 'account', label: '账号信息' },
   { id: 'ai', label: 'AI' },
-  { id: 'security', label: '安全' },
   { id: 'about', label: '关于' },
 ];
 
@@ -465,212 +456,6 @@ function AISettingsSection() {
   );
 }
 
-const SEC_INPUT_CLS =
-  'w-full h-9 px-3 rounded-lg border border-gray-200 bg-white text-[13px] text-gray-700 placeholder:text-gray-300 focus:outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100 transition';
-
-interface SecMsg {
-  ok: boolean;
-  text: string;
-}
-
-/** 安全区块通用小节：mono 标题 + 表单行 */
-function SecBlock({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-lg border border-gray-200 p-4">
-      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-3">
-        {title}
-      </p>
-      {children}
-    </section>
-  );
-}
-
-function SecFeedback({ msg }: { msg: SecMsg | null }) {
-  if (!msg) return null;
-  return (
-    <p
-      className={`mt-2 text-[12px] ${msg.ok ? 'text-emerald-600' : 'text-red-500'}`}
-      role="alert"
-    >
-      {msg.text}
-    </p>
-  );
-}
-
-/** 安全分类：修改用户名 / 邮箱 / 密码 */
-function SecuritySection() {
-  const { user, updateUser } = useAuth();
-  const [name, setName] = useState(user?.name ?? '');
-  const [nameMsg, setNameMsg] = useState<SecMsg | null>(null);
-  const [nameSaving, setNameSaving] = useState(false);
-  const [email, setEmail] = useState(user?.email ?? '');
-  const [emailMsg, setEmailMsg] = useState<SecMsg | null>(null);
-  const [emailSaving, setEmailSaving] = useState(false);
-  const [oldPwd, setOldPwd] = useState('');
-  const [newPwd, setNewPwd] = useState('');
-  const [confirmPwd, setConfirmPwd] = useState('');
-  const [pwdMsg, setPwdMsg] = useState<SecMsg | null>(null);
-  const [pwdSaving, setPwdSaving] = useState(false);
-
-  const saveName = async () => {
-    const trimmed = name.trim();
-    if (!trimmed || trimmed === user?.name) return;
-    setNameSaving(true);
-    setNameMsg(null);
-    try {
-      const { data } = await apiClient.put<User>('/auth/me', { name: trimmed });
-      updateUser(data);
-      setName(data.name);
-      setNameMsg({ ok: true, text: '用户名已更新' });
-    } catch (err: any) {
-      setNameMsg({
-        ok: false,
-        text: err?.response?.data?.detail || '保存失败，请重试',
-      });
-    } finally {
-      setNameSaving(false);
-    }
-  };
-
-  const saveEmail = async () => {
-    const trimmed = email.trim();
-    if (!trimmed || trimmed === user?.email) return;
-    setEmailSaving(true);
-    setEmailMsg(null);
-    try {
-      const { data } = await apiClient.put<User>('/auth/me', { email: trimmed });
-      updateUser(data);
-      setEmail(data.email);
-      setEmailMsg({ ok: true, text: '邮箱已更新' });
-    } catch (err: any) {
-      setEmailMsg({
-        ok: false,
-        text: err?.response?.data?.detail || '保存失败，请重试',
-      });
-    } finally {
-      setEmailSaving(false);
-    }
-  };
-
-  const savePassword = async () => {
-    if (newPwd.length < 6) {
-      setPwdMsg({ ok: false, text: '新密码至少需要 6 位' });
-      return;
-    }
-    if (newPwd !== confirmPwd) {
-      setPwdMsg({ ok: false, text: '两次输入的新密码不一致' });
-      return;
-    }
-    setPwdSaving(true);
-    setPwdMsg(null);
-    try {
-      await apiClient.put('/auth/password', {
-        old_password: oldPwd,
-        new_password: newPwd,
-      });
-      setOldPwd('');
-      setNewPwd('');
-      setConfirmPwd('');
-      setPwdMsg({ ok: true, text: '密码已更新' });
-    } catch (err: any) {
-      setPwdMsg({
-        ok: false,
-        text: err?.response?.data?.detail || '修改失败，请重试',
-      });
-    } finally {
-      setPwdSaving(false);
-    }
-  };
-
-  return (
-    <div className="flex flex-col gap-3">
-      <SecBlock title="// 修改用户名">
-        <div className="flex gap-2">
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="输入新的用户名"
-            className={SEC_INPUT_CLS}
-            aria-label="新的用户名"
-          />
-          <button
-            onClick={saveName}
-            disabled={nameSaving || !name.trim() || name.trim() === user?.name}
-            className="shrink-0 h-9 px-4 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
-          >
-            {nameSaving ? '保存中…' : '保存'}
-          </button>
-        </div>
-        <SecFeedback msg={nameMsg} />
-      </SecBlock>
-
-      <SecBlock title="// 修改邮箱">
-        <div className="flex gap-2">
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="输入新的邮箱"
-            className={`${SEC_INPUT_CLS} font-mono`}
-            aria-label="新的邮箱"
-          />
-          <button
-            onClick={saveEmail}
-            disabled={emailSaving || !email.trim() || email.trim() === user?.email}
-            className="shrink-0 h-9 px-4 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
-          >
-            {emailSaving ? '保存中…' : '保存'}
-          </button>
-        </div>
-        <SecFeedback msg={emailMsg} />
-      </SecBlock>
-
-      <SecBlock title="// 修改密码">
-        <div className="flex flex-col gap-2">
-          <input
-            value={oldPwd}
-            onChange={(e) => setOldPwd(e.target.value)}
-            type="password"
-            placeholder="原密码"
-            className={SEC_INPUT_CLS}
-            aria-label="原密码"
-          />
-          <input
-            value={newPwd}
-            onChange={(e) => setNewPwd(e.target.value)}
-            type="password"
-            placeholder="新密码（至少 6 位）"
-            className={SEC_INPUT_CLS}
-            aria-label="新密码"
-          />
-          <input
-            value={confirmPwd}
-            onChange={(e) => setConfirmPwd(e.target.value)}
-            type="password"
-            placeholder="确认新密码"
-            className={SEC_INPUT_CLS}
-            aria-label="确认新密码"
-          />
-          <button
-            onClick={savePassword}
-            disabled={pwdSaving || !oldPwd || !newPwd || !confirmPwd}
-            className="h-9 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-50 transition-colors"
-          >
-            {pwdSaving ? '保存中…' : '更新密码'}
-          </button>
-        </div>
-        <SecFeedback msg={pwdMsg} />
-      </SecBlock>
-    </div>
-  );
-}
-
 /** 设置弹窗：点击导航栏用户名称进入。
  *  左右两栏：左侧分类卡片，右侧展示对应分类内容 */
 export function UserModal() {
@@ -708,23 +493,20 @@ export function UserModal() {
   };
 
   const handleAvatarUpload = async (blob: Blob) => {
-    const fd = new FormData();
-    fd.append('file', blob, 'avatar.png');
-    const { data } = await apiClient.post<User>('/auth/avatar', fd);
-    updateUser(data);
-    closeAvatarCrop();
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      updateUser({ avatar: e.target?.result as string });
+      closeAvatarCrop();
+    };
+    reader.readAsDataURL(blob);
   };
 
-  // 每次打开重置到第一个分类，并拉取简历数量（接口返回 { items: [...] }）
+  // 每次打开重置到第一个分类，并从本地存储读取简历数量
   useEffect(() => {
     if (userModalOpen) {
       setTab('account');
-      apiClient
-        .get('/resumes')
-        .then(({ data }) => {
-          const items = data?.items;
-          setResumeCount(Array.isArray(items) ? items.length : null);
-        })
+      listResumes()
+        .then((items) => setResumeCount(items.length))
         .catch(() => setResumeCount(null));
     }
   }, [userModalOpen]);
@@ -740,12 +522,6 @@ export function UserModal() {
   }, [userModalOpen, toggleUserModal]);
 
   if (!userModalOpen || !user) return null;
-
-  const registeredAt = new Date(user.created_at).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 
   return (
     <div
@@ -837,7 +613,7 @@ export function UserModal() {
                     >
                       {user.avatar ? (
                         <img
-                          src={`${import.meta.env.VITE_API_URL || ''}${user.avatar}`}
+                          src={user.avatar}
                           alt={`${user.name} 的头像`}
                           className="w-12 h-12 rounded-full object-cover border border-gray-200"
                         />
@@ -869,31 +645,23 @@ export function UserModal() {
                 <dl className="mt-4 w-full rounded-lg border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      邮箱
-                    </dt>
-                    <dd className="text-[13px] text-gray-700 truncate">{user.email}</dd>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-2.5">
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      注册时间
-                    </dt>
-                    <dd className="text-[13px] text-gray-700">{registeredAt}</dd>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-2.5">
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       简历数量
                     </dt>
                     <dd className="text-[13px] text-gray-700 tabular-nums">
                       {resumeCount === null ? '—' : `${resumeCount} 份`}
                     </dd>
                   </div>
+                  <div className="flex items-center gap-3 px-4 py-2.5">
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
+                      数据存储
+                    </dt>
+                    <dd className="text-[13px] text-gray-700">仅保存在当前浏览器本地</dd>
+                  </div>
                 </dl>
               </div>
             )}
 
             {tab === 'ai' && <AISettingsSection />}
-
-            {tab === 'security' && <SecuritySection />}
 
             {tab === 'about' && (
               <div className="flex flex-col h-full">
@@ -902,7 +670,8 @@ export function UserModal() {
                 </p>
                 <p className="mt-2 text-[13px] text-gray-600 leading-relaxed">
                   一个在线 Markdown 简历编辑器：左侧书写 Markdown，右侧实时预览排版，
-                  内置多套模板与 AI 润色能力，服务端渲染导出高质量 PDF。
+                  内置多套模板与 AI 润色能力，通过浏览器打印一键导出 PDF。纯前端版本，
+                  数据仅保存在本地浏览器，无需注册登录。
                 </p>
                 <dl className="mt-4 rounded-lg border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5">
@@ -929,8 +698,8 @@ export function UserModal() {
                     </dt>
                     <dd className="text-[13px] text-gray-700 leading-relaxed">
                       <span className="block">前端：React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6</span>
-                      <span className="block">后端：FastAPI · SQLAlchemy (async) · SQLite · JWT</span>
-                      <span className="block">PDF 导出：Playwright 服务端渲染</span>
+                      <span className="block">数据存储：IndexedDB（本地浏览器）</span>
+                      <span className="block">PDF 导出：浏览器打印（window.print）</span>
                     </dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">

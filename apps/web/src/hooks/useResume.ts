@@ -1,6 +1,14 @@
 import { useCallback } from 'react';
-import { apiClient } from '@/api/client';
+import {
+  getResume,
+  listResumes,
+  newResumeId,
+  putResume,
+  removeResume,
+  updateResumeRecord,
+} from '@/storage/resumeStore';
 import { useResumeStore } from '@/store/ResumeContext';
+import { defaultTheme } from '@stylan/shared-types';
 import type { ResumeCreate, ResumeUpdate, Resume } from '@stylan/shared-types';
 
 export function useResume() {
@@ -10,8 +18,7 @@ export function useResume() {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await apiClient.get('/resumes');
-      setResumes(data.items);
+      setResumes(await listResumes());
     } catch (err: any) {
       setError(err.message || 'Failed to fetch resumes');
     } finally {
@@ -23,9 +30,13 @@ export function useResume() {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await apiClient.get(`/resumes/${id}`);
-      setCurrentResume(data);
-      return data as Resume;
+      const found = await getResume(id);
+      if (!found) {
+        setError('简历不存在或已被删除');
+        return null;
+      }
+      setCurrentResume(found);
+      return found;
     } catch (err: any) {
       setError(err.message || 'Failed to fetch resume');
       return null;
@@ -38,12 +49,22 @@ export function useResume() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiClient.post('/resumes', data);
-      setCurrentResume(response.data);
-      return response.data as Resume;
+      const now = new Date().toISOString();
+      const resume: Resume = {
+        id: newResumeId(),
+        user_id: 'local',
+        title: data.title,
+        markdown: data.markdown,
+        template_id: data.template_id ?? 'classic',
+        theme_config: data.theme_config ?? defaultTheme,
+        created_at: now,
+        updated_at: now,
+      };
+      await putResume(resume);
+      setCurrentResume(resume);
+      return resume;
     } catch (err: any) {
-      // 后端业务校验（如创建份数上限）的 detail 优先展示
-      setError(err.response?.data?.detail || err.message || 'Failed to create resume');
+      setError(err.message || 'Failed to create resume');
       return null;
     } finally {
       setLoading(false);
@@ -63,9 +84,13 @@ export function useResume() {
   const updateResume = useCallback(async (id: string, data: ResumeUpdate) => {
     setError(null);
     try {
-      const response = await apiClient.put(`/resumes/${id}`, data);
-      setCurrentResume(response.data);
-      return response.data as Resume;
+      const merged = await updateResumeRecord(id, data);
+      if (!merged) {
+        setError('简历不存在或已被删除');
+        return null;
+      }
+      setCurrentResume(merged);
+      return merged;
     } catch (err: any) {
       setError(err.message || 'Failed to update resume');
       return null;
@@ -75,7 +100,7 @@ export function useResume() {
   const deleteResume = useCallback(async (id: string) => {
     setError(null);
     try {
-      await apiClient.delete(`/resumes/${id}`);
+      await removeResume(id);
       return true;
     } catch (err: any) {
       setError(err.message || 'Failed to delete resume');

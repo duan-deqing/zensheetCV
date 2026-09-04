@@ -1,78 +1,61 @@
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { apiClient } from '@/api/client';
-import type { User, LoginRequest, UserCreate } from '@stylan/shared-types';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import type { User } from '@stylan/shared-types';
+
+/**
+ * 本地访客认证：纯前端版本无账号体系，
+ * 用户资料（昵称/头像）持久化在 localStorage `stylan.profile`，恒为已登录态。
+ */
+
+const PROFILE_KEY = 'stylan.profile';
+
+const DEFAULT_USER: User = {
+  id: 'local',
+  email: '',
+  name: '用户',
+  avatar: '',
+  created_at: '',
+};
+
+function loadProfile(): User {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (raw) {
+      const saved = JSON.parse(raw) as Partial<User>;
+      return { ...DEFAULT_USER, ...saved, id: 'local' };
+    }
+  } catch {
+    // 数据损坏时回退默认访客
+  }
+  return DEFAULT_USER;
+}
 
 interface AuthContextType {
-  user: User | null;
+  user: User;
   isLoading: boolean;
-  isAuthenticated: boolean;
-  login: (data: LoginRequest) => Promise<boolean>;
-  register: (data: UserCreate) => Promise<boolean>;
-  logout: () => void;
-  /** 用服务器返回的最新用户信息替换当前用户（如头像上传后） */
-  updateUser: (user: User) => void;
+  isAuthenticated: true;
+  /** 更新本地资料（昵称/头像），同步写入 localStorage */
+  updateUser: (patch: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User>(loadProfile);
 
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      apiClient.get('/auth/me')
-        .then((res) => setUser(res.data))
-        .catch(() => {
-          localStorage.removeItem('access_token');
-        })
-        .finally(() => setIsLoading(false));
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const login = useCallback(async (data: LoginRequest) => {
-    try {
-      const res = await apiClient.post('/auth/login', data);
-      if (!res.data || typeof res.data !== 'object') {
-        console.error('Login: invalid response', res.data);
-        return false;
+  const updateUser = useCallback((patch: Partial<User>) => {
+    setUser((prev) => {
+      const next = { ...prev, ...patch, id: 'local' };
+      try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+      } catch {
+        // 存储失败（隐私模式等）时仅保留在内存
       }
-      const { access_token, user: userData } = res.data;
-      if (typeof access_token === 'string') {
-        localStorage.setItem('access_token', access_token);
-      }
-      if (userData && typeof userData === 'object') {
-        setUser(userData as User);
-      }
-      return true;
-    } catch (err: any) {
-      console.error('Login error:', err?.message || err);
-      return false;
-    }
+      return next;
+    });
   }, []);
-
-  const register = useCallback(async (data: UserCreate) => {
-    try {
-      await apiClient.post('/auth/register', data);
-      return true;
-    } catch (err: any) {
-      console.error('Register error:', err?.response?.data || err?.message || err);
-      return false;
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem('access_token');
-    setUser(null);
-  }, []);
-
-  const updateUser = useCallback((u: User) => setUser(u), []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, isLoading: false, isAuthenticated: true, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

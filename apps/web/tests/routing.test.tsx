@@ -1,14 +1,6 @@
 
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('@/api/client', () => ({
-  apiClient: {
-    get: vi.fn().mockRejectedValue(new Error('network disabled in test')),
-    post: vi.fn().mockRejectedValue(new Error('network disabled in test')),
-    interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
-  },
-}));
+import { describe, it, expect, beforeEach } from 'vitest';
 
 import App from '../src/App';
 
@@ -18,26 +10,25 @@ describe('App routing', () => {
     window.location.hash = '';
   });
 
-  it('renders home page', async () => {
+  it('renders home page with editor CTA', async () => {
     render(<App />);
     expect(await screen.findAllByText(/ZENSHEET/i)).not.toHaveLength(0);
-    expect(screen.getByText('免费注册')).toBeInTheDocument();
-    expect(screen.getAllByText('登录').length).toBeGreaterThan(0);
+    expect(screen.getByText('进入编辑器')).toBeInTheDocument();
+    expect(screen.queryByText('免费注册')).not.toBeInTheDocument();
+    expect(screen.queryByText('登录')).not.toBeInTheDocument();
   });
 
-  it('renders register page without error', async () => {
+  it('renders docs page without error', async () => {
     render(<App />);
-    window.location.hash = '#/register';
-    const heading = await screen.findByText('创建账户');
-    expect(heading).toBeInTheDocument();
+    window.location.hash = '#/docs';
+    await screen.findAllByText(/ZENSHEET/i);
     expect(screen.queryByText('出错了')).not.toBeInTheDocument();
   });
 
-  it('renders login page without error', async () => {
+  it('renders resumes page without error', async () => {
     render(<App />);
-    window.location.hash = '#/login';
-    const heading = await screen.findByText('欢迎回来');
-    expect(heading).toBeInTheDocument();
+    window.location.hash = '#/resumes';
+    await screen.findAllByText(/ZENSHEET/i);
     expect(screen.queryByText('出错了')).not.toBeInTheDocument();
   });
 });

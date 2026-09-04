@@ -1,41 +1,38 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { putResume } from '@/storage/resumeStore';
+import type { Resume, ThemeConfig } from '@stylan/shared-types';
 
-vi.mock('@/api/client', () => ({
-  apiClient: {
-    get: vi.fn().mockImplementation((url) => {
-      if (url === '/auth/me') return Promise.resolve({ data: { id: 'u1', name: '测试用户', email: 'test@test.com', created_at: '2026-08-01' } });
-      if (url === '/resumes') return Promise.resolve({ data: { items: [
-        { id: 'r1', title: '我的第一份简历', markdown: '# 张三', template_id: 'classic', updated_at: '2026-08-19T10:00:00' },
-        { id: 'r2', title: '求职简历', markdown: '# 李四', template_id: 'modern', updated_at: '2026-08-18T10:00:00' },
-      ] } });
-      if (url === '/resumes/r1') return Promise.resolve({ data: { id: 'r1', title: '我的第一份简历', markdown: '# 张三', template_id: 'classic', updated_at: '2026-08-19T10:00:00' } });
-      return Promise.reject(new Error('not found'));
-    }),
-    post: vi.fn().mockResolvedValue({ data: { id: 'r3', title: '未命名简历', markdown: '# 姓名', updated_at: '2026-08-19' } }),
-    put: vi.fn().mockResolvedValue({ data: {} }),
-    delete: vi.fn().mockResolvedValue({ data: {} }),
-    interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
-  },
-}));
+function seedResume(overrides: Partial<Resume> = {}): Promise<void> {
+  const now = new Date().toISOString();
+  return putResume({
+    id: 'r1',
+    user_id: 'local',
+    title: '我的第一份简历',
+    markdown: '# 张三',
+    template_id: 'classic',
+    theme_config: {} as ThemeConfig,
+    created_at: now,
+    updated_at: now,
+    ...overrides,
+  });
+}
 
 import App from '../src/App';
 
-const setToken = () => localStorage.setItem('access_token', 'test-token');
-
 describe('editor and resumes layout', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     localStorage.clear();
     window.location.hash = '';
+    await seedResume();
+    await seedResume({ id: 'r2', title: '求职简历', template_id: 'modern', updated_at: '2026-08-18T10:00:00.000Z' });
   });
 
   it('editor page has only ONE header (TopBar), no global Navbar', async () => {
-    setToken();
     window.location.hash = '#/editor/r1';
     render(<App />);
     await screen.findByText('我的第一份简历', {}, { timeout: 5000 });
-    await waitFor(() => expect(screen.queryByText('创建账户')).not.toBeInTheDocument());
     const headers = document.querySelectorAll('header');
     const navs = document.querySelectorAll('nav');
     expect(headers.length).toBe(1);
@@ -46,7 +43,6 @@ describe('editor and resumes layout', () => {
   });
 
   it('resumes page shows resume cards', async () => {
-    setToken();
     window.location.hash = '#/resumes';
     render(<App />);
     await screen.findByText('我的第一份简历', {}, { timeout: 5000 });
@@ -59,12 +55,11 @@ describe('editor and resumes layout', () => {
   });
 
   it('editor page has resizable splitter handle', async () => {
-    setToken();
     window.location.hash = '#/editor/r1';
     render(<App />);
     await screen.findByText('我的第一份简历', {}, { timeout: 5000 });
     const splitter = document.querySelector('[aria-label="拖拽调整编辑器宽度"]');
     expect(splitter).not.toBeNull();
-    expect(splitter.className).toContain('col-resize');
+    expect(splitter!.className).toContain('col-resize');
   });
 });

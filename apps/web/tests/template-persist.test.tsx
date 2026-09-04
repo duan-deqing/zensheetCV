@@ -1,43 +1,29 @@
 
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { apiClient } from '@/api/client';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { getResume, putResume } from '@/storage/resumeStore';
+import type { Resume, ThemeConfig } from '@stylan/shared-types';
 
-// 模拟一份 classic 模板简历（模拟用户进入编辑器时的初始状态）
-vi.mock('@/api/client', () => ({
-  apiClient: {
-    get: vi.fn().mockImplementation((url) => {
-      if (url === '/auth/me') return Promise.resolve({ data: { id: 'u1', name: '测试用户', email: 'test@test.com', created_at: '2026-08-01' } });
-      if (url === '/resumes/r1') return Promise.resolve({
-        data: {
-          id: 'r1',
-          title: '写入链路测试',
-          markdown: '# 张三',
-          template_id: 'classic',
-          theme_config: {},
-          updated_at: '2026-08-19T10:00:00',
-        },
-      });
-      return Promise.reject(new Error('not found'));
-    }),
-    post: vi.fn(),
-    put: vi.fn().mockResolvedValue({ data: {} }),
-    delete: vi.fn(),
-    interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
-  },
-}));
+beforeEach(async () => {
+  localStorage.clear();
+  window.location.hash = '';
+  const now = '2026-08-19T10:00:00.000Z';
+  await putResume({
+    id: 'r1',
+    user_id: 'local',
+    title: '写入链路测试',
+    markdown: '# 张三',
+    template_id: 'classic',
+    theme_config: {} as ThemeConfig,
+    created_at: now,
+    updated_at: now,
+  } satisfies Resume);
+});
 
 import App from '../src/App';
 
 describe('editor persists template switch + theme change on manual save', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    localStorage.setItem('access_token', 'test-token');
-    window.location.hash = '';
-    vi.mocked(apiClient.put).mockClear();
-  });
-
-  it('PUT payload carries template_id and theme_config after user edits', async () => {
+  it('saved resume carries template_id and theme_config after user edits', async () => {
     window.location.hash = '#/editor/r1';
     render(<App />);
 
@@ -67,14 +53,12 @@ describe('editor persists template switch + theme change on manual save', () => 
     const saveBtn = screen.getByRole('button', { name: '保存' });
     fireEvent.click(saveBtn);
 
-    // 4. 断言 PUT 载荷包含 template_id 与 theme_config
-    await waitFor(() => {
-      expect(apiClient.put).toHaveBeenCalled();
-      const calls = vi.mocked(apiClient.put).mock.calls.filter(([url]) => String(url).includes('/resumes/r1'));
-      expect(calls.length).toBeGreaterThan(0);
-      const payload = calls[calls.length - 1][1] as Record<string, unknown>;
-      expect(payload.template_id).toBe('modern');
-      expect(payload.theme_config).toMatchObject({ primaryColor: '#10B981' });
+    // 4. 断言本地存储中的简历包含 template_id 与 theme_config
+    await waitFor(async () => {
+      const saved = await getResume('r1');
+      expect(saved).toBeDefined();
+      expect(saved!.template_id).toBe('modern');
+      expect(saved!.theme_config).toMatchObject({ primaryColor: '#10B981' });
     }, { timeout: 10000 });
   }, 30000);
 });

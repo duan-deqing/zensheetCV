@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import type { CSSProperties } from 'react';
-import { useAuth } from '@/store/AuthContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
 import {
@@ -200,8 +199,6 @@ const AI_CAPABILITIES = [
 ];
 
 export function HomePage() {
-  const { isAuthenticated } = useAuth();
-
   return (
     <div className="bg-white text-gray-900">
       <style>{`
@@ -239,23 +236,9 @@ export function HomePage() {
             className="fade-up flex flex-wrap items-center gap-3"
             style={{ animationDelay: '0.24s' }}
           >
-            {isAuthenticated ? (
-              <Link to="/editor" className="btn-primary text-base px-7 py-3">
-                进入编辑器
-              </Link>
-            ) : (
-              <>
-                <Link to="/register" className="btn-primary text-base px-7 py-3">
-                  免费注册
-                </Link>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center px-7 py-3 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 active:scale-[0.98] transition-all"
-                >
-                  登录
-                </Link>
-              </>
-            )}
+            <Link to="/editor" className="btn-primary text-base px-7 py-3">
+              进入编辑器
+            </Link>
           </div>
         </div>
 

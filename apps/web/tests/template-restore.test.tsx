@@ -1,45 +1,37 @@
 
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { putResume } from '@/storage/resumeStore';
+import type { Resume, ThemeConfig } from '@stylan/shared-types';
 
 // 模拟一份已保存为 modern 模板 + 自定义主色调（翡翠绿）的简历
-vi.mock('@/api/client', () => ({
-  apiClient: {
-    get: vi.fn().mockImplementation((url) => {
-      if (url === '/auth/me') return Promise.resolve({ data: { id: 'u1', name: '测试用户', email: 'test@test.com', created_at: '2026-08-01' } });
-      if (url === '/resumes/r1') return Promise.resolve({
-        data: {
-          id: 'r1',
-          title: '模板恢复测试',
-          markdown: '# 张三',
-          template_id: 'modern',
-          theme_config: {
-            primaryColor: '#10B981',
-            fontFamily: "'Georgia', 'Noto Serif SC', serif",
-            fontSize: 'lg',
-            spacing: 'loose',
-          },
-          updated_at: '2026-08-19T10:00:00',
-        },
-      });
-      return Promise.reject(new Error('not found'));
-    }),
-    post: vi.fn(),
-    put: vi.fn().mockResolvedValue({ data: {} }),
-    delete: vi.fn(),
-    interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
-  },
-}));
+// theme_config 沿用云端版旧格式（fontSize/spacing 为档位字符串），验证旧数据兼容
+const LEGACY_THEME = {
+  primaryColor: '#10B981',
+  fontFamily: "'Georgia', 'Noto Serif SC', serif",
+  fontSize: 'lg',
+  spacing: 'loose',
+} as unknown as ThemeConfig;
+
+beforeEach(async () => {
+  localStorage.clear();
+  window.location.hash = '';
+  const now = '2026-08-19T10:00:00.000Z';
+  await putResume({
+    id: 'r1',
+    user_id: 'local',
+    title: '模板恢复测试',
+    markdown: '# 张三',
+    template_id: 'modern',
+    theme_config: LEGACY_THEME,
+    created_at: now,
+    updated_at: now,
+  } satisfies Resume);
+});
 
 import App from '../src/App';
 
 describe('editor restores saved template & theme on re-enter', () => {
-  beforeEach(() => {
-    localStorage.clear();
-    localStorage.setItem('access_token', 'test-token');
-    window.location.hash = '';
-  });
-
   it('template cards show saved template as current and preview uses saved primary color', async () => {
     window.location.hash = '#/editor/r1';
     render(<App />);
