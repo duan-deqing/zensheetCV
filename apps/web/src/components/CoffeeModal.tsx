@@ -76,7 +76,7 @@ export function CoffeeModal() {
         aria-hidden="true"
       />
       {/* 卡片 */}
-      <div className="coffee-modal-in relative w-[340px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+      <div className="coffee-modal-in relative w-[410px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col">
         {/* 顶栏：与应用其他弹窗同构（mono 眉标 + 关闭按钮） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p
@@ -100,7 +100,7 @@ export function CoffeeModal() {
           <img
             src={QR_SRC}
             alt="赞赏收款码"
-            className="w-[210px] rounded-xl border border-gray-200"
+            className="w-[270px] rounded-xl border border-gray-200"
           />
           <p className="mt-3 text-[13px] text-gray-500 text-center leading-relaxed">
             如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕
