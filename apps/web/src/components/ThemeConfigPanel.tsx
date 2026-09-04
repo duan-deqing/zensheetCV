@@ -8,6 +8,7 @@ import { TemplatePreview } from '@/components/TemplatePreview';
 import { DEFAULT_CONTENT_PADDING, DEFAULT_LINE_HEIGHT, normalizeElementFontSizes, normalizeLineHeight } from '@/preview/previewShared';
 import { builtinTemplates } from '@/templates';
 import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
+import { useModalClose } from '@/hooks/useModalClose';
 import type { ElementFontSizes, ThemeConfig } from '@stylan/shared-types';
 import { defaultElementFontSizes } from '@stylan/shared-types';
 
@@ -201,6 +202,8 @@ export function ThemeConfigPanel() {
   const { updateTheme } = useResumeStore();
   const { themePanelOpen, toggleThemePanel, addedTemplates } = useUI();
   const switchTemplate = useTemplateSwitch();
+  // 统一关闭流程：滑出动画结束后再卸载（侧边栏对称滑出）
+  const { closing, close } = useModalClose(themePanelOpen, toggleThemePanel);
 
   // 当前模板卡片引用：打开面板/切换模板时自动滚动到可视区（jsdom 无 scrollIntoView，需可选调用）
   const currentCardRef = useRef<HTMLButtonElement | null>(null);
@@ -265,7 +268,7 @@ export function ThemeConfigPanel() {
 
   return (
     <aside
-      className="theme-side-in absolute right-2 top-2 bottom-2 z-10 w-96 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto"
+      className={`${closing ? 'theme-side-out' : 'theme-side-in'} absolute right-2 top-2 bottom-2 z-10 w-96 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto`}
       aria-label="主题配置"
     >
       <style>{`
@@ -274,8 +277,13 @@ export function ThemeConfigPanel() {
           to { opacity: 1; transform: translateX(0); }
         }
         .theme-side-in { animation: themeSideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes themeSideOut {
+          from { opacity: 1; transform: translateX(0); }
+          to { opacity: 0; transform: translateX(16px); }
+        }
+        .theme-side-out { animation: themeSideOut 0.18s ease-in both; }
         @media (prefers-reduced-motion: reduce) {
-          .theme-side-in { animation: none; }
+          .theme-side-in, .theme-side-out { animation: none; }
         }
         /* 自定义调色盘弹层入场动画 */
         @keyframes colorPickerIn {
@@ -323,7 +331,7 @@ export function ThemeConfigPanel() {
         <h3 className="text-sm font-semibold text-gray-900">主题配置</h3>
         <HoverTip text="关闭">
           <button
-            onClick={toggleThemePanel}
+            onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
           >
             ✕
