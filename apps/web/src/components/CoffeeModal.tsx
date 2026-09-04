@@ -33,12 +33,30 @@ export function CoffeeIcon() {
   );
 }
 
-/** 请作者喝杯咖啡弹窗：展示收款码，「已支持」从窗口两端释放礼花、屏幕中央弹出致谢胶囊后关闭，「稍后支持」直接关闭 */
+/** 线性对勾图标：感谢卡片使用 */
+function CheckIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 12.5l5 5L20 6.5" />
+    </svg>
+  );
+}
+
+/** 请作者喝杯咖啡弹窗：展示收款码（可切换），「已支持」释放礼花、内容切换为感谢卡片、屏幕顶部中央弹出致谢胶囊 */
 export function CoffeeModal() {
   const { coffeeModalOpen, toggleCoffeeModal } = useUI();
-  // 「已支持」触发礼花后延迟关闭；标记已触发，避免停留期间重复点击叠加多个关闭定时器
+  // 「已支持」后内容切换为感谢卡片；标记已触发，避免重复点击
   const [celebrated, setCelebrated] = useState(false);
-  // 屏幕中央致谢胶囊：in 显示 / out 淡出 / null 隐藏；独立于弹窗渲染，弹窗关闭后仍可停留
+  // 屏幕顶部中央致谢胶囊：in 显示 / out 淡出 / null 隐藏；独立于弹窗渲染，弹窗关闭后仍可停留
   const [thanks, setThanks] = useState<null | 'in' | 'out'>(null);
   // 当前展示的收款码（微信 / 支付宝）
   const [qrIdx, setQrIdx] = useState(0);
@@ -105,11 +123,10 @@ export function CoffeeModal() {
         colors: CONFETTI_COLORS,
       });
     }
-    // 致谢胶囊：屏幕中央弹出，弹窗关闭后继续停留片刻再淡出
+    // 致谢胶囊：屏幕顶部中央弹出，停留片刻后淡出；弹窗切换为感谢卡片，由用户手动关闭
     setThanks('in');
-    timersRef.current.push(window.setTimeout(() => close(), 1000));
-    timersRef.current.push(window.setTimeout(() => setThanks('out'), 2700));
-    timersRef.current.push(window.setTimeout(() => setThanks(null), 3000));
+    timersRef.current.push(window.setTimeout(() => setThanks('out'), 2400));
+    timersRef.current.push(window.setTimeout(() => setThanks(null), 2700));
   };
 
   return (
@@ -137,12 +154,12 @@ export function CoffeeModal() {
           to { opacity: 0; }
         }
         @keyframes coffeePillIn {
-          from { opacity: 0; transform: translateY(10px) scale(0.92); }
+          from { opacity: 0; transform: translateY(-12px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes coffeePillOut {
           from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+          to { opacity: 0; transform: translateY(-10px) scale(0.95); }
         }
         @keyframes coffeeQrIn {
           from { opacity: 0; transform: scale(0.96); }
@@ -192,65 +209,90 @@ export function CoffeeModal() {
           </button>
         </div>
 
-        {/* 内容：收款码（可切换）+ 文案 */}
-        <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
-          <div className="coffee-qr-in w-[270px] h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
-            <img
-              src={QR_CODES[qrIdx].src}
-              alt={`${QR_CODES[qrIdx].label}收款码`}
-              className="max-w-full max-h-full rounded-xl border border-gray-200"
-            />
+        {/* 内容：感谢卡片（已支持后）/ 收款码（可切换）+ 文案 */}
+        {celebrated ? (
+          <div className="coffee-qr-in w-[270px] h-[330px] flex flex-col items-center justify-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+              <CheckIcon className="w-7 h-7 text-emerald-500" />
+            </div>
+            <p className="mt-4 text-lg font-semibold text-gray-900">感谢支持！</p>
+            <p className="mt-2 text-[13px] text-gray-500 text-center leading-relaxed">
+              你的鼓励是持续更新的动力
+              <br />
+              祝你求职顺利，offer 满满！
+            </p>
           </div>
-          {/* 收款码切换：胶囊分段控件 */}
-          <div
-            className="mt-2.5 flex items-center rounded-full border border-gray-200 bg-gray-50 p-0.5"
-            role="tablist"
-            aria-label="切换收款码"
-          >
-            {QR_CODES.map((q, i) => (
-              <button
-                key={q.id}
-                role="tab"
-                aria-selected={i === qrIdx}
-                onClick={() => setQrIdx(i)}
-                className={`px-3.5 h-7 rounded-full text-[12px] font-medium transition-all ${
-                  i === qrIdx
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {q.label}
-              </button>
-            ))}
+        ) : (
+          <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
+            <div className="coffee-qr-in w-[270px] h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
+              <img
+                src={QR_CODES[qrIdx].src}
+                alt={`${QR_CODES[qrIdx].label}收款码`}
+                className="max-w-full max-h-full rounded-xl border border-gray-200"
+              />
+            </div>
+            {/* 收款码切换：胶囊分段控件 */}
+            <div
+              className="mt-2.5 flex items-center rounded-full border border-gray-200 bg-gray-50 p-0.5"
+              role="tablist"
+              aria-label="切换收款码"
+            >
+              {QR_CODES.map((q, i) => (
+                <button
+                  key={q.id}
+                  role="tab"
+                  aria-selected={i === qrIdx}
+                  onClick={() => setQrIdx(i)}
+                  className={`px-3.5 h-7 rounded-full text-[12px] font-medium transition-all ${
+                    i === qrIdx
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-2.5 text-[13px] text-gray-500 text-center leading-relaxed">
+              如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕
+            </p>
           </div>
-          <p className="mt-2.5 text-[13px] text-gray-500 text-center leading-relaxed">
-            如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕
-          </p>
-        </div>
+        )}
 
-        {/* 底部操作：已支持 / 稍后支持 */}
+        {/* 底部操作：已支持后仅保留关闭 */}
         <div className="px-5 pb-4 pt-1 flex items-center gap-2.5">
-          <button
-            onClick={handleSupported}
-            disabled={celebrated}
-            className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-default"
-          >
-            {celebrated ? '感谢支持' : '已支持'}
-          </button>
-          <button
-            onClick={close}
-            className="flex-1 h-9 rounded-full border border-gray-200 bg-white text-gray-600 text-[13px] font-medium hover:bg-gray-50 active:scale-[0.98] transition-all"
-          >
-            稍后支持
-          </button>
+          {celebrated ? (
+            <button
+              onClick={close}
+              className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all"
+            >
+              关闭
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleSupported}
+                disabled={celebrated}
+                className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-default"
+              >
+                {celebrated ? '感谢支持' : '已支持'}
+              </button>
+              <button
+                onClick={close}
+                className="flex-1 h-9 rounded-full border border-gray-200 bg-white text-gray-600 text-[13px] font-medium hover:bg-gray-50 active:scale-[0.98] transition-all"
+              >
+                稍后支持
+              </button>
+            </>
+          )}
         </div>
         </div>
       )}
 
-      {/* 致谢胶囊：屏幕正中，弹窗关闭后仍停留片刻；不拦截点击 */}
+      {/* 致谢胶囊：屏幕顶部中央，弹窗关闭后仍停留片刻；不拦截点击 */}
       {thanks && (
         <div
-          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[110] pointer-events-none"
+          className="fixed left-1/2 top-6 -translate-x-1/2 z-[110] pointer-events-none"
           role="status"
           aria-live="polite"
         >
