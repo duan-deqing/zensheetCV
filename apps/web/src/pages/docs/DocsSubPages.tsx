@@ -462,7 +462,16 @@ export function AIDocPage() {
 
 /* ============ 更新日志 ============ */
 
-const CHANGELOG = [
+type ChangelogEntry = {
+  version: string;
+  date: string;
+  title: string;
+  /** 分支标识徽章（如：免登录版），无则为普通全栈版条目 */
+  tag?: string;
+  items: string[];
+};
+
+const CHANGELOG: ChangelogEntry[] = [
   {
     version: 'v0.12.0',
     date: '2026-09-04',
@@ -602,42 +611,95 @@ const CHANGELOG = [
   },
 ];
 
+/** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
+const STATIC_CHANGELOG: ChangelogEntry[] = [
+  {
+    version: 'v1.0.0',
+    date: '2026-09-05',
+    title: '免登录在线版首发',
+    tag: '免登录版',
+    items: [
+      '纯前端版本首发：无需注册登录，打开即用，作为全栈版之外的免登录在线版入口',
+      '数据本地化：简历与 AI 对话历史保存在浏览器 IndexedDB，隐私模式自动降级为内存存储',
+      'PDF 导出改为浏览器打印直出：逐页排版与预览完全一致，不再依赖服务端渲染',
+      'AI 助手浏览器直连 OpenAI 兼容供应商：API KEY 自持、保存在本地，对话请求不经服务器',
+      '纯静态托管：无后端依赖，可部署于任意静态平台',
+      '保留全栈版核心能力：8 套模板、主题微调、Markdown 简历语法、图标库与照片排版',
+      '单个浏览器最多保存 15 份简历',
+    ],
+  },
+];
+
+/** 单个分支的版本时间线，全栈版与免登录版共用 */
+function ChangelogTimeline({ versions }: { versions: ChangelogEntry[] }) {
+  return (
+    <div className="flex flex-col gap-8">
+      {versions.map((v, i) => (
+        <section
+          key={v.version}
+          data-docs-reveal
+          className="relative sm:ml-28 pl-6 border-l-2 border-gray-100"
+        >
+          {/* 时间信息：置于时间线圆点左侧（窄屏时回退到版本号右侧） */}
+          <span className="hidden sm:block absolute top-0.5 -left-28 w-24 text-right font-mono text-sm text-gray-500 tabular-nums">
+            {v.date}
+          </span>
+          <span className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-50" />
+          <p className="font-mono text-sm text-primary-600 font-medium">
+            {v.version}
+            {/* 最新版本标记 NEW */}
+            {i === 0 && (
+              <span className="ml-2 inline-block align-[1px] rounded-full bg-primary-500 px-1.5 py-px font-sans text-[10px] font-semibold tracking-widest text-white">
+                NEW
+              </span>
+            )}
+            {/* 分支标识徽章（如：免登录版） */}
+            {v.tag && (
+              <span className="ml-2 inline-block align-[1px] rounded-full bg-emerald-500 px-1.5 py-px font-sans text-[10px] font-semibold tracking-widest text-white">
+                {v.tag}
+              </span>
+            )}
+            <span className="sm:hidden ml-2.5 text-gray-500 font-normal">{v.date}</span>
+          </p>
+          <p className="font-semibold text-gray-900 mt-1">{v.title}</p>
+          <ul className="list-disc pl-5 mt-2 flex flex-col gap-1 text-[13px] text-gray-500 leading-relaxed">
+            {v.items.map((it) => (
+              <li key={it}>{it}</li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  );
+}
+
 export function ChangelogPage() {
   return (
     <DocsLayout>
       <DocSectionHeader no="CHANGELOG" title="更新日志" desc="ZENSHEET · 简历 的版本演进记录。" />
 
-      <div className="flex flex-col gap-8">
-        {CHANGELOG.map((v, i) => (
-          <section
-            key={v.version}
-            data-docs-reveal
-            className="relative sm:ml-28 pl-6 border-l-2 border-gray-100"
-          >
-            {/* 时间信息：置于时间线圆点左侧（窄屏时回退到版本号右侧） */}
-            <span className="hidden sm:block absolute top-0.5 -left-28 w-24 text-right font-mono text-sm text-gray-500 tabular-nums">
-              {v.date}
-            </span>
-            <span className="absolute -left-[7px] top-1.5 w-3 h-3 rounded-full bg-primary-500 ring-4 ring-primary-50" />
-            <p className="font-mono text-sm text-primary-600 font-medium">
-              {v.version}
-              {/* 最新版本标记 NEW */}
-              {i === 0 && (
-                <span className="ml-2 inline-block align-[1px] rounded-full bg-primary-500 px-1.5 py-px font-sans text-[10px] font-semibold tracking-widest text-white">
-                  NEW
-                </span>
-              )}
-              <span className="sm:hidden ml-2.5 text-gray-500 font-normal">{v.date}</span>
-            </p>
-            <p className="font-semibold text-gray-900 mt-1">{v.title}</p>
-            <ul className="list-disc pl-5 mt-2 flex flex-col gap-1 text-[13px] text-gray-500 leading-relaxed">
-              {v.items.map((it) => (
-                <li key={it}>{it}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
+      {/* 免登录在线版（static 分支）：版本号独立计数 */}
+      <div data-docs-reveal className="mb-8">
+        <h2 className="text-lg font-bold tracking-tight flex items-center gap-2.5">
+          免登录在线版
+          <span className="rounded-full bg-emerald-500 px-2 py-0.5 font-sans text-[10px] font-semibold tracking-widest text-white">
+            免登录版
+          </span>
+        </h2>
+        <p className="text-[13px] text-gray-500 mt-1">
+          纯前端版本，无需注册登录、打开即用；版本号独立计数，不随全栈版演进。
+        </p>
       </div>
+      <ChangelogTimeline versions={STATIC_CHANGELOG} />
+
+      {/* 全栈版 */}
+      <div data-docs-reveal className="mt-14 mb-8">
+        <h2 className="text-lg font-bold tracking-tight">全栈版</h2>
+        <p className="text-[13px] text-gray-500 mt-1">
+          支持注册登录与账号体系的服务端版本，功能最完整。
+        </p>
+      </div>
+      <ChangelogTimeline versions={CHANGELOG} />
     </DocsLayout>
   );
 }
