@@ -259,7 +259,7 @@ export function Navbar() {
           {menuOpen && (
             <div
               role="menu"
-              className="nav-menu-pop md:hidden absolute left-2 right-2 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
+              className="nav-menu-pop md:hidden absolute right-2 w-60 max-w-[calc(100%-1rem)] top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
             >
               <style>{`
                 @keyframes navMenuIn {
