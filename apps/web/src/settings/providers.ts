@@ -29,6 +29,7 @@ export const AI_PROVIDERS: AIProviderPreset[] = [
     id: 'longcat',
     label: { zh: 'LongCat', en: 'LongCat' },
     // 官方对话端点为 /openai/v1/chat/completions，OpenAI SDK 会在 baseUrl 后拼接 /chat/completions
+    // 注意：实测其网关不返回 CORS 头，浏览器直连获取模型/对话会被拦截，需手动输入模型名称
     baseUrl: 'https://api.longcat.chat/openai/v1',
   },
   {

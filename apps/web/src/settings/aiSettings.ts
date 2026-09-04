@@ -84,9 +84,17 @@ export function resolveAISettings(settings: AISettings): {
 
 export async function fetchProviderModels(baseUrl: string, apiKey: string): Promise<string[]> {
   const url = `${baseUrl.replace(/\/+$/, '')}/models`;
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch {
+    // 网络层失败：断网/被网络环境拦截，或供应商不开放浏览器跨域（CORS，如实测 LongCat 未返回 CORS 头）
+    throw new Error(getLang() === 'en'
+      ? 'Cannot reach the provider endpoint — check your network; the provider must also allow browser CORS. Enter the model name manually'
+      : '无法连接到供应商接口：请检查网络，且供应商需支持浏览器跨域（CORS）。可手动输入模型名称');
+  }
   if (!res.ok) {
     throw new Error(getLang() === 'en'
       ? `Request failed (HTTP ${res.status})`
