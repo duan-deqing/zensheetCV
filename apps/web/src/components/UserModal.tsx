@@ -3,6 +3,7 @@ import { useUI } from '@/store/UIContext';
 import { useAuth } from '@/store/AuthContext';
 import { HoverTip } from '@/components/HoverTip';
 import { AvatarCropModal } from '@/components/AvatarCropModal';
+import { useModalClose } from '@/hooks/useModalClose';
 import { listResumes } from '@/storage/resumeStore';
 import {
   loadAISettings,
@@ -480,6 +481,8 @@ function AISettingsSection() {
 export function UserModal() {
   const { userModalOpen, toggleUserModal } = useUI();
   const { user, updateUser } = useAuth();
+  // 统一关闭流程：淡出动画结束后再卸载
+  const { closing, close } = useModalClose(userModalOpen, toggleUserModal);
   const [tab, setTab] = useState<UserTab>('account');
 
   // 头像上传：选择文件 → 裁剪弹窗 → 确定后上传
@@ -549,11 +552,11 @@ export function UserModal() {
   useEffect(() => {
     if (!userModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleUserModal();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [userModalOpen, toggleUserModal]);
+  }, [userModalOpen, close]);
 
   if (!userModalOpen || !user) return null;
 
@@ -581,13 +584,13 @@ export function UserModal() {
       `}</style>
       {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
       <div
-        className="user-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
-        onClick={toggleUserModal}
+        className={`${closing ? 'modal-backdrop-out' : 'user-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}
+        onClick={close}
         aria-hidden="true"
       />
       {/* 尺寸与屏幕等比：66vw × 66vh 的比值恒等于屏幕宽高比；
           min/max 上限同样保持 16:9，保护极小/超大屏幕 */}
-      <div className="user-modal-in relative w-[66vw] h-[66vh] min-w-[512px] min-h-[288px] max-w-[960px] max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+      <div className={`${closing ? 'modal-out' : 'user-modal-in'} relative w-[66vw] h-[66vh] min-w-[512px] min-h-[288px] max-w-[960px] max-h-[540px] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col`}>
         {/* 顶栏：与模板库/图标库弹窗同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 shrink-0">
           <p
@@ -599,7 +602,7 @@ export function UserModal() {
           <h3 className="text-sm font-semibold text-gray-900">设置</h3>
           <HoverTip text="关闭">
             <button
-              onClick={toggleUserModal}
+              onClick={close}
               className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
               aria-label="关闭设置"
             >

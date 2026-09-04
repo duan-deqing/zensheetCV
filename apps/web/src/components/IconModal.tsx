@@ -3,6 +3,7 @@ import { useUI } from '@/store/UIContext';
 import { usePreview } from '@/store/PreviewContext';
 import { getIconMap } from '@/preview/resumeIcons';
 import { HoverTip } from '@/components/HoverTip';
+import { useModalClose } from '@/hooks/useModalClose';
 
 /** 复制文本：优先 Clipboard API（仅安全上下文可用），
  *  非安全上下文（如局域网 IP 访问 dev server）或 API 失败时回退 execCommand */
@@ -35,6 +36,8 @@ async function copyText(text: string): Promise<boolean> {
 export function IconModal() {
   const { iconModalOpen, toggleIconModal } = useUI();
   const { themeConfig } = usePreview();
+  // 统一关闭流程：淡出动画结束后再卸载
+  const { closing, close } = useModalClose(iconModalOpen, toggleIconModal);
   // 复制结果内联提示：显示在底部提示区右侧，2 秒后自动消失
   const [copied, setCopied] = useState<{ text: string; ok: boolean } | null>(null);
 
@@ -42,11 +45,11 @@ export function IconModal() {
   useEffect(() => {
     if (!iconModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleIconModal();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [iconModalOpen, toggleIconModal]);
+  }, [iconModalOpen, close]);
 
   // 提示自动消失
   useEffect(() => {
@@ -94,12 +97,12 @@ export function IconModal() {
       `}</style>
       {/* 遮罩：点击关闭 */}
       <div
-        className="icon-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
-        onClick={toggleIconModal}
+        className={`${closing ? 'modal-backdrop-out' : 'icon-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}
+        onClick={close}
         aria-hidden="true"
       />
       {/* 面板：图标网格 + 底部提示区 */}
-      <div className="icon-modal-in relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-[min(760px,92vw)] max-h-[78vh]">
+      <div className={`${closing ? 'modal-out' : 'icon-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-[min(760px,92vw)] max-h-[78vh]`}>
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">
           <p
@@ -111,7 +114,7 @@ export function IconModal() {
           <h3 className="text-sm font-semibold text-gray-900">图标库</h3>
           <HoverTip text="关闭">
             <button
-              onClick={toggleIconModal}
+              onClick={close}
               className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
               aria-label="关闭图标库"
             >

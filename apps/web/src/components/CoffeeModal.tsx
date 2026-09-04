@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useUI } from '@/store/UIContext';
+import { useModalClose } from '@/hooks/useModalClose';
 
 /** 收款码列表（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
 const QR_CODES = [
@@ -60,29 +61,17 @@ export function CoffeeModal() {
   const [thanks, setThanks] = useState<null | 'in' | 'out'>(null);
   // 当前展示的收款码（微信 / 支付宝）
   const [qrIdx, setQrIdx] = useState(0);
-  // 关闭动画进行中：先播淡出，动画结束后再真正卸载
-  const [closing, setClosing] = useState(false);
-  const closingRef = useRef(false);
+  // 统一关闭流程：淡出动画结束后再卸载并复位状态
+  const { closing, close } = useModalClose(coffeeModalOpen, () => {
+    toggleCoffeeModal();
+    setCelebrated(false);
+    setQrIdx(0);
+  });
   const cardRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<number[]>([]);
 
-  // 卸载时清理胶囊/关闭相关定时器
+  // 卸载时清理胶囊相关定时器
   useEffect(() => () => timersRef.current.forEach((t) => window.clearTimeout(t)), []);
-
-  // 统一关闭入口：播淡出动画 → 卸载弹窗并复位状态
-  const close = () => {
-    if (closingRef.current) return;
-    closingRef.current = true;
-    setClosing(true);
-    const t = window.setTimeout(() => {
-      toggleCoffeeModal();
-      setClosing(false);
-      setCelebrated(false);
-      setQrIdx(0);
-      closingRef.current = false;
-    }, 180);
-    timersRef.current.push(t);
-  };
 
   // Esc 关闭
   useEffect(() => {

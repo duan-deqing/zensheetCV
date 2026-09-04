@@ -4,6 +4,7 @@ import { usePreview } from '@/store/PreviewContext';
 import { builtinTemplates } from '@/templates';
 import { TemplatePreview } from '@/components/TemplatePreview';
 import { HoverTip } from '@/components/HoverTip';
+import { useModalClose } from '@/hooks/useModalClose';
 
 /** 屏幕顶部中央胶囊提示（与 Coffee 致谢胶囊同款样式） */
 type TopPill = { id: number; text: string; visible: boolean };
@@ -13,6 +14,8 @@ type TopPill = { id: number; text: string; visible: boolean };
 export function TemplateModal() {
   const { templateModalOpen, toggleTemplateModal, addedTemplates, addTemplate, removeTemplate } = useUI();
   const { currentTemplate } = usePreview();
+  // 统一关闭流程：淡出动画结束后再卸载
+  const { closing, close } = useModalClose(templateModalOpen, toggleTemplateModal);
   // 添加/取消添加的顶部胶囊提示；id 递增用于连续操作时重播动画
   const [pill, setPill] = useState<TopPill | null>(null);
   const pillIdRef = useRef(0);
@@ -35,11 +38,11 @@ export function TemplateModal() {
   useEffect(() => {
     if (!templateModalOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleTemplateModal();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [templateModalOpen, toggleTemplateModal]);
+  }, [templateModalOpen, close]);
 
   if (!templateModalOpen) return null;
   const currentId = currentTemplate?.id || 'classic';
@@ -78,13 +81,13 @@ export function TemplateModal() {
       `}</style>
       {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
       <div
-        className="tpl-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]"
-        onClick={toggleTemplateModal}
+        className={`${closing ? 'modal-backdrop-out' : 'tpl-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}
+        onClick={close}
         aria-hidden="true"
       />
       {/* 面板：宽度按屏幕 16:9 比例计算，顶栏固定、滚动区限制在其下方 */}
       <div
-        className="tpl-modal-in relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden"
+        className={`${closing ? 'modal-out' : 'tpl-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden`}
         style={{ width: 'min(1600px, 94vw, calc(82vh * 16 / 9))', maxHeight: '85vh' }}
       >
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
@@ -98,7 +101,7 @@ export function TemplateModal() {
           <h3 className="text-sm font-semibold text-gray-900">模板库</h3>
           <HoverTip text="关闭">
             <button
-              onClick={toggleTemplateModal}
+              onClick={close}
               className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
               aria-label="关闭模板库"
             >

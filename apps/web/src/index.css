@@ -220,3 +220,39 @@
     animation: none;
   }
 }
+
+/* 弹窗统一关闭动画：卡片下沉缩小 + 遮罩渐隐，与各弹窗进入动画对称（useModalClose 驱动） */
+@keyframes modal-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+.modal-out {
+  animation: modal-out 0.18s ease-in both;
+}
+
+@keyframes modal-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.modal-backdrop-out {
+  animation: modal-backdrop-out 0.18s ease-in both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-out,
+  .modal-backdrop-out {
+    animation: none;
+  }
+}

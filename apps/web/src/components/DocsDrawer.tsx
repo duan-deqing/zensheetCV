@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
+import { useModalClose } from '@/hooks/useModalClose';
 import {
   AIDocContent,
   DrawerNavContext,
@@ -57,6 +58,8 @@ const PATH_TO_TAB: Record<string, TabId> = {
 export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [tab, setTab] = useState<TabId>('guide');
   const scrollRef = useRef<HTMLDivElement>(null);
+  // 统一关闭流程：滑出动画结束后再卸载（抽屉为滑入面板，采用对称滑出）
+  const { closing, close } = useModalClose(open, onClose);
 
   // 打开时锁定 body 滚动，Esc 关闭
   useEffect(() => {
@@ -64,14 +67,14 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', handleKey);
     return () => {
       document.body.style.overflow = prevOverflow;
       document.removeEventListener('keydown', handleKey);
     };
-  }, [open, onClose]);
+  }, [open, close]);
 
   // 切换 Tab 回到滚动顶部
   useEffect(() => {
@@ -95,13 +98,18 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           to { transform: translateX(0); }
         }
         .docs-drawer-panel { animation: docsDrawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes docsDrawerOut {
+          from { transform: translateX(0); }
+          to { transform: translateX(100%); }
+        }
+        .docs-drawer-out { animation: docsDrawerOut 0.2s ease-in both; }
         @keyframes docsTabIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: none; }
         }
         .docs-drawer-tabpane { animation: docsTabIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
         @media (prefers-reduced-motion: reduce) {
-          .docs-drawer-panel, .docs-drawer-tabpane { animation: none; }
+          .docs-drawer-panel, .docs-drawer-out, .docs-drawer-tabpane { animation: none; }
         }
       `}</style>
 
@@ -109,12 +117,12 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       <button
         type="button"
         aria-label="关闭文档"
-        onClick={onClose}
-        className="absolute inset-0 w-full h-full bg-gray-900/20 cursor-default"
+        onClick={close}
+        className={`absolute inset-0 w-full h-full bg-gray-900/20 cursor-default ${closing ? 'modal-backdrop-out' : ''}`}
       />
 
       {/* 右侧文档面板：与屏幕边缘留出间距的浮动圆角卡片 */}
-      <aside className="docs-drawer-panel absolute top-4 right-4 bottom-4 w-[min(560px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-[0_24px_70px_rgba(17,24,39,0.22)] flex flex-col overflow-hidden">
+      <aside className={`${closing ? 'docs-drawer-out' : 'docs-drawer-panel'} absolute top-4 right-4 bottom-4 w-[min(560px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-[0_24px_70px_rgba(17,24,39,0.22)] flex flex-col overflow-hidden`}>
         {/* 面板顶栏：mono 标签 + 标题 + 关闭按钮 */}
         <div className="shrink-0 flex items-center justify-between px-5 h-12 border-b border-gray-200">
           <div className="flex items-baseline gap-2.5 min-w-0">
@@ -125,7 +133,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={close}
             aria-label="关闭"
             className="w-7 h-7 inline-flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
           >

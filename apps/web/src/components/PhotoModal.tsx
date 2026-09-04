@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useUI } from '@/store/UIContext';
 import { usePhotoSync } from '@/hooks/usePhotoSync';
+import { useModalClose } from '@/hooks/useModalClose';
 import { HoverTip } from '@/components/HoverTip';
 
 /** 证件照尺寸（一寸 295×413，宽高比 ≈ 0.714），框与裁切均按此比例 */
@@ -50,6 +51,12 @@ export function PhotoModal() {
     if (photoModalOpen) setSrc(null);
   }, [photoModalOpen]);
 
+  // 统一关闭流程：淡出动画结束后再卸载并重置预览图
+  const { closing, close } = useModalClose(photoModalOpen, () => {
+    setSrc(null);
+    togglePhotoModal();
+  });
+
   if (!photoModalOpen) return null;
 
   const handleFile = (file: File | undefined) => {
@@ -61,11 +68,6 @@ export function PhotoModal() {
     reader.onload = () => setSrc(String(reader.result));
     reader.onerror = () => addToast('图片读取失败', 'error');
     reader.readAsDataURL(file);
-  };
-
-  const close = () => {
-    setSrc(null);
-    togglePhotoModal();
   };
 
   const confirm = async () => {
@@ -107,8 +109,8 @@ export function PhotoModal() {
         }
       `}</style>
       {/* 遮罩：背景变灰聚焦，点击取消 */}
-      <div className="ph-backdrop-in absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]" onClick={close} aria-hidden="true" />
-      <div className="ph-modal-in relative flex flex-col items-center bg-white border border-gray-200 rounded-2xl shadow-xl px-6 pt-5 pb-6">
+      <div className={`${closing ? 'modal-backdrop-out' : 'ph-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`} onClick={close} aria-hidden="true" />
+      <div className={`${closing ? 'modal-out' : 'ph-modal-in'} relative flex flex-col items-center bg-white border border-gray-200 rounded-2xl shadow-xl px-6 pt-5 pb-6`}>
         {/* 头部 */}
         <div className="w-full flex items-center justify-between mb-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600">{'// PHOTO'}</p>
