@@ -19,6 +19,7 @@ import { useModalClose } from '@/hooks/useModalClose';
 import { getTemplateById, toApiTemplate } from '@/templates';
 import type { MarginOption, ThemeConfig } from '@stylan/shared-types';
 import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
+import { useTr } from '@/i18n/LangContext';
 
 const MIN_EDITOR_PCT = 25;
 const MAX_EDITOR_PCT = 70;
@@ -60,6 +61,7 @@ function EditorSkeleton() {
 export function EditorPage() {
   useAutoSave();
   useKeyboardShortcut();
+  const tr = useTr();
 
   const { id } = useParams();
   const { fetchResume } = useResume();
@@ -238,7 +240,7 @@ export function EditorPage() {
               {themeReady ? <MarkdownEditor /> : <EditorSkeleton />}
             </div>
           </div>
-          <HoverTip text="拖拽调整编辑器宽度">
+          <HoverTip text={tr({ zh: '拖拽调整编辑器宽度', en: 'Drag to resize editor' })}>
             <div
               className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
               onMouseDown={startDrag}
@@ -251,7 +253,7 @@ export function EditorPage() {
               关闭时 wrapper 先播滑出动画（携拖拽条整体），结束后再卸载 */}
           {(aiWindowOpen || aiClosing) && (
             <div className={`${aiClosing ? 'ai-window-out' : 'ai-window-in'} flex items-stretch min-w-0 shrink-0`}>
-              <HoverTip text="拖拽调整 AI 助手宽度">
+              <HoverTip text={tr({ zh: '拖拽调整 AI 助手宽度', en: 'Drag to resize AI assistant' })}>
                 <div
                   className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
                   onMouseDown={startAIDrag}

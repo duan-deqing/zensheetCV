@@ -1,21 +1,23 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { DocsFooter } from './DocsFooter';
+import { useTr, type Bi } from '@/i18n/LangContext';
 
 /** 文档子页面导航结构 */
-export const DOCS_NAV = [
-  { to: '/docs', label: '文档主页', no: '' },
-  { to: '/docs/guide', label: '使用指南', no: '01' },
-  { to: '/docs/markdown', label: 'Markdown 简历教程', no: '02' },
-  { to: '/docs/theme', label: '主题配置', no: '03' },
-  { to: '/docs/icons', label: '图标库', no: '04' },
-  { to: '/docs/ai', label: 'AI 助手', no: '05' },
-  { to: '/docs/changelog', label: '更新日志', no: '' },
-] as const;
+export const DOCS_NAV: { to: string; label: Bi; no: string }[] = [
+  { to: '/docs', label: { zh: '文档主页', en: 'Docs Home' }, no: '' },
+  { to: '/docs/guide', label: { zh: '使用指南', en: 'User Guide' }, no: '01' },
+  { to: '/docs/markdown', label: { zh: 'Markdown 简历教程', en: 'Markdown Resume Tutorial' }, no: '02' },
+  { to: '/docs/theme', label: { zh: '主题配置', en: 'Theme Settings' }, no: '03' },
+  { to: '/docs/icons', label: { zh: '图标库', en: 'Icon Library' }, no: '04' },
+  { to: '/docs/ai', label: { zh: 'AI 助手', en: 'AI Assistant' }, no: '05' },
+  { to: '/docs/changelog', label: { zh: '更新日志', en: 'Changelog' }, no: '' },
+];
 
 /** 文档子页面布局：右侧目录导航 + 底部页脚（与 DocsPage 同风格的入场动画） */
 export function DocsLayout({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
+  const tr = useTr();
 
   // 路由切换回到页首
   useEffect(() => {
@@ -68,9 +70,14 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
         <p className="docs-enter font-mono text-xs uppercase tracking-[0.22em] text-primary-600 mb-4">
           &lt; DOCS /&gt;
         </p>
-        <h1 className="docs-enter docs-enter-1 text-3xl md:text-4xl font-bold tracking-tight">使用文档</h1>
+        <h1 className="docs-enter docs-enter-1 text-3xl md:text-4xl font-bold tracking-tight">
+          {tr({ zh: '使用文档', en: 'Documentation' })}
+        </h1>
         <p className="docs-enter docs-enter-2 text-gray-600 mt-3 max-w-[36em] leading-relaxed">
-          从创建简历到导出 PDF 的完整指南。右侧目录可在各子文档间切换。
+          {tr({
+            zh: '从创建简历到导出 PDF 的完整指南。右侧目录可在各子文档间切换。',
+            en: 'A complete guide from creating a resume to exporting a PDF. Use the table of contents on the right to switch between sections.',
+          })}
         </p>
       </header>
 
@@ -78,8 +85,10 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
       <div className="max-w-7xl mx-auto w-full px-6 pb-20 flex gap-10 items-start flex-1">
         <main className="docs-enter docs-enter-2 flex-1 min-w-0">{children}</main>
 
-        <nav className="docs-enter docs-enter-3 hidden lg:block w-48 shrink-0 sticky top-24" aria-label="文档目录">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 px-3">目录</p>
+        <nav className="docs-enter docs-enter-3 hidden lg:block w-48 shrink-0 sticky top-24" aria-label={tr({ zh: '文档目录', en: 'Documentation contents' })}>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 mb-2 px-3">
+            {tr({ zh: '目录', en: 'Contents' })}
+          </p>
           <ul className="flex flex-col gap-0.5">
             {DOCS_NAV.map((item) => {
               const active = pathname === item.to;
@@ -97,7 +106,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
                     {item.no && (
                       <span className="font-mono text-[11px] tabular-nums opacity-70">{item.no}</span>
                     )}
-                    {item.label}
+                    {tr(item.label)}
                   </Link>
                 </li>
               );

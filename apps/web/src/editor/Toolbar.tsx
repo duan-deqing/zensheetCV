@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { TipBubble, type TipAnchor } from '@/components/HoverTip';
 import { useEditor } from '@/store/EditorContext';
+import { useTr, getLang, type Bi } from '@/i18n/LangContext';
 import { editorViewRef, insertMarkdown } from './insertMarkdown';
 
 /** 内联线性图标，颜色跟随 currentColor */
@@ -80,49 +81,60 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+/** 解析插入片段：Bi 类型按当前语言取值（BUTTON_GROUPS 被非组件代码共用，故用 getLang） */
+export function snippetOf(v: string | Bi | undefined): string {
+  if (!v) return '';
+  return typeof v === 'string' ? v : v[getLang()];
+}
+
 /** 功能按钮分组：同组内紧凑排列，组间以细分隔线区隔（编辑器工具栏与选中文字悬浮工具栏共用） */
 export const BUTTON_GROUPS: {
-  buttons: { label: string; title: string; before?: string; after?: string; atLineStart?: boolean; fontWeight?: 'bold'; fontStyle?: 'italic' }[];
+  buttons: { label: string; title: Bi; before?: string | Bi; after?: string; atLineStart?: boolean; fontWeight?: 'bold'; fontStyle?: 'italic' }[];
 }[] = [
   {
     // 字体样式
     buttons: [
-      { label: 'B', title: '粗体 (Ctrl+B)', before: '**', after: '**', fontWeight: 'bold' },
-      { label: 'I', title: '斜体 (Ctrl+I)', before: '*', after: '*', fontStyle: 'italic' },
+      { label: 'B', title: { zh: '粗体 (Ctrl+B)', en: 'Bold (Ctrl+B)' }, before: '**', after: '**', fontWeight: 'bold' },
+      { label: 'I', title: { zh: '斜体 (Ctrl+I)', en: 'Italic (Ctrl+I)' }, before: '*', after: '*', fontStyle: 'italic' },
     ],
   },
   {
     // 标题
     buttons: [
-      { label: 'H1', title: '标题1', before: '# ', atLineStart: true },
-      { label: 'H2', title: '标题2', before: '## ', atLineStart: true },
-      { label: 'H3', title: '标题3', before: '### ', atLineStart: true },
+      { label: 'H1', title: { zh: '标题1', en: 'Heading 1' }, before: '# ', atLineStart: true },
+      { label: 'H2', title: { zh: '标题2', en: 'Heading 2' }, before: '## ', atLineStart: true },
+      { label: 'H3', title: { zh: '标题3', en: 'Heading 3' }, before: '### ', atLineStart: true },
     ],
   },
   {
     // 列表
     buttons: [
-      { label: 'ul', title: '无序列表', before: '- ', atLineStart: true },
-      { label: 'ol', title: '有序列表', before: '1. ', atLineStart: true },
+      { label: 'ul', title: { zh: '无序列表', en: 'Bullet list' }, before: '- ', atLineStart: true },
+      { label: 'ol', title: { zh: '有序列表', en: 'Numbered list' }, before: '1. ', atLineStart: true },
     ],
   },
   {
     // 插入
-    buttons: [{ label: 'link', title: '链接', before: '[', after: '](url)' }],
+    buttons: [{ label: 'link', title: { zh: '链接', en: 'Link' }, before: '[', after: '](url)' }],
   },
   {
     // 布局（::: 容器语法，连续书写的容器并排渲染为多栏）
     buttons: [
       {
         label: 'cols2',
-        title: '两栏布局 — 插入 :::left + :::right',
-        before: ':::left\n左栏内容\n:::\n\n:::right\n右栏内容\n:::\n\n',
+        title: { zh: '两栏布局 — 插入 :::left + :::right', en: 'Two columns — insert :::left + :::right' },
+        before: {
+          zh: ':::left\n左栏内容\n:::\n\n:::right\n右栏内容\n:::\n\n',
+          en: ':::left\nLeft column\n:::\n\n:::right\nRight column\n:::\n\n',
+        },
       },
       {
         label: 'cols3',
-        title: '三栏布局 — 插入 :::left + :::mid + :::right',
-        before:
-          ':::left\n左栏内容\n:::\n\n:::mid\n中栏内容\n:::\n\n:::right\n右栏内容\n:::\n\n',
+        title: { zh: '三栏布局 — 插入 :::left + :::mid + :::right', en: 'Three columns — insert :::left + :::mid + :::right' },
+        before: {
+          zh: ':::left\n左栏内容\n:::\n\n:::mid\n中栏内容\n:::\n\n:::right\n右栏内容\n:::\n\n',
+          en: ':::left\nLeft column\n:::\n\n:::mid\nMiddle column\n:::\n\n:::right\nRight column\n:::\n\n',
+        },
       },
     ],
   },
@@ -168,6 +180,7 @@ export function ToolbarHeader() {
 export function ToolbarActions() {
   const rootRef = useRef<HTMLDivElement>(null);
   const groupRef = useRef<HTMLDivElement>(null);
+  const tr = useTr();
   const [overflowing, setOverflowing] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   /** 自定义悬停提示：固定定位气泡，避免被按钮行的 overflow-hidden 裁剪 */
@@ -222,11 +235,11 @@ export function ToolbarActions() {
       {group.buttons.map((btn) => (
         <button
           key={btn.label}
-          onClick={() => insertText(btn.before ?? '', btn.after ?? '', btn.atLineStart)}
-          aria-label={btn.title}
+          onClick={() => insertText(snippetOf(btn.before), btn.after ?? '', btn.atLineStart)}
+          aria-label={tr(btn.title)}
           onMouseEnter={(e) => {
             const r = e.currentTarget.getBoundingClientRect();
-            setTip({ text: btn.title, anchor: { left: r.left, right: r.right, centerY: r.top + r.height / 2 } });
+            setTip({ text: tr(btn.title), anchor: { left: r.left, right: r.right, centerY: r.top + r.height / 2 } });
           }}
           onMouseLeave={() => setTip(null)}
           onBlur={() => setTip(null)}
@@ -270,7 +283,7 @@ export function ToolbarActions() {
                 : 'text-gray-500 hover:text-primary-600 hover:bg-primary-50'
             }`}
           >
-            更多
+            {tr({ zh: '更多', en: 'More' })}
             <ChevronIcon open={moreOpen} />
           </button>
         )}

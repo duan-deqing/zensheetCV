@@ -12,6 +12,7 @@ import { DocsDrawer } from '@/components/DocsDrawer';
 import { CoffeeModal, CoffeeIcon } from '@/components/CoffeeModal';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
+import { useTr } from '@/i18n/LangContext';
 
 /** 文档图标，颜色跟随 currentColor */
 function FileIcon() {
@@ -96,6 +97,7 @@ function FileMenu() {
   const { currentResume } = useResumeStore();
   const dispatch = useEditorDispatch();
   const { status, exiting, show } = useButtonStatus();
+  const tr = useTr();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -124,14 +126,14 @@ function FileMenu() {
     try {
       const text = await file.text();
       if (!text.trim()) {
-        show('error', '文件内容为空');
+        show('error', tr({ zh: '文件内容为空', en: 'File is empty' }));
         return;
       }
       // 载入编辑器并标记未保存，由自动保存持久化
       dispatch({ type: 'SET_MARKDOWN', payload: text });
-      show('success', '导入成功');
+      show('success', tr({ zh: '导入成功', en: 'Imported successfully' }));
     } catch {
-      show('error', '文件读取失败');
+      show('error', tr({ zh: '文件读取失败', en: 'Failed to read file' }));
     }
   };
 
@@ -140,10 +142,10 @@ function FileMenu() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${(currentResume?.title || '简历').replace(/[\\/:*?"<>|]/g, '_')}.md`;
+    a.download = `${(currentResume?.title || tr({ zh: '简历', en: 'Resume' })).replace(/[\\/:*?"<>|]/g, '_')}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    show('success', 'Markdown 导出成功');
+    show('success', tr({ zh: 'Markdown 导出成功', en: 'Markdown exported' }));
   };
 
   return (
@@ -156,7 +158,7 @@ function FileMenu() {
         className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
       >
         <FileIcon />
-        文件
+        {tr({ zh: '文件', en: 'File' })}
       </button>
       <ButtonStatus status={status} exiting={exiting} />
       {open && (
@@ -183,7 +185,7 @@ function FileMenu() {
             }}
             className="w-full text-left text-[13px] px-3 py-2 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
           >
-            导入 Markdown
+            {tr({ zh: '导入 Markdown', en: 'Import Markdown' })}
           </button>
           <button
             type="button"
@@ -194,7 +196,7 @@ function FileMenu() {
             }}
             className="w-full text-left text-[13px] px-3 py-2 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
           >
-            导出 Markdown
+            {tr({ zh: '导出 Markdown', en: 'Export Markdown' })}
           </button>
         </div>
       )}
@@ -281,6 +283,7 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const tr = useTr();
 
   useEffect(() => {
     if (editing) {
@@ -290,18 +293,21 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
   }, [editing]);
 
   if (!currentResume) {
-    return <h1 className="text-sm font-semibold text-gray-900 truncate">编辑简历</h1>;
+    return <h1 className="text-sm font-semibold text-gray-900 truncate">{tr({ zh: '编辑简历', en: 'Edit Resume' })}</h1>;
   }
 
   const commit = async () => {
     setEditing(false);
     const next = draft.trim();
     if (!next || next === currentResume.title) {
-      if (!next) onNotify('error', '名称不能为空');
+      if (!next) onNotify('error', tr({ zh: '名称不能为空', en: 'Name cannot be empty' }));
       return;
     }
     const result = await updateResume(currentResume.id, { title: next });
-    onNotify(result ? 'success' : 'error', result ? '重命名成功' : '重命名失败');
+    onNotify(
+      result ? 'success' : 'error',
+      result ? tr({ zh: '重命名成功', en: 'Renamed' }) : tr({ zh: '重命名失败', en: 'Rename failed' }),
+    );
   };
 
   if (editing) {
@@ -318,13 +324,13 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
         className="text-sm font-semibold text-gray-900 bg-white border-b border-primary-400 outline-none px-0.5 py-0"
         style={{ width: `${Math.min(Math.max(textWidth(draft) + 0.5, 10), 20)}em` }}
         maxLength={60}
-        aria-label="简历名称"
+        aria-label={tr({ zh: '简历名称', en: 'Resume name' })}
       />
     );
   }
 
   return (
-    <HoverTip text="点击修改名称">
+    <HoverTip text={tr({ zh: '点击修改名称', en: 'Click to rename' })}>
       <button
         type="button"
         onClick={() => {
@@ -342,6 +348,7 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
 
 export function TopBar() {
   const { user } = useAuth();
+  const tr = useTr();
   const { exportPDF, isExporting } = usePDFExport();
   const { status, exiting, show } = useButtonStatus();
   const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow, toggleCoffeeModal } = useUI();
@@ -351,7 +358,12 @@ export function TopBar() {
     const ok = await exportPDF();
     show(
       ok ? 'success' : 'error',
-      ok ? '已打开打印面板，请在目标打印机中选择「另存为 PDF」' : 'PDF 导出失败',
+      ok
+        ? tr({
+            zh: '已打开打印面板，请在目标打印机中选择「另存为 PDF」',
+            en: 'Print dialog opened — choose "Save as PDF" as the printer',
+          })
+        : tr({ zh: 'PDF 导出失败', en: 'PDF export failed' }),
     );
   };
 
@@ -360,53 +372,53 @@ export function TopBar() {
       {/* z-30：顶栏需要高于下方编辑器/预览面板，否则文件下拉菜单会被盖住 */}
       <div className="relative z-30 h-12 bg-white/90 backdrop-blur border border-gray-200 rounded-full shadow-sm flex items-center justify-between px-6">
         <div className="flex items-center gap-3 min-w-0">
-          <HoverTip text="返回简历列表">
+          <HoverTip text={tr({ zh: '返回简历列表', en: 'Back to my resumes' })}>
             <Link
               to="/resumes"
               className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
             >
               <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
-              <span>我的简历</span>
+              <span>{tr({ zh: '我的简历', en: 'My Resumes' })}</span>
             </Link>
           </HoverTip>
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
           <EditableTitle onNotify={show} />
           <FileMenu />
           {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
-          <HoverTip text="模板库">
+          <HoverTip text={tr({ zh: '模板库', en: 'Templates' })}>
             <button
               type="button"
               onClick={toggleTemplateModal}
               className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <LayoutIcon />
-              模板
+              {tr({ zh: '模板', en: 'Templates' })}
             </button>
           </HoverTip>
           {/* 图标库入口：点击图标复制 icon:名称 语法 */}
-          <HoverTip text="图标库">
+          <HoverTip text={tr({ zh: '图标库', en: 'Icons' })}>
             <button
               type="button"
               onClick={toggleIconModal}
               className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <SmileIcon />
-              图标
+              {tr({ zh: '图标', en: 'Icons' })}
             </button>
           </HoverTip>
           {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
-          <HoverTip text="使用文档">
+          <HoverTip text={tr({ zh: '使用文档', en: 'Docs' })}>
             <button
               type="button"
               onClick={toggleDocsDrawer}
               className="px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <BookIcon />
-              文档
+              {tr({ zh: '文档', en: 'Docs' })}
             </button>
           </HoverTip>
           {/* AI 助手入口：聊天窗口挤入预览右侧 */}
-          <HoverTip text="AI 助手">
+          <HoverTip text={tr({ zh: 'AI 助手', en: 'AI Assistant' })}>
             <button
               type="button"
               onClick={toggleAIWindow}
@@ -418,11 +430,11 @@ export function TopBar() {
               }`}
             >
               <SparkleIcon />
-              AI 助手
+              {tr({ zh: 'AI 助手', en: 'AI Assistant' })}
             </button>
           </HoverTip>
           {/* 请作者喝杯咖啡：收款码弹窗 */}
-          <HoverTip text="请作者喝杯咖啡">
+          <HoverTip text={tr({ zh: '请作者喝杯咖啡', en: 'Buy Me a Coffee' })}>
             <button
               type="button"
               onClick={toggleCoffeeModal}
@@ -446,11 +458,11 @@ export function TopBar() {
           className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
         >
           <ExportIcon />
-          {isExporting ? '导出中...' : '导出 PDF'}
+          {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
         </button>
         <div className="flex items-center gap-2 ml-1.5 pl-3 border-l border-gray-200">
           {/* 头像 + 用户名，点击打开用户信息弹窗 */}
-          <HoverTip text="用户信息">
+          <HoverTip text={tr({ zh: '用户信息', en: 'User info' })}>
             <button
               onClick={toggleUserModal}
               className="flex items-center gap-2 group"
@@ -459,7 +471,7 @@ export function TopBar() {
               {user.avatar ? (
                 <img
                   src={user.avatar}
-                  alt={`${user.name} 的头像`}
+                  alt={tr({ zh: `${user.name} 的头像`, en: `${user.name}'s avatar` })}
                   className="w-6 h-6 rounded-full object-cover border border-gray-200"
                 />
               ) : (

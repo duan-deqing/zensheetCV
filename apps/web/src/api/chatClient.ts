@@ -1,5 +1,6 @@
 /** OpenAI 兼容流式对话客户端（浏览器直连供应商，BYOK）。
  *  解析 SSE `data: {...}` 增量与 `data: [DONE]` 终止标记 */
+import { getLang } from '@/i18n/LangContext';
 
 export interface ChatRequestOptions {
   baseUrl: string;
@@ -27,7 +28,10 @@ export async function* streamChat(opts: ChatRequestOptions): AsyncGenerator<stri
   });
 
   if (!res.ok) {
-    let detail = `请求失败 (HTTP ${res.status})`;
+    const lang = getLang();
+    let detail = lang === 'en'
+      ? `Request failed (HTTP ${res.status})`
+      : `请求失败 (HTTP ${res.status})`;
     try {
       const body = await res.text();
       if (body) detail += `: ${body.slice(0, 300)}`;
@@ -36,7 +40,11 @@ export async function* streamChat(opts: ChatRequestOptions): AsyncGenerator<stri
   }
 
   const reader = res.body?.getReader();
-  if (!reader) throw new Error('当前浏览器不支持流式读取');
+  if (!reader) {
+    throw new Error(getLang() === 'en'
+      ? 'Streaming is not supported in this browser'
+      : '当前浏览器不支持流式读取');
+  }
 
   const decoder = new TextDecoder();
   let buffer = '';
@@ -61,7 +69,10 @@ export async function* streamChat(opts: ChatRequestOptions): AsyncGenerator<stri
       const error = (data as { error?: { message?: string } | string })?.error;
       if (error) {
         throw new Error(
-          typeof error === 'string' ? error : error.message || '供应商返回错误',
+          typeof error === 'string'
+            ? error
+            : error.message
+              || (getLang() === 'en' ? 'Provider returned an error' : '供应商返回错误'),
         );
       }
       const delta = (data as { choices?: Array<{ delta?: { content?: string } }> })

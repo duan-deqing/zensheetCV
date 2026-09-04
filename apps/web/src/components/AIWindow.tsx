@@ -7,6 +7,7 @@ import { useAuth } from '@/store/AuthContext';
 import { streamChat } from '@/api/chatClient';
 import { getAiHistory, putAiHistory } from '@/storage/aiHistoryStore';
 import { HoverTip } from '@/components/HoverTip';
+import { useTr, type Bi } from '@/i18n/LangContext';
 import { loadAISettings, resolveAISettings } from '@/settings/aiSettings';
 
 /** AI 请求执行元信息：用于消息上方的可展开执行状态 */
@@ -102,11 +103,29 @@ function AIMarkdown({ content }: { content: string }) {
 }
 
 /** 预填快捷指令：点击后写入输入框，用户可补充后发送 */
-const QUICK_PROMPTS = [
-  { label: '润色全文', text: '请帮我润色当前简历的表述，让经历更有说服力。' },
-  { label: '关键词分析', text: '以下是目标职位描述，请分析我的简历缺失哪些关键词：\n' },
-  { label: '要点成段', text: '请把以下要点扩写成结构完整的项目描述：\n- ' },
-] as const;
+const QUICK_PROMPTS: { label: Bi; text: Bi }[] = [
+  {
+    label: { zh: '润色全文', en: 'Polish resume' },
+    text: {
+      zh: '请帮我润色当前简历的表述，让经历更有说服力。',
+      en: 'Please polish the wording of my current resume to make my experience more persuasive.',
+    },
+  },
+  {
+    label: { zh: '关键词分析', en: 'Keyword analysis' },
+    text: {
+      zh: '以下是目标职位描述，请分析我的简历缺失哪些关键词：\n',
+      en: 'Here is the target job description. Analyze which keywords are missing from my resume:\n',
+    },
+  },
+  {
+    label: { zh: '要点成段', en: 'Expand bullets' },
+    text: {
+      zh: '请把以下要点扩写成结构完整的项目描述：\n- ',
+      en: 'Please expand the following bullet points into a well-structured project description:\n- ',
+    },
+  },
+];
 
 /** 发送图标（向上箭头） */
 function SendIcon() {
@@ -139,9 +158,16 @@ function StopIcon() {
 /** AI 消息上方的执行状态行：收起时显示摘要，点击展开查看具体步骤 */
 function AIStatus({ meta }: { meta: AIMeta }) {
   const [open, setOpen] = useState(false);
+  const tr = useTr();
   const dur = (((meta.end ?? Date.now()) - meta.start) / 1000).toFixed(1);
   const statusText =
-    meta.status === 'running' ? '生成中' : meta.status === 'done' ? '已完成' : meta.status === 'aborted' ? '已停止' : '执行出错';
+    meta.status === 'running'
+      ? tr({ zh: '生成中', en: 'Generating' })
+      : meta.status === 'done'
+        ? tr({ zh: '已完成', en: 'Done' })
+        : meta.status === 'aborted'
+          ? tr({ zh: '已停止', en: 'Stopped' })
+          : tr({ zh: '执行出错', en: 'Error' });
   const dotColor =
     meta.status === 'running'
       ? 'bg-primary-500 animate-pulse'
@@ -152,20 +178,29 @@ function AIStatus({ meta }: { meta: AIMeta }) {
           : 'bg-red-500';
 
   // 从实际请求过程还原的执行步骤
-  const steps: { label: string; detail: string; failed?: boolean }[] = [
-    { label: '读取模型配置', detail: meta.model ?? '未配置 AI 模型', failed: !meta.model },
-    { label: '组装对话上下文', detail: meta.context ? '已携带当前简历内容' : '仅携带对话历史' },
+  const steps: { label: Bi; detail: string; failed?: boolean }[] = [
     {
-      label: '连接推理服务',
+      label: { zh: '读取模型配置', en: 'Read model config' },
+      detail: meta.model ?? tr({ zh: '未配置 AI 模型', en: 'No AI model configured' }),
+      failed: !meta.model,
+    },
+    {
+      label: { zh: '组装对话上下文', en: 'Build context' },
+      detail: meta.context
+        ? tr({ zh: '已携带当前简历内容', en: 'With resume context' })
+        : tr({ zh: '仅携带对话历史', en: 'Chat history only' }),
+    },
+    {
+      label: { zh: '连接推理服务', en: 'Connect to inference service' },
       detail: meta.baseUrl
         ? meta.baseUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '')
         : meta.model
-          ? '未获取服务地址'
-          : '已跳过（未配置）',
+          ? tr({ zh: '未获取服务地址', en: 'Service address unavailable' })
+          : tr({ zh: '已跳过（未配置）', en: 'Skipped (not configured)' }),
       failed: !!meta.model && !meta.baseUrl,
     },
     {
-      label: '流式生成回复',
+      label: { zh: '流式生成回复', en: 'Stream response' },
       detail: `${statusText} · ${dur}s`,
       failed: meta.status === 'error',
     },
@@ -192,15 +227,15 @@ function AIStatus({ meta }: { meta: AIMeta }) {
           <path d="m9 18 6-6-6-6" />
         </svg>
         <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`} aria-hidden="true" />
-        AI 执行 · {statusText}
+        {tr({ zh: 'AI 执行', en: 'AI RUN' })} · {statusText}
         <span className="tabular-nums">· {dur}s</span>
       </button>
       {open && (
         <div className="mt-1.5 rounded-lg bg-gray-50 border border-gray-200/80 px-2.5 py-2 flex flex-col gap-1.5">
           {steps.map((s, i) => (
-            <div key={s.label} className="flex items-baseline gap-2 text-[11px] leading-snug">
+            <div key={s.label.zh} className="flex items-baseline gap-2 text-[11px] leading-snug">
               <span className="font-mono text-gray-300 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</span>
-              <span className={s.failed ? 'text-red-500 shrink-0' : 'text-gray-600 shrink-0'}>{s.label}</span>
+              <span className={s.failed ? 'text-red-500 shrink-0' : 'text-gray-600 shrink-0'}>{tr(s.label)}</span>
               <span className={`truncate ${s.failed ? 'text-red-400' : 'text-gray-400'}`} title={s.detail}>
                 {s.detail}
               </span>
@@ -209,7 +244,7 @@ function AIStatus({ meta }: { meta: AIMeta }) {
           {meta.error && (
             <div className="flex items-baseline gap-2 text-[11px] leading-snug pt-1 border-t border-gray-200/80">
               <span className="font-mono text-red-400 shrink-0">!</span>
-              <span className="text-red-500 shrink-0">错误详情</span>
+              <span className="text-red-500 shrink-0">{tr({ zh: '错误详情', en: 'Error details' })}</span>
               <span className="text-red-400 break-all" title={meta.error}>{meta.error}</span>
             </div>
           )}
@@ -230,6 +265,7 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
   const close = onClose ?? toggleAIWindow;
   const { markdown } = useEditor();
   const { user } = useAuth();
+  const tr = useTr();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -304,17 +340,20 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
 
     // BYOK：未配置供应商时直接给出提示，不发请求
     const cfg = resolveAISettings(loadAISettings());
-    const userMsg: ChatMessage = { role: 'user', content: text, time: nowTime(), name: user?.name || '我' };
+    const userMsg: ChatMessage = { role: 'user', content: text, time: nowTime(), name: user?.name || tr({ zh: '我', en: 'Me' }) };
     const history = [...messages, userMsg];
     // 附带当前简历 Markdown 作为上下文（仅首次请求携带，避免多轮重复超长）
     const contextPrefix = messages.length === 0 && markdown.trim()
-      ? `【我的当前简历 Markdown】\n${markdown}\n\n【我的问题】\n${text}`
+      ? tr({
+          zh: `【我的当前简历 Markdown】\n${markdown}\n\n【我的问题】\n${text}`,
+          en: `[My current resume Markdown]\n${markdown}\n\n[My question]\n${text}`,
+        })
       : text;
     setMessages([...history, {
       role: 'assistant',
       content: '',
       time: nowTime(),
-      name: 'AI 助手',
+      name: tr({ zh: 'AI 助手', en: 'AI Assistant' }),
       meta: { model: cfg?.model, baseUrl: cfg?.baseUrl, context: messages.length === 0 && !!markdown.trim(), start: Date.now(), status: 'running' },
     }]);
     setIsStreaming(true);
@@ -330,7 +369,10 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
       });
     };
     /** 将技术性报错写入执行状态，正文只保留友好提示 */
-    const FAIL_HINT = '生成失败：请检查网络连接与 API 配置，可展开上方「AI 执行」查看详情。';
+    const FAIL_HINT = tr({
+      zh: '生成失败：请检查网络连接与 API 配置，可展开上方「AI 执行」查看详情。',
+      en: 'Generation failed: check your network connection and API configuration. Expand "AI RUN" above for details.',
+    });
     const setLastError = (error: string) => {
       setMessages((prev) => {
         if (prev.length === 0) return prev;
@@ -349,8 +391,14 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
     try {
       if (!cfg) {
         outcome = 'error';
-        setLastError('未配置 AI 模型，未发起请求');
-        patchLast(() => '尚未配置 AI 模型：点击右上角用户名，在「设置 → AI」中配置供应商与 API KEY 后重试。');
+        setLastError(tr({ zh: '未配置 AI 模型，未发起请求', en: 'No AI model configured — request not sent' }));
+        patchLast(
+          () =>
+            tr({
+              zh: '尚未配置 AI 模型：点击右上角用户名，在「设置 → AI」中配置供应商与 API KEY 后重试。',
+              en: 'No AI model configured yet: click your username at the top right, set up a provider and API key under "Settings → AI", then try again.',
+            }),
+        );
         return;
       }
       // 浏览器直连供应商（OpenAI 兼容协议，SSE 流式）
@@ -371,7 +419,7 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
         outcome = 'aborted';
       } else {
         outcome = 'error';
-        setLastError((err as Error)?.message || '网络请求异常');
+        setLastError((err as Error)?.message || tr({ zh: '网络请求异常', en: 'Network request error' }));
         patchLast((prev) => prev || FAIL_HINT);
       }
     } finally {
@@ -410,7 +458,7 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
     <aside
       className="relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
       style={{ width }}
-      aria-label="AI 助手"
+      aria-label={tr({ zh: 'AI 助手', en: 'AI Assistant' })}
     >
       {/* 顶栏：与主题面板同构（mono 眉标 + 关闭按钮） */}
       <div className="flex items-center gap-3 px-4 py-2 bg-white border-b border-gray-200 shrink-0">
@@ -420,11 +468,11 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
         >
           {'< AI ASSISTANT />'}
         </p>
-        <HoverTip text="关闭">
+        <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
           <button
             onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-            aria-label="关闭 AI 助手"
+            aria-label={tr({ zh: '关闭 AI 助手', en: 'Close AI assistant' })}
           >
             ✕
           </button>
@@ -436,19 +484,25 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
         {messages.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center px-2">
             <p className="text-[13px] text-gray-400 leading-relaxed">
-              向 AI 描述你的需求，例如润色一段经历、分析职位关键词。
+              {tr({
+                zh: '向 AI 描述你的需求，例如润色一段经历、分析职位关键词。',
+                en: 'Tell the AI what you need — polish a bullet point or analyze job keywords.',
+              })}
               <br />
-              首次提问会自动附带当前简历内容作为参考。
+              {tr({
+                zh: '首次提问会自动附带当前简历内容作为参考。',
+                en: 'Your first question automatically includes your current resume for reference.',
+              })}
             </p>
             <div className="flex flex-wrap justify-center gap-1.5">
               {QUICK_PROMPTS.map((q) => (
                 <button
-                  key={q.label}
+                  key={q.label.zh}
                   type="button"
-                  onClick={() => { setInput(q.text); inputRef.current?.focus(); }}
+                  onClick={() => { setInput(tr(q.text)); inputRef.current?.focus(); }}
                   className="px-2.5 py-1 rounded-full text-[12px] border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50 transition-colors"
                 >
-                  {q.label}
+                  {tr(q.label)}
                 </button>
               ))}
             </div>
@@ -499,7 +553,10 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={1}
-            placeholder="输入消息，Enter 发送，Shift+Enter 换行..."
+            placeholder={tr({
+              zh: '输入消息，Enter 发送，Shift+Enter 换行...',
+              en: 'Type a message. Enter to send, Shift+Enter for a new line...',
+            })}
             className="block w-full font-mono text-[13px] leading-relaxed px-1.5 py-1 bg-transparent outline-none resize-none placeholder:text-gray-400 max-h-[120px] overflow-y-auto"
           />
           <div className="flex justify-end mt-1">
@@ -507,7 +564,7 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
               <button
                 onClick={stop}
                 className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-full bg-gray-200/70 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"
-                aria-label="停止生成"
+                aria-label={tr({ zh: '停止生成', en: 'Stop generating' })}
               >
                 <StopIcon />
               </button>
@@ -516,7 +573,7 @@ export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; r
                 onClick={send}
                 disabled={!input.trim()}
                 className="w-8 h-8 shrink-0 inline-flex items-center justify-center rounded-full bg-gray-200/70 text-gray-500 hover:bg-primary-600 hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                aria-label="发送"
+                aria-label={tr({ zh: '发送', en: 'Send' })}
               >
                 <SendIcon />
               </button>

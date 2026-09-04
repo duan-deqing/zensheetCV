@@ -14,7 +14,8 @@ import {
   resumeQuoteCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
-import { SAMPLE_MARKDOWN as PREVIEW_MARKDOWN } from '@/sampleResume';
+import { sampleMarkdown } from '@/sampleResume';
+import { useLang } from '@/i18n/LangContext';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 
 /** A4 设计稿尺寸（px，96dpi），与预览/导出一致 */
@@ -34,6 +35,7 @@ interface TemplatePreviewProps {
 /** 模板卡片预览：与首页/编辑页同一套作用域替换方案 + 主题变量注入，
  *  完整示例简历整页等比缩放展示，供模板库弹窗与主题面板卡片共用 */
 export function TemplatePreview({ templateId, height, mode = 'page', className = '' }: TemplatePreviewProps) {
+  const { lang } = useLang();
   const scoped = getTemplateCss(templateId).replace(
     /\.resume-preview/g,
     `.tpl-${templateId}`,
@@ -112,7 +114,7 @@ export function TemplatePreview({ templateId, height, mode = 'page', className =
             rehypePlugins={[rehypeWrapH2Text]}
             components={components}
           >
-            {normalizeColMarkers(PREVIEW_MARKDOWN)}
+            {normalizeColMarkers(sampleMarkdown(lang))}
           </ReactMarkdown>
         </div>
       </div>

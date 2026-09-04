@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { ResumePhoto } from '@stylan/shared-types';
 import { HoverTip } from '@/components/HoverTip';
+import { useTr } from '@/i18n/LangContext';
 
 /** 照片宽度范围（相对页宽百分比） */
 const MIN_WIDTH_PCT = 4;
@@ -30,6 +31,7 @@ interface DragState {
 /** 页面照片图层：渲染某页上的照片，支持选中后拖动改位、
  *  右下角手柄等比缩放（height:auto 天然锁比例）、× 删除 */
 export function ResumePhotos({ photos, selectedId, onSelect, onUpdate, onDelete }: ResumePhotosProps) {
+  const tr = useTr();
   // 拖动/缩放过程中的临时坐标：本地渲染即时反馈，pointerup 才提交持久化
   const [transient, setTransient] = useState<{ id: string; x: number; y: number; width: number } | null>(null);
   const dragRef = useRef<DragState | null>(null);
@@ -127,10 +129,10 @@ export function ResumePhotos({ photos, selectedId, onSelect, onUpdate, onDelete 
                   onPointerUp={endDrag}
                 />
                 {/* 删除按钮 */}
-                <HoverTip text="删除照片">
+                <HoverTip text={tr({ zh: '删除照片', en: 'Delete photo' })}>
                   <button
                     className="absolute -top-2.5 -right-2.5 w-5 h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-[11px] leading-none rounded-full shadow-sm cursor-pointer"
-                    aria-label="删除照片"
+                    aria-label={tr({ zh: '删除照片', en: 'Delete photo' })}
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
                       e.stopPropagation();

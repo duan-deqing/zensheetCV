@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, ReactNode, Dispatch } from 'react';
+import { getLang } from '@/i18n/LangContext';
 
 interface EditorState {
   markdown: string;
@@ -10,8 +11,15 @@ type EditorAction =
   | { type: 'MARK_CLEAN' }
   | { type: 'RESET'; payload: string };
 
+/** 初始骨架：按当前语言给出中文/英文占位章节 */
+function initialMarkdown(): string {
+  return getLang() === 'en'
+    ? '# Name\n\n## Work Experience\n\n## Projects\n\n## Education\n'
+    : '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n';
+}
+
 const initialState: EditorState = {
-  markdown: '# 姓名\n\n## 工作经历\n\n## 项目经验\n\n## 教育背景\n',
+  markdown: initialMarkdown(),
   isDirty: false,
 };
 

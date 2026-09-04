@@ -14,9 +14,10 @@ import {
   resumeIconsCss,
 } from '@/preview/previewShared';
 import { defaultTheme } from '@stylan/shared-types';
-import { SAMPLE_MARKDOWN } from '@/sampleResume';
+import { sampleMarkdown } from '@/sampleResume';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 import { DocsFooter } from '@/pages/docs/DocsFooter';
+import { useLang, useTr } from '@/i18n/LangContext';
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
    （react-markdown + 各模板真实 CSS），非静态截图，内容见 @/sampleResume */
@@ -35,6 +36,8 @@ function MiniResume({
   );
   // 与编辑页/我的简历页一致：使用模板自带默认主题（主色/字体/字号/间距）
   const theme = getTemplateById(templateId).defaultTheme;
+  // 按界面语言选择示例简历内容（中/英文版同人设同结构）
+  const { lang } = useLang();
   // 每页四周总留白 = 页边距 + 内容边距，与分页预览/导出同一套默认值
   const padXMM =
     (MARGIN_MM[defaultTheme.marginX] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
@@ -71,7 +74,7 @@ function MiniResume({
             rehypePlugins={[rehypeWrapH2Text]}
             components={components}
           >
-            {normalizeColMarkers(SAMPLE_MARKDOWN)}
+            {normalizeColMarkers(sampleMarkdown(lang))}
           </ReactMarkdown>
         </div>
       </div>
@@ -101,104 +104,112 @@ function ResumePaper({
   );
 }
 
-/** 模板展示区数据：span 为 3 列网格中的占位格数（每行合计 3） */
+/** 模板展示区数据：span 为 3 列网格中的占位格数（每行合计 3），name/desc 为双语文案 */
 const TEMPLATE_SHOWCASE = [
-  { id: 'classic', tag: 'CLASSIC', name: '经典简洁', desc: '黑白正式，适合大多数求职场景', span: 2 },
-  { id: 'modern', tag: 'MODERN', name: '现代蓝调', desc: '互联网与产品岗位首选', span: 1 },
-  { id: 'elegant', tag: 'ELEGANT', name: '优雅酒红', desc: '咨询、金融与品牌岗位', span: 1 },
-  { id: 'tech', tag: 'TECH', name: '科技墨绿', desc: '研发与技术岗位', span: 1 },
-  { id: 'muji', tag: 'MUJI', name: '墨纸极简', desc: '深色题头，沉稳耐看', span: 1 },
-  { id: 'azure', tag: 'AZURE', name: '青线极简', desc: '细线标题，素净轻盈', span: 1 },
-  { id: 'sunrise', tag: 'SUNRISE', name: '朝阳暖橙', desc: '渐变题头，明快有活力', span: 1 },
-  { id: 'carbon', tag: 'CARBON', name: '碳黑章标', desc: '灰底章节条 + 竖标，正式商务风', span: 1 },
+  { id: 'classic', tag: 'CLASSIC', name: { zh: '经典简洁', en: 'Classic' }, desc: { zh: '黑白正式，适合大多数求职场景', en: 'Black-and-white formality for most job hunts' }, span: 2 },
+  { id: 'modern', tag: 'MODERN', name: { zh: '现代蓝调', en: 'Modern Blue' }, desc: { zh: '互联网与产品岗位首选', en: 'A favorite for tech and product roles' }, span: 1 },
+  { id: 'elegant', tag: 'ELEGANT', name: { zh: '优雅酒红', en: 'Elegant Wine' }, desc: { zh: '咨询、金融与品牌岗位', en: 'For consulting, finance and brand roles' }, span: 1 },
+  { id: 'tech', tag: 'TECH', name: { zh: '科技墨绿', en: 'Tech Green' }, desc: { zh: '研发与技术岗位', en: 'For R&D and engineering roles' }, span: 1 },
+  { id: 'muji', tag: 'MUJI', name: { zh: '墨纸极简', en: 'Muji Minimal' }, desc: { zh: '深色题头，沉稳耐看', en: 'Dark header, calm and enduring' }, span: 1 },
+  { id: 'azure', tag: 'AZURE', name: { zh: '青线极简', en: 'Azure Line' }, desc: { zh: '细线标题，素净轻盈', en: 'Thin-line headings, clean and light' }, span: 1 },
+  { id: 'sunrise', tag: 'SUNRISE', name: { zh: '朝阳暖橙', en: 'Sunrise Orange' }, desc: { zh: '渐变题头，明快有活力', en: 'Gradient header, bright and energetic' }, span: 1 },
+  { id: 'carbon', tag: 'CARBON', name: { zh: '碳黑章标', en: 'Carbon Seal' }, desc: { zh: '灰底章节条 + 竖标，正式商务风', en: 'Gray section bars + vertical marks, formal business style' }, span: 1 },
 ] as const;
 
 const SPECS = [
-  { value: 'A4', unit: 'REAL-TIME PREVIEW', label: '逐页实时预览，所见即所得' },
-  { value: 'MD', unit: 'MARKDOWN FIRST', label: '专注内容，排版交给模板' },
-  { value: 'AI', unit: 'BYOK ASSISTANT', label: '自带密钥，多供应商接入' },
-  { value: 'PDF', unit: 'PRINT READY', label: '导出与预览完全一致' },
+  { value: 'A4', unit: 'REAL-TIME PREVIEW', label: { zh: '逐页实时预览，所见即所得', en: 'Page-by-page live preview, WYSIWYG' } },
+  { value: 'MD', unit: 'MARKDOWN FIRST', label: { zh: '专注内容，排版交给模板', en: 'Focus on content, templates handle the layout' } },
+  { value: 'AI', unit: 'BYOK ASSISTANT', label: { zh: '自带密钥，多供应商接入', en: 'Bring your own key, multiple providers' } },
+  { value: 'PDF', unit: 'PRINT READY', label: { zh: '导出与预览完全一致', en: 'Export matches the preview exactly' } },
 ];
 
 const STEPS = [
   {
     no: '01',
     tag: 'WRITE',
-    title: '用 Markdown 写内容',
-    desc: '左侧书写，右侧实时预览。专注文字本身，排版交给模板。',
+    title: { zh: '用 Markdown 写内容', en: 'Write content in Markdown' },
+    desc: { zh: '左侧书写，右侧实时预览。专注文字本身，排版交给模板。', en: 'Write on the left, live preview on the right. Focus on the words; templates handle the layout.' },
   },
   {
     no: '02',
     tag: 'REFINE',
-    title: '让 AI 打磨表达',
-    desc: '聊天窗内逐段润色经历，对照职位描述匹配关键词，补齐缺失亮点。',
+    title: { zh: '让 AI 打磨表达', en: 'Let AI polish your wording' },
+    desc: { zh: '聊天窗内逐段润色经历，对照职位描述匹配关键词，补齐缺失亮点。', en: 'Polish experiences paragraph by paragraph in the chat, match keywords against the job description and fill in missing highlights.' },
   },
   {
     no: '03',
     tag: 'EXPORT',
-    title: '一键导出 PDF',
-    desc: '浏览器打印直出，字距与分页与预览一致，直接投递。',
+    title: { zh: '一键导出 PDF', en: 'Export PDF in one click' },
+    desc: { zh: '浏览器打印直出，字距与分页与预览一致，直接投递。', en: 'Printed straight from your browser; spacing and pagination match the preview, ready to send.' },
   },
 ];
 
-/** 编辑器工作台：特性文案 */
+/** 编辑器工作台：特性文案（双语） */
 const WORKSPACE_FEATURES = [
-  { title: '三栏工作台', desc: '编辑器、预览、AI 聊天窗一字排开，拖拽手柄自由分配宽度' },
-  { title: '全屏预览', desc: '一键隐藏其余面板并复位缩放，逐页检查每一处细节' },
-  { title: '悬浮主题面板', desc: '主色、字体、间距随手可调，不遮挡预览内容' },
-  { title: '文档抽屉', desc: '写作中随时唤出使用文档，跨文档内容一键跳转' },
+  { title: { zh: '三栏工作台', en: 'Three-pane workspace' }, desc: { zh: '编辑器、预览、AI 聊天窗一字排开，拖拽手柄自由分配宽度', en: 'Editor, preview and AI chat side by side, with drag handles to resize freely' } },
+  { title: { zh: '全屏预览', en: 'Fullscreen preview' }, desc: { zh: '一键隐藏其余面板并复位缩放，逐页检查每一处细节', en: 'Hide the other panels and reset zoom in one click, checking every detail page by page' } },
+  { title: { zh: '悬浮主题面板', en: 'Floating theme panel' }, desc: { zh: '主色、字体、间距随手可调，不遮挡预览内容', en: 'Adjust primary color, font and spacing anytime without covering the preview' } },
+  { title: { zh: '文档抽屉', en: 'Docs drawer' }, desc: { zh: '写作中随时唤出使用文档，跨文档内容一键跳转', en: 'Open the docs anytime while writing and jump across documents in one click' } },
 ];
 
-/** AI 聊天窗卖点 */
+/** AI 聊天窗卖点（双语） */
 const AI_CHAT_FEATURES = [
-  '独立聊天窗 · 流式回复 · Markdown 渲染',
-  '对话历史保存在本地浏览器，随时继续上次话题',
-  '自带 API KEY（BYOK），密钥仅保存在本地浏览器',
+  { zh: '独立聊天窗 · 流式回复 · Markdown 渲染', en: 'Standalone chat window · streaming replies · Markdown rendering' },
+  { zh: '对话历史保存在本地浏览器，随时继续上次话题', en: 'Chat history is saved in your local browser, so you can pick up where you left off anytime' },
+  { zh: '自带 API KEY（BYOK），密钥仅保存在本地浏览器', en: 'Bring your own API key (BYOK); keys are stored only in your local browser' },
 ];
 
-/** AI 供应商（API KEY 由用户自备） */
-const AI_PROVIDERS = ['OpenAI', 'DeepSeek', 'GLM', 'Qwen', 'LongCat', 'MiMo'];
+/** AI 供应商（API KEY 由用户自备，展示名双语） */
+const AI_PROVIDERS = [
+  { zh: 'OpenAI', en: 'OpenAI' },
+  { zh: 'DeepSeek', en: 'DeepSeek' },
+  { zh: 'GLM（智谱）', en: 'GLM (Zhipu)' },
+  { zh: 'Qwen（通义千问）', en: 'Qwen' },
+  { zh: 'LongCat', en: 'LongCat' },
+  { zh: 'MiMo（小米）', en: 'Xiaomi MiMo' },
+];
 
-/** 主题配置卖点 */
+/** 主题配置卖点（双语） */
 const THEME_FEATURES = [
-  { title: '主色调 × 正文字体', desc: '多种主色与正文字体自由组合，风格一键切换' },
-  { title: '字号与行距微调', desc: '字号 10~30px、行距 1.2~2.5 倍自由选择，密度随心' },
-  { title: '页边距独立可调', desc: '页边距与内容边距叠加生效，导出与预览严格一致' },
-  { title: '照片自由排版', desc: '上传照片圆形裁剪，放在页眉或正文任意位置' },
+  { title: { zh: '主色调 × 正文字体', en: 'Primary color × body font' }, desc: { zh: '多种主色与正文字体自由组合，风格一键切换', en: 'Freely combine primary colors and body fonts, switching styles in one click' } },
+  { title: { zh: '字号与行距微调', en: 'Font size & line-height tuning' }, desc: { zh: '字号 10~30px、行距 1.2~2.5 倍自由选择，密度随心', en: 'Choose any font size from 10–30px and line height from 1.2–2.5×, density as you like' } },
+  { title: { zh: '页边距独立可调', en: 'Independent margin control' }, desc: { zh: '页边距与内容边距叠加生效，导出与预览严格一致', en: 'Page margins stack with content padding; export matches the preview exactly' } },
+  { title: { zh: '照片自由排版', en: 'Flexible photo layout' }, desc: { zh: '上传照片圆形裁剪，放在页眉或正文任意位置', en: 'Upload photos with circular cropping, placed anywhere in the header or body' } },
 ];
 
 /** 首页图标展示区：真实渲染的内置图标 */
 const HOME_ICONS = ['email', 'phone', 'github', 'blog', 'location', 'weixin', 'zhihu', 'juejin'];
 
-/** 文档导航卡 */
+/** 文档导航卡（标题/描述双语） */
 const DOC_CARDS = [
-  { no: '01', title: '使用指南', desc: '从创建简历到导出的完整流程', to: '/docs/guide' },
-  { no: '02', title: 'Markdown 教程', desc: '常用语法与效果预览', to: '/docs/markdown' },
-  { no: '03', title: '主题配置', desc: '模板与排版设置详解', to: '/docs/theme' },
-  { no: '04', title: '图标库', desc: 'icon: 语法与内置图标', to: '/docs/icons' },
-  { no: '05', title: 'AI 助手', desc: '用法与 API KEY 配置', to: '/docs/ai' },
-  { no: '06', title: '更新日志', desc: '版本演进记录', to: '/docs/changelog' },
+  { no: '01', title: { zh: '使用指南', en: 'Guide' }, desc: { zh: '从创建简历到导出的完整流程', en: 'The full flow from creating a resume to export' }, to: '/docs/guide' },
+  { no: '02', title: { zh: 'Markdown 教程', en: 'Markdown Tutorial' }, desc: { zh: '常用语法与效果预览', en: 'Common syntax with rendered previews' }, to: '/docs/markdown' },
+  { no: '03', title: { zh: '主题配置', en: 'Theme Configuration' }, desc: { zh: '模板与排版设置详解', en: 'Templates and typography settings explained' }, to: '/docs/theme' },
+  { no: '04', title: { zh: '图标库', en: 'Icon Library' }, desc: { zh: 'icon: 语法与内置图标', en: 'The icon: syntax and built-in icons' }, to: '/docs/icons' },
+  { no: '05', title: { zh: 'AI 助手', en: 'AI Assistant' }, desc: { zh: '用法与 API KEY 配置', en: 'Usage and API key setup' }, to: '/docs/ai' },
+  { no: '06', title: { zh: '更新日志', en: 'Changelog' }, desc: { zh: '版本演进记录', en: 'Release history over time' }, to: '/docs/changelog' },
 ];
 
 const AI_CAPABILITIES = [
   {
     no: '01',
-    title: '经历润色',
-    desc: '把「负责xx工作」改写成有结果、有数字的表述',
+    title: { zh: '经历润色', en: 'Experience polishing' },
+    desc: { zh: '把「负责xx工作」改写成有结果、有数字的表述', en: 'Turn "responsible for X" into results-driven statements with numbers' },
   },
   {
     no: '02',
-    title: '关键词匹配',
-    desc: '粘贴职位描述，找出简历中缺失的能力词',
+    title: { zh: '关键词匹配', en: 'Keyword matching' },
+    desc: { zh: '粘贴职位描述，找出简历中缺失的能力词', en: 'Paste a job description and find the skill keywords missing from your resume' },
   },
   {
     no: '03',
-    title: '要点成段',
-    desc: '输入几个要点，生成结构完整的项目描述',
+    title: { zh: '要点成段', en: 'Bullets into paragraphs' },
+    desc: { zh: '输入几个要点，生成结构完整的项目描述', en: 'Enter a few bullet points and get a well-structured project description' },
   },
 ];
 
 export function HomePage() {
+  const tr = useTr();
   return (
     <div className="bg-white text-gray-900">
       <style>{`
@@ -216,29 +227,32 @@ export function HomePage() {
       <section className="max-w-7xl mx-auto px-6 pt-14 pb-16 lg:pt-20 grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
-            &lt; ZENSHEET · 简历 /&gt;
+            &lt; ZENSHEET{tr({ zh: ' · 简历', en: ' · Resume' })} /&gt;
           </p>
           <h1
             className="fade-up text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] mb-5"
             style={{ animationDelay: '0.08s' }}
           >
-            专注内容本身，
+            {tr({ zh: '专注内容本身，', en: 'Focus on the content,' })}
             <br />
-            使用<span className="text-primary-600"> Markdown</span>
+            {tr({ zh: '使用', en: 'written in' })}
+            <span className="text-primary-600"> Markdown</span>
           </h1>
           <p
             className="fade-up text-lg text-gray-600 leading-relaxed max-w-[32em] mb-8"
             style={{ animationDelay: '0.16s' }}
           >
-            无需注册登录，打开即用；简历数据保存在你自己的浏览器里。内置多套模板实时预览，
-            图标与照片自由排版，AI 润色与关键词优化，一键导出高质量 PDF。
+            {tr({
+              zh: '无需注册登录，打开即用；简历数据保存在你自己的浏览器里。内置多套模板实时预览，图标与照片自由排版，AI 润色与关键词优化，一键导出高质量 PDF。',
+              en: 'No sign-in required, ready to use; your resume data stays in your own browser. Multiple built-in templates with live preview, free icon and photo layout, AI polishing and keyword optimization, one-click export to high-quality PDF.',
+            })}
           </p>
           <div
             className="fade-up flex flex-wrap items-center gap-3"
             style={{ animationDelay: '0.24s' }}
           >
             <Link to="/editor" className="btn-primary text-base px-7 py-3">
-              进入编辑器
+              {tr({ zh: '进入编辑器', en: 'Open Editor' })}
             </Link>
           </div>
         </div>
@@ -279,7 +293,7 @@ export function HomePage() {
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mt-1">
                 {s.unit}
               </p>
-              <p className="text-sm text-gray-500 mt-1">{s.label}</p>
+              <p className="text-sm text-gray-500 mt-1">{tr(s.label)}</p>
             </div>
           ))}
         </div>
@@ -288,10 +302,10 @@ export function HomePage() {
       {/* 三步成稿 */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-gray-400 mb-3">
-          ▰ 三步成稿 ▰
+          {tr({ zh: '▰ 三步成稿 ▰', en: '▰ Three Steps ▰' })}
         </p>
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-12">
-          从初稿到投递，只做三件事
+          {tr({ zh: '从初稿到投递，只做三件事', en: 'From first draft to application, in three steps' })}
         </h2>
         <div className="grid md:grid-cols-3 gap-10 md:gap-0">
           {STEPS.map((step, i) => (
@@ -302,8 +316,8 @@ export function HomePage() {
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mt-2">
                 {step.tag}
               </p>
-              <h3 className="text-lg font-semibold mt-2 mb-2">{step.title}</h3>
-              <p className="text-sm text-gray-600 leading-relaxed max-w-[30em]">{step.desc}</p>
+              <h3 className="text-lg font-semibold mt-2 mb-2">{tr(step.title)}</h3>
+              <p className="text-sm text-gray-600 leading-relaxed max-w-[30em]">{tr(step.desc)}</p>
             </div>
           ))}
         </div>
@@ -312,21 +326,21 @@ export function HomePage() {
       {/* 编辑器工作台：左特性 + 右三栏布局示意 */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-gray-400 mb-3">
-          ▰ 工作台 ▰
+          {tr({ zh: '▰ 工作台 ▰', en: '▰ Workspace ▰' })}
         </p>
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-12">
-          一个页面，完成从写作到投递
+          {tr({ zh: '一个页面，完成从写作到投递', en: 'One page, from writing to applying' })}
         </h2>
         <div className="grid lg:grid-cols-5 gap-10 items-center">
           {/* 特性列表 */}
           <div className="lg:col-span-2 divide-y divide-gray-100">
             {WORKSPACE_FEATURES.map((f) => (
-              <div key={f.title} className="py-4 first:pt-0 last:pb-0">
+              <div key={f.title.zh} className="py-4 first:pt-0 last:pb-0">
                 <h3 className="font-semibold flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0" />
-                  {f.title}
+                  {tr(f.title)}
                 </h3>
-                <p className="text-sm text-gray-600 leading-relaxed mt-1 pl-3.5">{f.desc}</p>
+                <p className="text-sm text-gray-600 leading-relaxed mt-1 pl-3.5">{tr(f.desc)}</p>
               </div>
             ))}
           </div>
@@ -378,10 +392,10 @@ export function HomePage() {
                 </div>
                 <div className="flex-1 p-2.5 flex flex-col gap-2 text-[9px] leading-snug">
                   <p className="self-end max-w-[85%] bg-primary-50 text-gray-700 rounded-2xl rounded-br-sm px-2.5 py-1.5">
-                    帮我润色这段项目经历
+                    {tr({ zh: '帮我润色这段项目经历', en: 'Help me polish this project experience' })}
                   </p>
                   <p className="self-start max-w-[90%] text-gray-600">
-                    好的，建议把成果量化到数字…
+                    {tr({ zh: '好的，建议把成果量化到数字…', en: 'Sure — try quantifying the results with numbers…' })}
                   </p>
                   <div className="flex gap-1 mt-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse" />
@@ -391,7 +405,7 @@ export function HomePage() {
                 </div>
                 <div className="border-t border-gray-100 p-2">
                   <div className="rounded-full border border-gray-200 px-2.5 py-1 text-[9px] text-gray-400">
-                    输入消息…
+                    {tr({ zh: '输入消息…', en: 'Type a message…' })}
                   </div>
                 </div>
               </div>
@@ -402,9 +416,11 @@ export function HomePage() {
 
       {/* 模板展示：不对称网格，8 套模板全部真实渲染 */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">多套模板，同一份内容</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
+          {tr({ zh: '多套模板，同一份内容', en: 'Many templates, one source of content' })}
+        </h2>
         <p className="text-gray-600 mb-10">
-          换模板不用改一个字。以下全部为编辑器内的真实渲染效果。
+          {tr({ zh: '换模板不用改一个字。以下全部为编辑器内的真实渲染效果。', en: 'Switch templates without changing a word. Everything below is rendered live by the editor.' })}
         </p>
         <div className="grid md:grid-cols-3 gap-5">
           {TEMPLATE_SHOWCASE.map((t) => (
@@ -415,8 +431,8 @@ export function HomePage() {
               <ResumePaper templateId={t.id} zoom={0.5} className="h-[300px] border-b border-gray-100" />
               <div className="flex items-baseline justify-between px-5 py-4">
                 <div>
-                  <h3 className="font-semibold">{t.name}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{t.desc}</p>
+                  <h3 className="font-semibold">{tr(t.name)}</h3>
+                  <p className="text-sm text-gray-500 mt-0.5">{tr(t.desc)}</p>
                 </div>
                 {/* 彩色胶囊标签：取模板默认主色着色 */}
                 <span
@@ -441,19 +457,19 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.22em] text-gray-400 mb-3">
-              ▰ 主题与排版 ▰
+              {tr({ zh: '▰ 主题与排版 ▰', en: '▰ Theme & Typography ▰' })}
             </p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-3">
-              细节可调，风格自定
+              {tr({ zh: '细节可调，风格自定', en: 'Adjustable details, your own style' })}
             </h2>
             <p className="text-gray-600 mb-8 max-w-[30em]">
-              悬浮主题面板不遮挡内容，所有改动实时生效，导出 PDF 与预览严格一致。
+              {tr({ zh: '悬浮主题面板不遮挡内容，所有改动实时生效，导出 PDF 与预览严格一致。', en: 'The floating theme panel never covers your content; every change applies in real time, and the exported PDF matches the preview exactly.' })}
             </p>
             <div className="divide-y divide-gray-100">
               {THEME_FEATURES.map((f) => (
-                <div key={f.title} className="py-3.5 first:pt-0 last:pb-0">
-                  <h3 className="font-semibold text-[15px]">{f.title}</h3>
-                  <p className="text-sm text-gray-600 mt-0.5">{f.desc}</p>
+                <div key={f.title.zh} className="py-3.5 first:pt-0 last:pb-0">
+                  <h3 className="font-semibold text-[15px]">{tr(f.title)}</h3>
+                  <p className="text-sm text-gray-600 mt-0.5">{tr(f.desc)}</p>
                 </div>
               ))}
             </div>
@@ -475,14 +491,14 @@ export function HomePage() {
                 ))}
               </div>
               {[
-                { label: '字号', value: '14 px' },
-                { label: '行距', value: '1.6 倍' },
-                { label: '页边距', value: '常规' },
+                { label: { zh: '字号', en: 'Font size' }, value: { zh: '14 px', en: '14 px' } },
+                { label: { zh: '行距', en: 'Line height' }, value: { zh: '1.6 倍', en: '1.6×' } },
+                { label: { zh: '页边距', en: 'Margins' }, value: { zh: '常规', en: 'Normal' } },
               ].map((row) => (
-                <div key={row.label} className="flex items-center justify-between mb-3 last:mb-0">
-                  <span className="text-xs text-gray-500">{row.label}</span>
+                <div key={row.label.zh} className="flex items-center justify-between mb-3 last:mb-0">
+                  <span className="text-xs text-gray-500">{tr(row.label)}</span>
                   <span className="flex items-center gap-6 rounded-lg border border-gray-200 px-2.5 py-1 text-xs text-gray-700">
-                    {row.value}
+                    {tr(row.value)}
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
@@ -536,16 +552,16 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-3">
-              卡在措辞上的时候，交给 AI
+              {tr({ zh: '卡在措辞上的时候，交给 AI', en: 'When the words get stuck, hand it to AI' })}
             </h2>
             <p className="text-zinc-400 mb-8 max-w-[30em]">
-              不替你编造经历，只把你做过的事，写到招聘方看得懂、愿意看。
+              {tr({ zh: '不替你编造经历，只把你做过的事，写到招聘方看得懂、愿意看。', en: 'It never invents experience — it rewrites what you have done into words recruiters understand and want to read.' })}
             </p>
             <ul className="flex flex-col gap-2.5 mb-8">
               {AI_CHAT_FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-2.5 text-sm text-zinc-300">
+                <li key={f.zh} className="flex items-start gap-2.5 text-sm text-zinc-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary-400 shrink-0 mt-[7px]" />
-                  {f}
+                  {tr(f)}
                 </li>
               ))}
             </ul>
@@ -556,10 +572,10 @@ export function HomePage() {
               <div className="flex flex-wrap gap-2">
                 {AI_PROVIDERS.map((p) => (
                   <span
-                    key={p}
+                    key={p.en}
                     className="text-xs text-zinc-300 border border-zinc-700 rounded-full px-3 py-1"
                   >
-                    {p}
+                    {tr(p)}
                   </span>
                 ))}
               </div>
@@ -572,8 +588,8 @@ export function HomePage() {
                   {c.no}
                 </p>
                 <div>
-                  <h3 className="font-semibold">{c.title}</h3>
-                  <p className="text-sm text-zinc-400 mt-1">{c.desc}</p>
+                  <h3 className="font-semibold">{tr(c.title)}</h3>
+                  <p className="text-sm text-zinc-400 mt-1">{tr(c.desc)}</p>
                 </div>
               </div>
             ))}
@@ -587,17 +603,17 @@ export function HomePage() {
           <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.22em] text-gray-400 mb-3">
-                ▰ 文档 ▰
+                {tr({ zh: '▰ 文档 ▰', en: '▰ Docs ▰' })}
               </p>
               <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-                边写边学，文档就在手边
+                {tr({ zh: '边写边学，文档就在手边', en: 'Learn as you write — docs at hand' })}
               </h2>
             </div>
             <Link
               to="/docs"
               className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
             >
-              进入文档中心 →
+              {tr({ zh: '进入文档中心 →', en: 'Open Docs Center →' })}
             </Link>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -611,9 +627,9 @@ export function HomePage() {
                   {d.no}
                 </p>
                 <p className="font-semibold mt-1.5 group-hover:text-primary-700 transition-colors">
-                  {d.title} →
+                  {tr(d.title)} →
                 </p>
-                <p className="text-sm text-gray-500 mt-1">{d.desc}</p>
+                <p className="text-sm text-gray-500 mt-1">{tr(d.desc)}</p>
               </Link>
             ))}
           </div>

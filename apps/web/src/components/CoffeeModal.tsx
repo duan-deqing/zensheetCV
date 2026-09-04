@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { useUI } from '@/store/UIContext';
 import { useModalClose } from '@/hooks/useModalClose';
+import { useTr, type Bi } from '@/i18n/LangContext';
 
 /** 收款码列表（public 下，构建时保持原路径，运行时以 BASE_URL 前缀引用兼容子路径部署） */
-const QR_CODES = [
-  { id: 'wechat', label: '微信支付', src: `${import.meta.env.BASE_URL}buy-me-a-coffee.png` },
-  { id: 'alipay', label: '支付宝', src: `${import.meta.env.BASE_URL}buy-me-a-coffee-alipay.jpg` },
-] as const;
+const QR_CODES: { id: string; label: Bi; src: string }[] = [
+  { id: 'wechat', label: { zh: '微信支付', en: 'WeChat Pay' }, src: `${import.meta.env.BASE_URL}buy-me-a-coffee.png` },
+  { id: 'alipay', label: { zh: '支付宝', en: 'Alipay' }, src: `${import.meta.env.BASE_URL}buy-me-a-coffee-alipay.jpg` },
+];
 
 /** 礼花配色：应用主题色系 */
 const CONFETTI_COLORS = ['#2563eb', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6'];
@@ -61,6 +62,7 @@ export function CoffeeModal() {
   const [thanks, setThanks] = useState<null | 'in' | 'out'>(null);
   // 当前展示的收款码（微信 / 支付宝）
   const [qrIdx, setQrIdx] = useState(0);
+  const tr = useTr();
   // 统一关闭流程：淡出动画结束后再卸载并复位状态
   const { closing, close } = useModalClose(coffeeModalOpen, () => {
     toggleCoffeeModal();
@@ -123,7 +125,7 @@ export function CoffeeModal() {
       className="fixed inset-0 z-50 flex items-center justify-center p-6 pointer-events-none"
       role="dialog"
       aria-modal="true"
-      aria-label="请作者喝杯咖啡"
+      aria-label={tr({ zh: '请作者喝杯咖啡', en: 'Buy me a coffee' })}
     >
       <style>{`
         @keyframes coffeeModalIn {
@@ -188,11 +190,11 @@ export function CoffeeModal() {
           >
             {'< COFFEE />'}
           </p>
-          <h3 className="text-sm font-semibold text-gray-900">请作者喝杯咖啡</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{tr({ zh: '请作者喝杯咖啡', en: 'Buy me a coffee' })}</h3>
           <button
             onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-            aria-label="关闭"
+            aria-label={tr({ zh: '关闭', en: 'Close' })}
           >
             ✕
           </button>
@@ -205,11 +207,11 @@ export function CoffeeModal() {
               <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
                 <CheckIcon className="w-7 h-7 text-emerald-500" />
               </div>
-              <p className="mt-4 text-lg font-semibold text-gray-900">感谢支持！</p>
+              <p className="mt-4 text-lg font-semibold text-gray-900">{tr({ zh: '感谢支持！', en: 'Thanks for your support!' })}</p>
               <p className="mt-2 text-[13px] text-gray-500 text-center leading-relaxed">
-                你的鼓励是持续更新的动力
+                {tr({ zh: '你的鼓励是持续更新的动力', en: 'Your encouragement keeps the updates coming' })}
                 <br />
-                祝你求职顺利，offer 满满！
+                {tr({ zh: '祝你求职顺利，offer 满满！', en: 'Wishing you a smooth job hunt and plenty of offers!' })}
               </p>
             </div>
           </div>
@@ -218,7 +220,7 @@ export function CoffeeModal() {
             <div className="coffee-qr-in w-[270px] flex-1 min-h-[330px] flex items-center justify-center" key={QR_CODES[qrIdx].id}>
               <img
                 src={QR_CODES[qrIdx].src}
-                alt={`${QR_CODES[qrIdx].label}收款码`}
+                alt={tr({ zh: `${QR_CODES[qrIdx].label.zh}收款码`, en: `${QR_CODES[qrIdx].label.en} QR code` })}
                 className="max-w-full max-h-full rounded-xl border border-gray-200"
               />
             </div>
@@ -226,7 +228,7 @@ export function CoffeeModal() {
             <div
               className="mt-2.5 flex items-center rounded-full border border-gray-200 bg-gray-50 p-0.5"
               role="tablist"
-              aria-label="切换收款码"
+              aria-label={tr({ zh: '切换收款码', en: 'Switch QR code' })}
             >
               {QR_CODES.map((q, i) => (
                 <button
@@ -240,12 +242,15 @@ export function CoffeeModal() {
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  {q.label}
+                  {tr(q.label)}
                 </button>
               ))}
             </div>
             <p className="mt-2.5 text-[13px] text-gray-500 text-center leading-relaxed">
-              如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕
+              {tr({
+                zh: '如果 ZENSHEET · 简历 帮到了你，欢迎请作者喝杯咖啡 ☕',
+                en: 'If ZENSHEET · Resume has helped you, buy the author a coffee ☕',
+              })}
             </p>
           </div>
         )}
@@ -257,7 +262,7 @@ export function CoffeeModal() {
               onClick={close}
               className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all"
             >
-              关闭
+              {tr({ zh: '关闭', en: 'Close' })}
             </button>
           ) : (
             <>
@@ -266,13 +271,13 @@ export function CoffeeModal() {
                 disabled={celebrated}
                 className="flex-1 h-9 rounded-full bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 active:scale-[0.98] transition-all disabled:opacity-80 disabled:cursor-default"
               >
-                {celebrated ? '感谢支持' : '已支持'}
+                {celebrated ? tr({ zh: '感谢支持', en: 'Thanks!' }) : tr({ zh: '已支持', en: 'Supported' })}
               </button>
               <button
                 onClick={close}
                 className="flex-1 h-9 rounded-full border border-gray-200 bg-white text-gray-600 text-[13px] font-medium hover:bg-gray-50 active:scale-[0.98] transition-all"
               >
-                稍后支持
+                {tr({ zh: '稍后支持', en: 'Maybe Later' })}
               </button>
             </>
           )}
@@ -292,7 +297,7 @@ export function CoffeeModal() {
               thanks === 'out' ? 'coffee-pill-out' : 'coffee-pill-in'
             } px-5 py-2.5 rounded-full bg-gray-900/90 text-white text-[13px] font-medium shadow-lg whitespace-nowrap`}
           >
-            感谢支持，祝你求职顺利！
+            {tr({ zh: '感谢支持，祝你求职顺利！', en: 'Thanks for your support — good luck with the job hunt!' })}
           </div>
         </div>
       )}

@@ -1,4 +1,5 @@
 import { AI_PROVIDERS } from './providers';
+import { getLang } from '@/i18n/LangContext';
 
 /** AI 设置：自带 Key（BYOK），全部保存在本地浏览器，仅用于当前设备。
  *  各供应商的 API KEY 独立存储（apiKeys 以供应商 id 为键） */
@@ -80,12 +81,17 @@ export function resolveAISettings(settings: AISettings): {
 
 /** 浏览器直连供应商 GET /models（OpenAI 兼容协议）。
  *  供应商未开放 CORS 时会抛出网络错误，此时可手动输入模型名称 */
+
 export async function fetchProviderModels(baseUrl: string, apiKey: string): Promise<string[]> {
   const url = `${baseUrl.replace(/\/+$/, '')}/models`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${apiKey}` },
   });
-  if (!res.ok) throw new Error(`请求失败 (HTTP ${res.status})`);
+  if (!res.ok) {
+    throw new Error(getLang() === 'en'
+      ? `Request failed (HTTP ${res.status})`
+      : `请求失败 (HTTP ${res.status})`);
+  }
   const data = await res.json();
   // OpenAI 协议返回 { data: [{ id }] }，兼容直接返回字符串数组或对象数组
   const raw: unknown[] = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];

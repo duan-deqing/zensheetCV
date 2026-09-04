@@ -4,6 +4,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useUI } from '@/store/UIContext';
 import { useResume } from '@/hooks/useResume';
 import { ButtonStatus, useButtonStatus } from '@/components/ButtonStatus';
+import { useTr } from '@/i18n/LangContext';
 
 /** 保存线性图标，颜色跟随 currentColor */
 function SaveIcon() {
@@ -23,6 +24,7 @@ export function SaveButton() {
   const { updateResume } = useResume();
   const { status, exiting, show } = useButtonStatus();
   const { savedPulse, pulseSaved } = useUI();
+  const tr = useTr();
   const [saving, setSaving] = useState(false);
   // 保存成功后短暂触发「落定回弹」动画，随后复位；手动与自动保存统一由 savedPulse 驱动
   const [justSaved, setJustSaved] = useState(false);
@@ -36,7 +38,7 @@ export function SaveButton() {
 
   const handleSave = async () => {
     if (!currentResume) {
-      show('error', '请先创建简历');
+      show('error', tr({ zh: '请先创建简历', en: 'Create a resume first' }));
       return;
     }
     setSaving(true);
@@ -49,10 +51,10 @@ export function SaveButton() {
     });
     if (result) {
       dispatch({ type: 'MARK_CLEAN' });
-      show('success', '保存成功');
+      show('success', tr({ zh: '保存成功', en: 'Saved successfully' }));
       pulseSaved();
     } else {
-      show('error', '保存失败');
+      show('error', tr({ zh: '保存失败', en: 'Save failed' }));
     }
     setSaving(false);
   };
@@ -70,11 +72,11 @@ export function SaveButton() {
       }`}
     >
       {saving ? (
-        '保存中...'
+        tr({ zh: '保存中...', en: 'Saving…' })
       ) : (
         // key 变化触发文案重挂载：保存 ↔ 已保存 切换时淡入上浮
         <span key={isDirty ? 'dirty' : 'clean'} className="save-label-in">
-          {isDirty ? '保存' : '已保存'}
+          {isDirty ? tr({ zh: '保存', en: 'Save' }) : tr({ zh: '已保存', en: 'Saved' })}
         </span>
       )}
       <SaveIcon />

@@ -3,6 +3,7 @@ import { useUI } from '@/store/UIContext';
 import { usePhotoSync } from '@/hooks/usePhotoSync';
 import { useModalClose } from '@/hooks/useModalClose';
 import { HoverTip } from '@/components/HoverTip';
+import { useTr } from '@/i18n/LangContext';
 
 /** 证件照尺寸（一寸 295×413，宽高比 ≈ 0.714），框与裁切均按此比例 */
 const ID_PHOTO_W = 295;
@@ -42,6 +43,7 @@ function cropToIdPhoto(src: string): Promise<string> {
 export function PhotoModal() {
   const { photoModalOpen, togglePhotoModal, addToast } = useUI();
   const { photos, setPhotos } = usePhotoSync();
+  const tr = useTr();
   const [src, setSrc] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -61,12 +63,12 @@ export function PhotoModal() {
 
   const handleFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith('image/')) {
-      addToast('请选择图片文件', 'error');
+      addToast(tr({ zh: '请选择图片文件', en: 'Please choose an image file' }), 'error');
       return;
     }
     const reader = new FileReader();
     reader.onload = () => setSrc(String(reader.result));
-    reader.onerror = () => addToast('图片读取失败', 'error');
+    reader.onerror = () => addToast(tr({ zh: '图片读取失败', en: 'Failed to read image' }), 'error');
     reader.readAsDataURL(file);
   };
 
@@ -85,17 +87,17 @@ export function PhotoModal() {
       };
       // 走 usePhotoSync 同步预览与落库两份状态
       setPhotos([...photos, photo]);
-      addToast('照片已添加，可在页面上拖动与缩放', 'success');
+      addToast(tr({ zh: '照片已添加，可在页面上拖动与缩放', en: 'Photo added — drag and resize it on the page' }), 'success');
       close();
     } catch {
-      addToast('照片处理失败', 'error');
+      addToast(tr({ zh: '照片处理失败', en: 'Failed to process photo' }), 'error');
     } finally {
       setConfirming(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label="上传照片">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={tr({ zh: '上传照片', en: 'Upload Photo' })}>
       <style>{`
         @keyframes phModalIn {
           from { opacity: 0; transform: translateY(12px) scale(0.98); }
@@ -114,11 +116,11 @@ export function PhotoModal() {
         {/* 头部 */}
         <div className="w-full flex items-center justify-between mb-4">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600">{'// PHOTO'}</p>
-          <HoverTip text="关闭">
+          <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
             <button
               onClick={close}
               className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-              aria-label="关闭"
+              aria-label={tr({ zh: '关闭', en: 'Close' })}
             >
               ✕
             </button>
@@ -134,11 +136,11 @@ export function PhotoModal() {
             <button
               className="w-full h-full cursor-pointer group relative"
               onClick={() => fileRef.current?.click()}
-              aria-label="点击重新选择图片"
+              aria-label={tr({ zh: '点击重新选择图片', en: 'Click to choose another image' })}
             >
-              <img src={src} alt="照片预览" className="w-full h-full object-cover" draggable={false} />
+              <img src={src} alt={tr({ zh: '照片预览', en: 'Photo preview' })} className="w-full h-full object-cover" draggable={false} />
               <span className="absolute inset-x-0 bottom-0 py-1 text-[11px] text-white bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-                点击重新选择
+                {tr({ zh: '点击重新选择', en: 'Click to change' })}
               </span>
             </button>
           ) : (
@@ -151,8 +153,8 @@ export function PhotoModal() {
                 <path d="M17 8l-5-5-5 5" />
                 <path d="M12 3v12" />
               </svg>
-              <span className="text-[13px] font-medium">上传照片</span>
-              <span className="text-[11px] text-gray-400">一寸比例 295 × 413</span>
+              <span className="text-[13px] font-medium">{tr({ zh: '上传照片', en: 'Upload Photo' })}</span>
+              <span className="text-[11px] text-gray-400">{tr({ zh: '一寸比例 295 × 413', en: '1-inch ratio 295 × 413' })}</span>
             </button>
           )}
         </div>
@@ -174,14 +176,14 @@ export function PhotoModal() {
             onClick={close}
             className="h-8 px-4 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 text-[13px] font-medium transition-colors"
           >
-            取消
+            {tr({ zh: '取消', en: 'Cancel' })}
           </button>
           <button
             onClick={confirm}
             disabled={!src || confirming}
             className="h-8 px-4 rounded-md bg-primary-600 hover:bg-primary-700 disabled:bg-gray-200 disabled:text-gray-400 text-white text-[13px] font-medium transition-colors"
           >
-            {confirming ? '处理中…' : '确定'}
+            {confirming ? tr({ zh: '处理中…', en: 'Processing…' }) : tr({ zh: '确定', en: 'Confirm' })}
           </button>
         </div>
       </div>

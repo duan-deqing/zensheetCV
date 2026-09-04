@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useResumeStore } from '@/store/ResumeContext';
+import { useTr } from '@/i18n/LangContext';
 
 /**
  * 浏览器打印导出（纯前端方案）：
@@ -11,16 +12,17 @@ export function usePDFExport() {
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { currentResume } = useResumeStore();
+  const tr = useTr();
 
   const exportPDF = useCallback(async () => {
     if (!currentResume) {
-      setError('No resume selected');
+      setError(tr({ zh: '未选择简历', en: 'No resume selected' }));
       return false;
     }
 
     const pages = Array.from(document.querySelectorAll<HTMLElement>('[data-resume-page]'));
     if (pages.length === 0) {
-      setError('未找到预览内容');
+      setError(tr({ zh: '未找到预览内容', en: 'No preview content found' }));
       return false;
     }
 
@@ -69,13 +71,13 @@ export function usePDFExport() {
     } catch (err: any) {
       printRoot.remove();
       document.body.classList.remove('print-mode');
-      setError(err.message || 'PDF export failed');
+      setError(err.message || tr({ zh: 'PDF 导出失败', en: 'PDF export failed' }));
       return false;
     } finally {
       // 清理可能仍由 afterprint 兜底，但按钮态先恢复
       setIsExporting(false);
     }
-  }, [currentResume]);
+  }, [currentResume, tr]);
 
   return { exportPDF, isExporting, error };
 }

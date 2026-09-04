@@ -10,6 +10,7 @@ import {
 import { useResumeStore } from '@/store/ResumeContext';
 import { defaultTheme } from '@stylan/shared-types';
 import type { ResumeCreate, ResumeUpdate, Resume } from '@stylan/shared-types';
+import { getLang } from '@/i18n/LangContext';
 
 export function useResume() {
   const { setCurrentResume, setResumes, setLoading, setError } = useResumeStore();
@@ -32,7 +33,7 @@ export function useResume() {
     try {
       const found = await getResume(id);
       if (!found) {
-        setError('简历不存在或已被删除');
+        setError(getLang() === 'en' ? 'Resume not found or deleted' : '简历不存在或已被删除');
         return null;
       }
       setCurrentResume(found);
@@ -73,8 +74,9 @@ export function useResume() {
 
   /** 复制一份简历（内容 / 模板 / 主题原样拷贝），名称追加「副本」 */
   const copyResume = useCallback(async (resume: Resume) => {
+    const suffix = getLang() === 'en' ? ' (Copy)' : ' 副本';
     return createResume({
-      title: `${resume.title} 副本`,
+      title: `${resume.title}${suffix}`,
       markdown: resume.markdown ?? '',
       template_id: resume.template_id,
       theme_config: (resume.theme_config || undefined) as ResumeCreate['theme_config'],
@@ -86,7 +88,7 @@ export function useResume() {
     try {
       const merged = await updateResumeRecord(id, data);
       if (!merged) {
-        setError('简历不存在或已被删除');
+        setError(getLang() === 'en' ? 'Resume not found or deleted' : '简历不存在或已被删除');
         return null;
       }
       setCurrentResume(merged);

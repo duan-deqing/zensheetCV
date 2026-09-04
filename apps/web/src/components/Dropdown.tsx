@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useTr } from '@/i18n/LangContext';
 
 export interface DropdownOption<T extends string> {
   value: T;
@@ -12,7 +13,7 @@ export function Dropdown<T extends string>({
   options,
   value,
   onChange,
-  placeholder = '请选择',
+  placeholder,
   ariaLabel,
   className = '',
 }: {
@@ -23,6 +24,7 @@ export function Dropdown<T extends string>({
   ariaLabel?: string;
   className?: string;
 }) {
+  const tr = useTr();
   const [open, setOpen] = useState(false);
   const [dir, setDir] = useState<'down' | 'up'>('down');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -75,7 +77,7 @@ export function Dropdown<T extends string>({
         }`}
       >
         <span className={`truncate ${current ? 'text-gray-700' : 'text-gray-400'}`}>
-          {current?.label ?? placeholder}
+          {current?.label ?? placeholder ?? tr({ zh: '请选择', en: 'Select' })}
         </span>
         <svg
           viewBox="0 0 24 24"

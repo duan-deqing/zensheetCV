@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useUI } from '@/store/UIContext';
 import { useAuth } from '@/store/AuthContext';
+import { useTr, type Bi } from '@/i18n/LangContext';
 import { HoverTip } from '@/components/HoverTip';
 import { AvatarCropModal } from '@/components/AvatarCropModal';
 import { useModalClose } from '@/hooks/useModalClose';
@@ -52,10 +53,10 @@ function TabIcon({ tab }: { tab: UserTab }) {
   );
 }
 
-const TABS: { id: UserTab; label: string }[] = [
-  { id: 'account', label: '账号信息' },
-  { id: 'ai', label: 'AI' },
-  { id: 'about', label: '关于' },
+const TABS: { id: UserTab; label: Bi }[] = [
+  { id: 'account', label: { zh: '账号信息', en: 'Account' } },
+  { id: 'ai', label: { zh: 'AI', en: 'AI' } },
+  { id: 'about', label: { zh: '关于', en: 'About' } },
 ];
 
 /** 线性铅笔图标：用户名编辑入口，颜色跟随 currentColor */
@@ -85,13 +86,14 @@ function FetchModelsButton({
   state: 'idle' | 'loading' | 'error';
   onClick: () => void;
 }) {
+  const tr = useTr();
   return (
     <button
       onClick={onClick}
       disabled={state === 'loading'}
       className="shrink-0 h-9 px-3 rounded-lg border border-gray-200 bg-white text-[12px] font-medium text-gray-600 hover:border-primary-300 hover:text-primary-600 transition-colors disabled:opacity-60 disabled:cursor-wait"
     >
-      {state === 'loading' ? '获取中…' : '获取模型'}
+      {state === 'loading' ? tr({ zh: '获取中…', en: 'Fetching…' }) : tr({ zh: '获取模型', en: 'Fetch models' })}
     </button>
   );
 }
@@ -114,6 +116,7 @@ function ModelCombobox({
 }) {
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(-1);
+  const tr = useTr();
   const rootRef = useRef<HTMLDivElement>(null);
 
   // 输入即过滤
@@ -204,7 +207,7 @@ function ModelCombobox({
           <button
             type="button"
             onClick={() => setOpen((p) => !p)}
-            aria-label={open ? '收起模型列表' : '展开模型列表'}
+            aria-label={open ? tr({ zh: '收起模型列表', en: 'Collapse model list' }) : tr({ zh: '展开模型列表', en: 'Expand model list' })}
             className="shrink-0 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg
@@ -226,11 +229,13 @@ function ModelCombobox({
       {open && models.length > 0 && (
         <div
           role="listbox"
-          aria-label="模型列表"
+          aria-label={tr({ zh: '模型列表', en: 'Model list' })}
           className="absolute left-0 right-0 top-full mt-1 z-10 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg py-1"
         >
           {filtered.length === 0 ? (
-            <p className="px-3 py-2 text-[12px] text-gray-400">无匹配模型，直接使用当前输入</p>
+            <p className="px-3 py-2 text-[12px] text-gray-400">
+              {tr({ zh: '无匹配模型，直接使用当前输入', en: 'No matching model — your input will be used as-is' })}
+            </p>
           ) : (
             filtered.map((m, idx) => {
               const selected = m === value;
@@ -274,6 +279,7 @@ function AISettingsSection() {
   const [models, setModels] = useState<string[]>([]);
   const [fetchState, setFetchState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [fetchError, setFetchError] = useState('');
+  const tr = useTr();
 
   const selectProvider = (id: string) => {
     const preset = AI_PROVIDERS.find((p) => p.id === id);
@@ -299,7 +305,11 @@ function AISettingsSection() {
     const apiKey = settings.apiKeys[settings.provider] ?? '';
     if (!apiKey || !baseUrl) {
       setFetchState('error');
-      setFetchError(isCustom ? '请先填写 API KEY 和接口地址' : '请先填写 API KEY');
+      setFetchError(
+        isCustom
+          ? tr({ zh: '请先填写 API KEY 和接口地址', en: 'Enter the API key and base URL first' })
+          : tr({ zh: '请先填写 API KEY', en: 'Enter the API key first' }),
+      );
       return;
     }
     setFetchState('loading');
@@ -308,7 +318,12 @@ function AISettingsSection() {
       const list = await fetchProviderModels(baseUrl, apiKey);
       if (list.length === 0) {
         setFetchState('error');
-        setFetchError('端点未返回任何模型，可手动输入模型名称');
+        setFetchError(
+          tr({
+            zh: '端点未返回任何模型，可手动输入模型名称',
+            en: 'The endpoint returned no models — enter a model name manually',
+          }),
+        );
         return;
       }
       setModels(list);
@@ -319,8 +334,11 @@ function AISettingsSection() {
       setFetchState('error');
       setFetchError(
         e instanceof Error
-          ? `获取失败（${e.message}），可手动输入模型名称`
-          : '获取失败，可手动输入模型名称',
+          ? tr({
+              zh: `获取失败（${e.message}），可手动输入模型名称`,
+              en: `Fetch failed (${e.message}) — enter a model name manually`,
+            })
+          : tr({ zh: '获取失败，可手动输入模型名称', en: 'Fetch failed — enter a model name manually' }),
       );
     }
   };
@@ -335,9 +353,10 @@ function AISettingsSection() {
     <div className="flex flex-col h-full">
       {/* 服务商卡片 */}
       <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
-        {'// 服务商'}
+        {'// '}
+        {tr({ zh: '服务商', en: 'Provider' })}
       </p>
-      <div className="mt-2.5 grid grid-cols-3 gap-2" role="radiogroup" aria-label="AI 服务商">
+      <div className="mt-2.5 grid grid-cols-3 gap-2" role="radiogroup" aria-label={tr({ zh: 'AI 服务商', en: 'AI providers' })}>
         {AI_PROVIDERS.map((p) => {
           const active = settings.provider === p.id;
           return (
@@ -354,10 +373,10 @@ function AISettingsSection() {
               <span
                 className={`block text-[13px] font-medium ${active ? 'text-primary-700' : 'text-gray-700'}`}
               >
-                {p.label}
+                {tr(p.label)}
               </span>
               <span className="block mt-0.5 font-mono text-[10px] text-gray-400 truncate">
-                {p.baseUrl || 'OpenAI 兼容协议'}
+                {p.baseUrl || tr({ zh: 'OpenAI 兼容协议', en: 'OpenAI-compatible' })}
               </span>
             </button>
           );
@@ -366,7 +385,8 @@ function AISettingsSection() {
 
       {/* 凭证 */}
       <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">
-        {'// 凭证'}
+        {'// '}
+        {tr({ zh: '凭证', en: 'Credentials' })}
       </p>
       <div className="mt-2.5 space-y-2.5">
         <div className="relative">
@@ -388,7 +408,7 @@ function AISettingsSection() {
           <button
             onClick={() => setShowKey((p) => !p)}
             className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-            aria-label={showKey ? '隐藏 API KEY' : '显示 API KEY'}
+            aria-label={showKey ? tr({ zh: '隐藏 API KEY', en: 'Hide API key' }) : tr({ zh: '显示 API KEY', en: 'Show API key' })}
           >
             {showKey ? (
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
@@ -413,9 +433,12 @@ function AISettingsSection() {
                 setSettings((s) => ({ ...s, baseUrl: e.target.value.trim() }));
                 setSaved(false);
               }}
-              placeholder="https://your-host.com/v1（OpenAI 兼容端点）"
+              placeholder={tr({
+                zh: 'https://your-host.com/v1（OpenAI 兼容端点）',
+                en: 'https://your-host.com/v1 (OpenAI-compatible endpoint)',
+              })}
               spellCheck={false}
-              aria-label="接口地址 Base URL"
+              aria-label={tr({ zh: '接口地址 Base URL', en: 'Base URL' })}
               className="w-full h-9 px-3 rounded-lg border border-gray-200 bg-white font-mono text-[13px] text-gray-700 placeholder:text-gray-300 focus:outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100 transition"
             />
             <div className="flex gap-2">
@@ -426,8 +449,8 @@ function AISettingsSection() {
                   setSaved(false);
                 }}
                 models={models}
-                placeholder="模型名称，可点击右侧按钮获取"
-                ariaLabel="模型名称"
+                placeholder={tr({ zh: '模型名称，可点击右侧按钮获取', en: 'Model name — click the button on the right to fetch' })}
+                ariaLabel={tr({ zh: '模型名称', en: 'Model name' })}
               />
               <FetchModelsButton state={fetchState} onClick={handleFetchModels} />
             </div>
@@ -435,15 +458,15 @@ function AISettingsSection() {
         ) : (
           <div className="flex gap-2">
             <ModelCombobox
-              prefix="模型"
+              prefix={tr({ zh: '模型', en: 'Model' })}
               value={settings.model}
               onChange={(v) => {
                 setSettings((s) => ({ ...s, model: v }));
                 setSaved(false);
               }}
               models={models}
-              placeholder="点击右侧按钮获取"
-              ariaLabel="模型名称"
+              placeholder={tr({ zh: '点击右侧按钮获取', en: 'Click the button on the right to fetch' })}
+              ariaLabel={tr({ zh: '模型名称', en: 'Model name' })}
             />
             <FetchModelsButton state={fetchState} onClick={handleFetchModels} />
           </div>
@@ -455,14 +478,19 @@ function AISettingsSection() {
         )}
         {fetchState !== 'error' && models.length > 0 && (
           <p className="text-[12px] text-gray-400 leading-relaxed">
-            已获取 {models.length} 个模型，可直接选择或手动输入
+            {tr({
+              zh: `已获取 ${models.length} 个模型，可直接选择或手动输入`,
+              en: `${models.length} models fetched — pick one or type your own`,
+            })}
           </p>
         )}
       </div>
 
       <p className="mt-3 text-[12px] text-gray-400 leading-relaxed">
-        每个供应商的 API KEY 独立保存，切换供应商互不影响；配置仅存于当前浏览器（localStorage），
-        不会上传到服务器
+        {tr({
+          zh: '每个供应商的 API KEY 独立保存，切换供应商互不影响；配置仅存于当前浏览器（localStorage），不会上传到服务器',
+          en: 'API keys are stored separately per provider and switching providers does not affect them. Settings stay in this browser only (localStorage) and are never uploaded to any server',
+        })}
       </p>
 
       <button
@@ -470,7 +498,7 @@ function AISettingsSection() {
         disabled={saved}
         className="mt-auto w-full h-9 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-70 transition-colors"
       >
-        {saved ? '已保存 ✓' : '保存'}
+        {saved ? tr({ zh: '已保存 ✓', en: 'Saved ✓' }) : tr({ zh: '保存', en: 'Save' })}
       </button>
     </div>
   );
@@ -494,6 +522,7 @@ export function UserModal() {
   // 用户名行内编辑：点击铅笔进入编辑态，Enter / 失焦保存，Esc 取消
   const [editingName, setEditingName] = useState(false);
   const [nameDraft, setNameDraft] = useState('');
+  const tr = useTr();
 
   const startEditName = () => {
     setNameDraft(user.name);
@@ -511,11 +540,11 @@ export function UserModal() {
     e.target.value = ''; // 允许重复选择同一文件
     if (!file) return;
     if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      setAvatarError('仅支持 PNG / JPEG / WebP 图片');
+      setAvatarError(tr({ zh: '仅支持 PNG / JPEG / WebP 图片', en: 'Only PNG / JPEG / WebP images are supported' }));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setAvatarError('图片不能超过 5MB');
+      setAvatarError(tr({ zh: '图片不能超过 5MB', en: 'The image must be smaller than 5MB' }));
       return;
     }
     setAvatarError('');
@@ -565,7 +594,7 @@ export function UserModal() {
       className="fixed inset-0 z-50 flex items-center justify-center p-6"
       role="dialog"
       aria-modal="true"
-      aria-label="设置"
+      aria-label={tr({ zh: '设置', en: 'Settings' })}
     >
       <style>{`
         @keyframes userModalIn {
@@ -599,12 +628,12 @@ export function UserModal() {
           >
             {'< SETTINGS />'}
           </p>
-          <h3 className="text-sm font-semibold text-gray-900">设置</h3>
-          <HoverTip text="关闭">
+          <h3 className="text-sm font-semibold text-gray-900">{tr({ zh: '设置', en: 'Settings' })}</h3>
+          <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
             <button
               onClick={close}
               className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-              aria-label="关闭设置"
+              aria-label={tr({ zh: '关闭设置', en: 'Close settings' })}
             >
               ✕
             </button>
@@ -613,7 +642,7 @@ export function UserModal() {
 
         <div className="flex flex-1 min-h-0">
           {/* 左栏：分类卡片 */}
-          <nav className="w-36 shrink-0 bg-gray-50 border-r border-gray-200 p-2.5 flex flex-col gap-1.5" aria-label="分类">
+          <nav className="w-36 shrink-0 bg-gray-50 border-r border-gray-200 p-2.5 flex flex-col gap-1.5" aria-label={tr({ zh: '分类', en: 'Categories' })}>
             {TABS.map((t) => {
               const active = tab === t.id;
               return (
@@ -630,7 +659,7 @@ export function UserModal() {
                   <span className={active ? 'text-primary-500' : 'text-gray-400'}>
                     <TabIcon tab={t.id} />
                   </span>
-                  {t.label}
+                  {tr(t.label)}
                 </button>
               );
             })}
@@ -642,16 +671,16 @@ export function UserModal() {
               <div className="flex flex-col">
                 {/* 头像 + 名称同行展示，圆角框宽度随内容区，内容靠左；点击头像更换 */}
                 <div className="w-full flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3">
-                  <HoverTip text="更换头像">
+                  <HoverTip text={tr({ zh: '更换头像', en: 'Change avatar' })}>
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="relative group shrink-0 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300"
-                      aria-label="更换头像"
+                      aria-label={tr({ zh: '更换头像', en: 'Change avatar' })}
                     >
                       {user.avatar ? (
                         <img
                           src={user.avatar}
-                          alt={`${user.name} 的头像`}
+                          alt={tr({ zh: `${user.name} 的头像`, en: `${user.name}'s avatar` })}
                           className="w-12 h-12 rounded-full object-cover border border-gray-200"
                         />
                       ) : (
@@ -683,11 +712,11 @@ export function UserModal() {
                       }}
                       className="flex-1 min-w-0 text-base font-semibold text-gray-900 bg-white border-b border-primary-400 outline-none px-0.5 py-0"
                       maxLength={20}
-                      placeholder="输入用户名"
-                      aria-label="用户名"
+                      placeholder={tr({ zh: '输入用户名', en: 'Enter a username' })}
+                      aria-label={tr({ zh: '用户名', en: 'Username' })}
                     />
                   ) : (
-                    <HoverTip text="修改用户名">
+                    <HoverTip text={tr({ zh: '修改用户名', en: 'Edit username' })}>
                       <button
                         onClick={startEditName}
                         className="flex items-center gap-1 min-w-0 text-base font-semibold text-gray-900 hover:text-primary-700 transition-colors"
@@ -709,17 +738,19 @@ export function UserModal() {
                 <dl className="mt-4 w-full rounded-lg border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      简历数量
+                      {tr({ zh: '简历数量', en: 'Resumes' })}
                     </dt>
                     <dd className="text-[13px] text-gray-700 tabular-nums">
-                      {resumeCount === null ? '—' : `${resumeCount} 份`}
+                      {resumeCount === null ? '—' : tr({ zh: `${resumeCount} 份`, en: `${resumeCount}` })}
                     </dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      数据存储
+                      {tr({ zh: '数据存储', en: 'Storage' })}
                     </dt>
-                    <dd className="text-[13px] text-gray-700">仅保存在当前浏览器本地</dd>
+                    <dd className="text-[13px] text-gray-700">
+                      {tr({ zh: '仅保存在当前浏览器本地', en: 'Stored locally in this browser only' })}
+                    </dd>
                   </div>
                 </dl>
               </div>
@@ -730,47 +761,58 @@ export function UserModal() {
             {tab === 'about' && (
               <div className="flex flex-col h-full">
                 <p className="font-mono text-xs tracking-[0.18em] text-primary-600">
-                  {'< ZENSHEET · 简历 />'}
+                  {tr({ zh: '< ZENSHEET · 简历 />', en: '< ZENSHEET · RESUME />' })}
                 </p>
                 <p className="mt-2 text-[13px] text-gray-600 leading-relaxed">
-                  一个在线 Markdown 简历编辑器：左侧书写 Markdown，右侧实时预览排版，
-                  内置多套模板与 AI 润色能力，通过浏览器打印一键导出 PDF。纯前端版本，
-                  数据仅保存在本地浏览器，无需注册登录。
+                  {tr({
+                    zh: '一个在线 Markdown 简历编辑器：左侧书写 Markdown，右侧实时预览排版，内置多套模板与 AI 润色能力，通过浏览器打印一键导出 PDF。纯前端版本，数据仅保存在本地浏览器，无需注册登录。',
+                    en: 'An online Markdown resume editor: write Markdown on the left and see the layout preview live on the right, with built-in templates and AI polishing, plus one-click PDF export via browser printing. Pure front-end — data stays in your local browser, no sign-in required.',
+                  })}
                 </p>
                 <dl className="mt-4 rounded-lg border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      项目名称
+                      {tr({ zh: '项目名称', en: 'Project' })}
                     </dt>
-                    <dd className="text-[13px] text-gray-700">ZENSHEET · 简历 — 在线 Markdown 简历编辑器</dd>
+                    <dd className="text-[13px] text-gray-700">
+                      {tr({
+                        zh: 'ZENSHEET · 简历 — 在线 Markdown 简历编辑器',
+                        en: 'ZENSHEET · Resume — Online Markdown Resume Editor',
+                      })}
+                    </dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      当前版本
+                      {tr({ zh: '当前版本', en: 'Version' })}
                     </dt>
                     <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.2.0</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      作者
+                      {tr({ zh: '作者', en: 'Author' })}
                     </dt>
                     <dd className="text-[13px] text-gray-700">STYLAN &amp; GLM-5.3-flash</dd>
                   </div>
                   <div className="flex items-start gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0 pt-0.5">
-                      技术栈
+                      {tr({ zh: '技术栈', en: 'Stack' })}
                     </dt>
                     <dd className="text-[13px] text-gray-700 leading-relaxed">
-                      <span className="block">前端：React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6</span>
-                      <span className="block">数据存储：IndexedDB（本地浏览器）</span>
-                      <span className="block">PDF 导出：浏览器打印（window.print）</span>
+                      <span className="block">{tr({ zh: '前端：React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6', en: 'Front-end: React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6' })}</span>
+                      <span className="block">{tr({ zh: '数据存储：IndexedDB（本地浏览器）', en: 'Data storage: IndexedDB (local browser)' })}</span>
+                      <span className="block">{tr({ zh: 'PDF 导出：浏览器打印（window.print）', en: 'PDF export: browser printing (window.print)' })}</span>
                     </dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      AI 接入
+                      {tr({ zh: 'AI 接入', en: 'AI' })}
                     </dt>
-                    <dd className="text-[13px] text-gray-700">OpenAI 兼容协议，支持 DeepSeek / GLM / LongCat / 自定义端点</dd>
+                    <dd className="text-[13px] text-gray-700">
+                      {tr({
+                        zh: 'OpenAI 兼容协议，支持 DeepSeek / GLM / LongCat / 自定义端点',
+                        en: 'OpenAI-compatible protocol, supporting DeepSeek / GLM / LongCat / custom endpoints',
+                      })}
+                    </dd>
                   </div>
                 </dl>
               </div>

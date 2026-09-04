@@ -5,54 +5,58 @@ import { useUI } from '@/store/UIContext';
 import { Dropdown, type DropdownOption } from '@/components/Dropdown';
 import { HoverTip } from '@/components/HoverTip';
 import { TemplatePreview } from '@/components/TemplatePreview';
+import { TEMPLATE_TEXT } from '@/components/TemplateModal';
 import { DEFAULT_CONTENT_PADDING, DEFAULT_LINE_HEIGHT, normalizeElementFontSizes, normalizeLineHeight } from '@/preview/previewShared';
 import { builtinTemplates } from '@/templates';
 import { useTemplateSwitch } from '@/hooks/useTemplateSwitch';
 import { useModalClose } from '@/hooks/useModalClose';
+import { useTr, type Bi } from '@/i18n/LangContext';
 import type { ElementFontSizes, ThemeConfig } from '@stylan/shared-types';
 import { defaultElementFontSizes } from '@stylan/shared-types';
 
 const colorPresets = [
-  { label: '科技蓝', value: '#2563EB' },
-  { label: '翡翠绿', value: '#10B981' },
-  { label: '琥珀橙', value: '#F59E0B' },
-  { label: '玫瑰红', value: '#E11D48' },
-  { label: '紫罗兰', value: '#7C3AED' },
-  { label: '石墨黑', value: '#111827' },
-  { label: '亮黄', value: '#FFD335' },
-  { label: '珊瑚红', value: '#FF6B6B' },
-  { label: '玫粉', value: '#FF6EA9' },
-  { label: '青蓝', value: '#00A8E8' },
-  { label: '湖水绿', value: '#00C2A8' },
+  { label: { zh: '科技蓝', en: 'Tech Blue' }, value: '#2563EB' },
+  { label: { zh: '翡翠绿', en: 'Emerald' }, value: '#10B981' },
+  { label: { zh: '琥珀橙', en: 'Amber' }, value: '#F59E0B' },
+  { label: { zh: '玫瑰红', en: 'Rose Red' }, value: '#E11D48' },
+  { label: { zh: '紫罗兰', en: 'Violet' }, value: '#7C3AED' },
+  { label: { zh: '石墨黑', en: 'Graphite Black' }, value: '#111827' },
+  { label: { zh: '亮黄', en: 'Bright Yellow' }, value: '#FFD335' },
+  { label: { zh: '珊瑚红', en: 'Coral' }, value: '#FF6B6B' },
+  { label: { zh: '玫粉', en: 'Rose Pink' }, value: '#FF6EA9' },
+  { label: { zh: '青蓝', en: 'Cyan Blue' }, value: '#00A8E8' },
+  { label: { zh: '湖水绿', en: 'Teal' }, value: '#00C2A8' },
 ];
 
 /** 简历常用字体选项，前三个与内置模板默认值一致，保证旧数据可回显 */
 const fontPresets = [
-  { label: 'Inter · 现代无衬线', value: "'Inter', 'Noto Sans SC', sans-serif" },
-  { label: '思源黑体 · 简洁清晰', value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
-  { label: '苹方 · 苹果系统字体', value: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif" },
-  { label: '阿里惠普体 · 商务无衬线', value: "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif" },
-  { label: 'Times New Roman · 经典衬线', value: "'Times New Roman', 'Noto Serif SC', serif" },
-  { label: '思源宋体 · 优雅正式', value: "'Noto Serif SC', 'SimSun', serif" },
+  { label: { zh: 'Inter · 现代无衬线', en: 'Inter · Modern sans-serif' }, value: "'Inter', 'Noto Sans SC', sans-serif" },
+  { label: { zh: '思源黑体 · 简洁清晰', en: 'Noto Sans SC · Clean & clear' }, value: "'Noto Sans SC', 'Microsoft YaHei', sans-serif" },
+  { label: { zh: '苹方 · 苹果系统字体', en: 'PingFang SC · Apple system font' }, value: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif" },
+  { label: { zh: '阿里惠普体 · 商务无衬线', en: 'Alibaba PuHuiTi · Business sans-serif' }, value: "'Alibaba PuHuiTi', 'Noto Sans SC', sans-serif" },
+  { label: { zh: 'Times New Roman · 经典衬线', en: 'Times New Roman · Classic serif' }, value: "'Times New Roman', 'Noto Serif SC', serif" },
+  { label: { zh: '思源宋体 · 优雅正式', en: 'Noto Serif SC · Elegant & formal' }, value: "'Noto Serif SC', 'SimSun', serif" },
 ];
 
 /** 「默认」徽章标签：下拉选项与选中值中标识该分类的默认字号 */
 function DefaultBadge() {
+  const tr = useTr();
   return (
     <span className="inline-flex items-center px-1.5 py-px rounded text-[10px] leading-[1.5] font-medium bg-primary-50 text-primary-600 border border-primary-100 whitespace-nowrap">
-      默认
+      {tr({ zh: '默认', en: 'Default' })}
     </span>
   );
 }
 
 /** 重置按钮：循环箭头 + 文案，白底圆角边框，hover 主色，与面板控件风格一致 */
-function ResetButton({ label, onClick }: { label: string; onClick: () => void }) {
+function ResetButton({ label, onClick }: { label: Bi; onClick: () => void }) {
+  const tr = useTr();
   return (
     <button
       type="button"
       onClick={onClick}
       className="w-full flex items-center justify-center gap-1.5 text-[13px] border rounded-full px-2.5 py-1.5 bg-gray-50 text-gray-400 border-gray-100 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition-colors"
-      aria-label={`重置为默认${label}`}
+      aria-label={tr({ zh: `重置为默认${label.zh}`, en: `Reset ${label.en} to default` })}
     >
       <svg
         viewBox="0 0 24 24"
@@ -67,7 +71,7 @@ function ResetButton({ label, onClick }: { label: string; onClick: () => void })
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
         <path d="M3 3v5h5" />
       </svg>
-      重置{label}
+      {tr({ zh: `重置${label.zh}`, en: `Reset ${label.en}` })}
     </button>
   );
 }
@@ -105,47 +109,39 @@ const elementSizeOptionsMap = {
 } as const;
 
 /** 字号分类配置：渲染顺序与标签（2 列网格，行距垫底凑满 8 格） */
-const fontSizeCategories: Array<[keyof ElementFontSizes, string]> = [
-  ['h1', 'H1'],
-  ['h2', 'H2'],
-  ['h3', 'H3'],
-  ['h4', 'H4'],
-  ['h5', 'H5'],
-  ['p', '段落'],
-  ['list', '列表'],
+const fontSizeCategories: Array<[keyof ElementFontSizes, Bi]> = [
+  ['h1', { zh: 'H1', en: 'H1' }],
+  ['h2', { zh: 'H2', en: 'H2' }],
+  ['h3', { zh: 'H3', en: 'H3' }],
+  ['h4', { zh: 'H4', en: 'H4' }],
+  ['h5', { zh: 'H5', en: 'H5' }],
+  ['p', { zh: '段落', en: 'Paragraph' }],
+  ['list', { zh: '列表', en: 'List' }],
 ];
 
 /** 行距下拉：12 ~ 25 → 1.2 ~ 2.5 倍，默认值 1.4 选项以「默认」徽章标识 */
-const lineHeightOptions: DropdownOption<string>[] = Array.from({ length: 14 }, (_, i) => {
+const lineHeightOptions: { value: string; label: Bi }[] = Array.from({ length: 14 }, (_, i) => {
   const lh = ((12 + i) / 10).toFixed(1);
   return {
     value: lh,
-    label:
-      lh === DEFAULT_LINE_HEIGHT.toFixed(1) ? (
-        <span className="inline-flex items-center gap-1.5">
-          {lh} 倍
-          <DefaultBadge />
-        </span>
-      ) : (
-        `${lh} 倍`
-      ),
+    label: { zh: `${lh} 倍`, en: `${lh}x` },
   };
 });
 
 /** 页边距档位，mm 值与 previewShared.MARGIN_MM 一致，仅用于展示 */
 const marginOptions = [
-  { value: 'none', label: '无 · 0mm' },
-  { value: 'narrow', label: '窄 · 8mm' },
-  { value: 'normal', label: '标准 · 12mm' },
-  { value: 'wide', label: '宽 · 20mm' },
+  { value: 'none', label: { zh: '无 · 0mm', en: 'None · 0mm' } },
+  { value: 'narrow', label: { zh: '窄 · 8mm', en: 'Narrow · 8mm' } },
+  { value: 'normal', label: { zh: '标准 · 12mm', en: 'Normal · 12mm' } },
+  { value: 'wide', label: { zh: '宽 · 20mm', en: 'Wide · 20mm' } },
 ] as const;
 
 /** 内容边距档位，mm 值与 previewShared.CONTENT_PADDING_MM 一致，仅用于展示 */
 const contentPaddingOptions = [
-  { value: 'none', label: '无 · 0mm' },
-  { value: 'narrow', label: '窄 · 5mm' },
-  { value: 'normal', label: '标准 · 10mm' },
-  { value: 'wide', label: '宽 · 15mm' },
+  { value: 'none', label: { zh: '无 · 0mm', en: 'None · 0mm' } },
+  { value: 'narrow', label: { zh: '窄 · 5mm', en: 'Narrow · 5mm' } },
+  { value: 'normal', label: { zh: '标准 · 10mm', en: 'Normal · 10mm' } },
+  { value: 'wide', label: { zh: '宽 · 15mm', en: 'Wide · 15mm' } },
 ] as const;
 
 /** 分组标题：mono 眉标风格（`// 分组名`），与面板头部同构 */
@@ -201,6 +197,7 @@ export function ThemeConfigPanel() {
   const { currentTemplate, themeConfig, setThemeConfig } = usePreview();
   const { updateTheme } = useResumeStore();
   const { themePanelOpen, toggleThemePanel, addedTemplates } = useUI();
+  const tr = useTr();
   const switchTemplate = useTemplateSwitch();
   // 统一关闭流程：滑出动画结束后再卸载（侧边栏对称滑出）
   const { closing, close } = useModalClose(themePanelOpen, toggleThemePanel);
@@ -269,7 +266,7 @@ export function ThemeConfigPanel() {
   return (
     <aside
       className={`${closing ? 'theme-side-out' : 'theme-side-in'} absolute right-2 top-2 bottom-2 z-10 w-96 rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto`}
-      aria-label="主题配置"
+      aria-label={tr({ zh: '主题配置', en: 'Theme settings' })}
     >
       <style>{`
         @keyframes themeSideIn {
@@ -328,8 +325,8 @@ export function ThemeConfigPanel() {
         >
           {'< THEME />'}
         </p>
-        <h3 className="text-sm font-semibold text-gray-900">主题配置</h3>
-        <HoverTip text="关闭">
+        <h3 className="text-sm font-semibold text-gray-900">{tr({ zh: '主题配置', en: 'Theme settings' })}</h3>
+        <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
           <button
             onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
@@ -342,21 +339,22 @@ export function ThemeConfigPanel() {
       <div className="p-4 flex flex-col gap-6 overflow-y-auto flex-1 min-h-0">
         {/* 分组：模板（预览卡片，一屏最多 4 张，超出纵向滚动并吸附到卡片） */}
         <section>
-          <GroupTitle>模板</GroupTitle>
+          <GroupTitle>{tr({ zh: '模板', en: 'Templates' })}</GroupTitle>
           {/* 卡片高 175px（预览 144 + 分隔线 1 + 名称 28 + 上下边框 2），两行 + gap = 358px；切换后视觉主题重置为该模板默认，页面布局设置保留 */}
           <div
             className="grid grid-cols-2 gap-2 max-h-[358px] overflow-y-auto snap-y snap-mandatory [scrollbar-width:thin]"
-            aria-label="选择模板"
+            aria-label={tr({ zh: '选择模板', en: 'Choose a template' })}
           >
             {availableTemplates.map((t) => {
               const isCurrent = t.id === currentId;
+              const tName = TEMPLATE_TEXT[t.id]?.name ?? { zh: t.name, en: t.name };
               return (
                 <button
                   key={t.id}
                   ref={isCurrent ? currentCardRef : undefined}
                   onClick={() => switchTemplate(t.id)}
                   aria-pressed={isCurrent}
-                  aria-label={`切换到模板 ${t.name}`}
+                  aria-label={tr({ zh: `切换到模板 ${tName.zh}`, en: `Switch to template ${tName.en}` })}
                   className={`snap-start rounded-lg border overflow-hidden bg-white text-left transition-colors ${
                     isCurrent
                       ? 'border-primary-400 ring-1 ring-primary-200'
@@ -372,7 +370,7 @@ export function ThemeConfigPanel() {
                         isCurrent ? 'text-primary-600' : 'text-gray-600'
                       }`}
                     >
-                      {t.name}
+                      {tr(tName)}
                     </span>
                   </span>
                 </button>
@@ -383,15 +381,15 @@ export function ThemeConfigPanel() {
 
         {/* 分组：视觉风格 */}
         <section className="flex flex-col gap-4">
-          <GroupTitle>视觉风格</GroupTitle>
+          <GroupTitle>{tr({ zh: '视觉风格', en: 'Visual style' })}</GroupTitle>
           {/* 主色调 */}
           <div className="relative">
             <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              主色调
+              {tr({ zh: '主色调', en: 'Primary color' })}
             </label>
             <div className="grid grid-cols-6 gap-2">
               {colorPresets.map((color) => (
-                <HoverTip key={color.value} text={color.label}>
+                <HoverTip key={color.value} text={tr(color.label)}>
                   <button
                     onClick={() => applyTheme({ primaryColor: color.value })}
                     className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
@@ -400,17 +398,17 @@ export function ThemeConfigPanel() {
                         : 'border-transparent'
                     }`}
                     style={{ backgroundColor: color.value }}
-                    aria-label={color.label}
+                    aria-label={tr(color.label)}
                   />
                 </HoverTip>
               ))}
               {/* 自定义颜色：点击展开圆角矩形调色盘弹层（二维选色区 + 色相滑杆 + HEX 输入），
                   当前主色不在预设中时视为自定义色并高亮 */}
-              <HoverTip text="自定义">
+              <HoverTip text={tr({ zh: '自定义', en: 'Custom' })}>
                 <button
                   type="button"
                   onClick={openPicker}
-                  aria-label="自定义颜色"
+                  aria-label={tr({ zh: '自定义颜色', en: 'Custom color' })}
                   aria-expanded={pickerOpen}
                   className={`relative block w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer bg-gray-100 ${
                     isCustomColor ? 'border-gray-900 scale-110' : 'border-transparent'
@@ -474,7 +472,7 @@ export function ThemeConfigPanel() {
                       value={hsv.h}
                       onChange={(e) => applyHsv({ ...hsv, h: Number(e.target.value) })}
                       className="hue-slider w-full"
-                      aria-label="色相"
+                      aria-label={tr({ zh: '色相', en: 'Hue' })}
                     />
                     <div className="flex items-center gap-2">
                       <span
@@ -489,7 +487,7 @@ export function ThemeConfigPanel() {
                         maxLength={7}
                         spellCheck={false}
                         className="flex-1 h-8 rounded-md border border-gray-200 px-2 font-mono text-[13px] uppercase text-gray-700 focus:outline-none focus:border-primary-400"
-                        aria-label="十六进制颜色值"
+                        aria-label={tr({ zh: '十六进制颜色值', en: 'Hex color value' })}
                       />
                     </div>
                   </div>
@@ -500,30 +498,30 @@ export function ThemeConfigPanel() {
           {/* 字体：下拉选择 */}
           <div>
             <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              字体
+              {tr({ zh: '字体', en: 'Font' })}
             </label>
             <Dropdown
-              options={fontPresets}
+              options={fontPresets.map((f) => ({ value: f.value, label: tr(f.label) }))}
               value={
                 fontPresets.some((f) => f.value === themeConfig.fontFamily)
                   ? themeConfig.fontFamily
                   : ''
               }
               onChange={(v) => applyTheme({ fontFamily: v })}
-              placeholder="当前字体（自定义）"
-              ariaLabel="选择字体"
+              placeholder={tr({ zh: '当前字体（自定义）', en: 'Current font (custom)' })}
+              ariaLabel={tr({ zh: '选择字体', en: 'Select font' })}
             />
           </div>
         </section>
 
         {/* 分组：字号与行距（H1~H5、段落、列表分别设置，默认值选项带「默认」标识，行距垫底凑满 8 格） */}
         <section className="flex flex-col gap-4">
-          <GroupTitle>字号与行距</GroupTitle>
+          <GroupTitle>{tr({ zh: '字号与行距', en: 'Font size & line height' })}</GroupTitle>
           <div className="grid grid-cols-2 gap-3">
             {fontSizeCategories.map(([key, label]) => (
               <div key={key}>
                 <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-                  {label}
+                  {tr(label)}
                 </label>
                 <Dropdown
                   options={elementSizeOptionsMap[key]}
@@ -533,67 +531,67 @@ export function ThemeConfigPanel() {
                       elementFontSizes: { ...themeConfig.elementFontSizes, [key]: Number(v) },
                     })
                   }
-                  ariaLabel={`选择${label}字号`}
+                  ariaLabel={tr({ zh: `选择${label.zh}字号`, en: `Select ${label.en} font size` })}
                 />
               </div>
             ))}
             <div>
               <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-                行距
+                {tr({ zh: '行距', en: 'Line height' })}
               </label>
               <Dropdown
-                options={lineHeightOptions}
+                options={lineHeightOptions.map((o) => ({ value: o.value, label: tr(o.label) }))}
                 value={normalizeLineHeight(
                   themeConfig.lineHeight ?? (themeConfig as { spacing?: unknown }).spacing,
                 ).toFixed(1)}
                 onChange={(v) => applyTheme({ lineHeight: Number(v) })}
-                ariaLabel="选择行距"
+                ariaLabel={tr({ zh: '选择行距', en: 'Select line height' })}
               />
             </div>
             {/* 重置按钮（常驻）：分别位于「列表」「行距」下拉正下方一格，一键恢复默认 */}
-            <ResetButton label="字号" onClick={() => applyTheme({ elementFontSizes: {} })} />
-            <ResetButton label="行距" onClick={() => applyTheme({ lineHeight: DEFAULT_LINE_HEIGHT })} />
+            <ResetButton label={{ zh: '字号', en: 'Font size' }} onClick={() => applyTheme({ elementFontSizes: {} })} />
+            <ResetButton label={{ zh: '行距', en: 'Line height' }} onClick={() => applyTheme({ lineHeight: DEFAULT_LINE_HEIGHT })} />
           </div>
         </section>
 
         {/* 分组：页面布局（预览与 PDF 导出共用，随主题持久化） */}
         <section className="flex flex-col gap-4">
-          <GroupTitle>页面布局</GroupTitle>
+          <GroupTitle>{tr({ zh: '页面布局', en: 'Page layout' })}</GroupTitle>
           {/* 页边距：左右 / 上下独立选择 */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-                左右边距
+                {tr({ zh: '左右边距', en: 'Horizontal margins' })}
               </label>
               <Dropdown
-                options={marginOptions}
+                options={marginOptions.map((o) => ({ value: o.value, label: tr(o.label) }))}
                 value={themeConfig.marginX}
                 onChange={(v) => applyTheme({ marginX: v })}
-                ariaLabel="选择左右页边距"
+                ariaLabel={tr({ zh: '选择左右页边距', en: 'Select horizontal margins' })}
               />
             </div>
             <div>
               <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-                上下边距
+                {tr({ zh: '上下边距', en: 'Vertical margins' })}
               </label>
               <Dropdown
-                options={marginOptions}
+                options={marginOptions.map((o) => ({ value: o.value, label: tr(o.label) }))}
                 value={themeConfig.marginY}
                 onChange={(v) => applyTheme({ marginY: v })}
-                ariaLabel="选择上下页边距"
+                ariaLabel={tr({ zh: '选择上下页边距', en: 'Select vertical margins' })}
               />
             </div>
           </div>
           {/* 内容边距：内容到页面边界的距离（四边），叠加在页边距上 */}
           <div>
             <label className="font-mono text-[13px] uppercase tracking-[0.18em] text-gray-400 mb-2 block">
-              内容边距
+              {tr({ zh: '内容边距', en: 'Content padding' })}
             </label>
             <Dropdown
-              options={contentPaddingOptions}
+              options={contentPaddingOptions.map((o) => ({ value: o.value, label: tr(o.label) }))}
               value={themeConfig.contentPadding ?? DEFAULT_CONTENT_PADDING}
               onChange={(v) => applyTheme({ contentPadding: v })}
-              ariaLabel="选择内容边距"
+              ariaLabel={tr({ zh: '选择内容边距', en: 'Select content padding' })}
             />
           </div>
         </section>

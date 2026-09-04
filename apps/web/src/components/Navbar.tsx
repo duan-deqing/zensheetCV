@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/store/AuthContext';
 import { useUI } from '@/store/UIContext';
+import { useLang, useTr } from '@/i18n/LangContext';
 
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
@@ -52,9 +53,21 @@ function BookIcon() {
   );
 }
 
+function GlobeIcon() {
+  return (
+    <NavIcon>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+      <path d="M2 12h20" />
+    </NavIcon>
+  );
+}
+
 export function Navbar() {
   const { user } = useAuth();
   const { toggleUserModal } = useUI();
+  const { lang, setLang } = useLang();
+  const tr = useTr();
   const { pathname } = useLocation();
   const [hidden, setHidden] = useState(false);
   const lastY = useRef(0);
@@ -116,7 +129,7 @@ export function Navbar() {
         className={`fixed top-4 inset-x-0 z-40 flex justify-center px-6 will-change-transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
           hidden ? '-translate-y-[130%]' : 'translate-y-0'
         }`}
-        aria-label="主导航"
+        aria-label={tr({ zh: '主导航', en: 'Main navigation' })}
         aria-hidden={hidden}
       >
         {/* 最大宽度与页面 section 一致（max-w-7xl），两侧留白对齐 */}
@@ -127,36 +140,48 @@ export function Navbar() {
               className="text-[15px] font-extrabold uppercase tracking-tight text-gray-900 shrink-0"
             >
               ZENSHEET{' '}
-              <span className="text-primary-600">· 简历</span>
+              <span className="text-primary-600">{tr({ zh: '· 简历', en: '· Resume' })}</span>
             </Link>
             <div className="hidden md:flex items-center gap-7">
               <Link to="/" className={linkClass('/')}>
                 <HomeIcon />
-                首页
+                {tr({ zh: '首页', en: 'Home' })}
               </Link>
               <Link to="/resumes" className={linkClass('/resumes')}>
                 <FileTextIcon />
-                我的简历
+                {tr({ zh: '我的简历', en: 'My Resumes' })}
               </Link>
               <Link to="/docs" className={linkClass('/docs')}>
                 <BookIcon />
-                文档
+                {tr({ zh: '文档', en: 'Docs' })}
               </Link>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* 语言切换：中 / EN，位于用户信息左侧 */}
+            <button
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors px-2 h-8 rounded-full hover:bg-gray-100"
+              aria-label={lang === 'zh' ? 'Switch to English' : '切换为中文'}
+              title={lang === 'zh' ? 'Switch to English' : '切换为中文'}
+            >
+              <GlobeIcon />
+              <span className="hidden sm:inline font-mono text-[12px] tracking-wide">
+                {lang === 'zh' ? 'EN' : '中'}
+              </span>
+            </button>
             {/* 头像 + 用户名，点击打开设置弹窗，与编辑页 TopBar 同构 */}
             <button
               onClick={toggleUserModal}
               className="flex items-center gap-2 group px-1"
               aria-haspopup="dialog"
-              aria-label="用户信息"
+              aria-label={tr({ zh: '用户信息', en: 'User' })}
             >
               {user?.avatar ? (
                 <img
                   src={user.avatar}
-                  alt={`${user?.name ?? '用户'} 的头像`}
+                  alt={tr({ zh: `${user?.name ?? '用户'} 的头像`, en: `Avatar of ${user?.name ?? 'user'}` })}
                   className="w-6 h-6 rounded-full object-cover border border-gray-200"
                 />
               ) : (

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { useTr } from '@/i18n/LangContext';
 
 const BOX = 320; // 预览区边长（px）
 const CIRCLE = 240; // 裁剪圆直径（px）
@@ -26,6 +27,7 @@ export function AvatarCropModal({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const tr = useTr();
   const imgRef = useRef<HTMLImageElement>(null);
   const dragRef = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
 
@@ -71,7 +73,7 @@ export function AvatarCropModal({
       canvas.toBlob(resolve, 'image/png'),
     );
     if (!blob) {
-      setError('导出图片失败，请重试');
+      setError(tr({ zh: '导出图片失败，请重试', en: 'Failed to export the image, please try again' }));
       return;
     }
     setUploading(true);
@@ -80,14 +82,14 @@ export function AvatarCropModal({
       await onConfirm(blob);
     } catch (err: any) {
       const detail = err?.response?.data?.detail;
-      setError(detail ? String(detail) : '上传失败，请重试');
+      setError(detail ? String(detail) : tr({ zh: '上传失败，请重试', en: 'Upload failed, please try again' }));
     } finally {
       setUploading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label="调整头像">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={tr({ zh: '调整头像', en: 'Adjust avatar' })}>
       <style>{`
         @keyframes avatarModalIn {
           from { opacity: 0; transform: translateY(12px) scale(0.98); }
@@ -103,12 +105,12 @@ export function AvatarCropModal({
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0" aria-hidden="true">
             {'< AVATAR />'}
           </p>
-          <h3 className="text-sm font-semibold text-gray-900">调整头像</h3>
+          <h3 className="text-sm font-semibold text-gray-900">{tr({ zh: '调整头像', en: 'Adjust avatar' })}</h3>
           <button
             onClick={onCancel}
             disabled={uploading}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm disabled:opacity-50"
-            aria-label="关闭头像裁剪"
+            aria-label={tr({ zh: '关闭头像裁剪', en: 'Close avatar cropping' })}
           >
             ✕
           </button>
@@ -134,13 +136,13 @@ export function AvatarCropModal({
             <img
               ref={imgRef}
               src={src}
-              alt="待裁剪头像"
+              alt={tr({ zh: '待裁剪头像', en: 'Avatar to crop' })}
               draggable={false}
               onLoad={(e) => {
                 const el = e.currentTarget;
                 setDims({ w: el.naturalWidth, h: el.naturalHeight });
               }}
-              onError={() => setError('图片加载失败，请取消后重新选择')}
+              onError={() => setError(tr({ zh: '图片加载失败，请取消后重新选择', en: 'Failed to load the image — cancel and pick another one' }))}
               className="absolute select-none"
               style={
                 dims
@@ -173,7 +175,7 @@ export function AvatarCropModal({
           {/* 缩放滑杆 */}
           <div className="mt-4 w-[320px] flex items-center gap-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 shrink-0">
-              缩放
+              {tr({ zh: '缩放', en: 'Zoom' })}
             </span>
             <input
               type="range"
@@ -182,7 +184,7 @@ export function AvatarCropModal({
               step={0.01}
               value={zoom}
               onChange={(e) => handleZoom(Number(e.target.value))}
-              aria-label="缩放头像"
+              aria-label={tr({ zh: '缩放头像', en: 'Zoom avatar' })}
               className="flex-1 accent-primary-600"
             />
             <span className="font-mono text-[11px] text-gray-500 w-8 text-right">
@@ -190,7 +192,12 @@ export function AvatarCropModal({
             </span>
           </div>
 
-          <p className="mt-2 text-[12px] text-gray-400">拖动调整位置 · 滑杆调整缩放 · 圆形区域为最终头像</p>
+          <p className="mt-2 text-[12px] text-gray-400">
+            {tr({
+              zh: '拖动调整位置 · 滑杆调整缩放 · 圆形区域为最终头像',
+              en: 'Drag to reposition · Slider to zoom · The circle is the final avatar',
+            })}
+          </p>
 
           {error && (
             <p className="mt-2 text-[12px] text-red-500" role="alert">
@@ -204,14 +211,14 @@ export function AvatarCropModal({
               disabled={uploading}
               className="flex-1 h-9 rounded-lg border border-gray-300 text-[13px] font-medium text-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50"
             >
-              取消
+              {tr({ zh: '取消', en: 'Cancel' })}
             </button>
             <button
               onClick={handleConfirm}
               disabled={uploading || !dims}
               className="flex-1 h-9 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-70 transition-colors"
             >
-              {uploading ? '上传中…' : '确定'}
+              {uploading ? tr({ zh: '上传中…', en: 'Uploading…' }) : tr({ zh: '确定', en: 'Confirm' })}
             </button>
           </div>
         </div>

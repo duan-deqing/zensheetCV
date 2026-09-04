@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useModalClose } from '@/hooks/useModalClose';
+import { useTr, type Bi } from '@/i18n/LangContext';
 import {
   AIDocContent,
   DrawerNavContext,
@@ -31,12 +32,12 @@ function CloseIcon() {
 }
 
 /** 抽屉内的文档 Tab，与文档子页面一一对应 */
-const TABS = [
-  { id: 'guide', no: '01 · GUIDE', label: '使用指南', title: '使用指南', desc: '从创建简历到导出 PDF 的完整流程，并汇总其余教程入口。' },
-  { id: 'markdown', no: '02 · MARKDOWN', label: 'Markdown 教程', title: 'Markdown 简历教程', desc: '常用语法速查，附使用示例与实时渲染效果预览。' },
-  { id: 'theme', no: '03 · THEME', label: '主题配置', title: '主题配置', desc: '模板、视觉风格与页面布局的设置详解与注意事项。' },
-  { id: 'icons', no: '04 · ICONS', label: '图标库', title: '图标库', desc: 'icon: 语法、使用方式与常用内置图标一览。' },
-  { id: 'ai', no: '05 · AI', label: 'AI 助手', title: 'AI 助手', desc: '润色、关键词分析、要点成段，以及 API KEY 的获取与配置。' },
+const TABS: { id: string; no: string; label: Bi; title: Bi; desc: Bi }[] = [
+  { id: 'guide', no: '01 · GUIDE', label: { zh: '使用指南', en: 'Guide' }, title: { zh: '使用指南', en: 'Guide' }, desc: { zh: '从创建简历到导出 PDF 的完整流程，并汇总其余教程入口。', en: 'The full workflow from creating a resume to exporting PDF, plus links to other tutorials.' } },
+  { id: 'markdown', no: '02 · MARKDOWN', label: { zh: 'Markdown 教程', en: 'Markdown' }, title: { zh: 'Markdown 简历教程', en: 'Markdown Resume Tutorial' }, desc: { zh: '常用语法速查，附使用示例与实时渲染效果预览。', en: 'A syntax quick reference with examples and live-rendered previews.' } },
+  { id: 'theme', no: '03 · THEME', label: { zh: '主题配置', en: 'Theme' }, title: { zh: '主题配置', en: 'Theme Settings' }, desc: { zh: '模板、视觉风格与页面布局的设置详解与注意事项。', en: 'Templates, visual style and page layout explained, with notes.' } },
+  { id: 'icons', no: '04 · ICONS', label: { zh: '图标库', en: 'Icons' }, title: { zh: '图标库', en: 'Icon Library' }, desc: { zh: 'icon: 语法、使用方式与常用内置图标一览。', en: 'The icon: syntax, usage and all built-in icons at a glance.' } },
+  { id: 'ai', no: '05 · AI', label: { zh: 'AI 助手', en: 'AI Assistant' }, title: { zh: 'AI 助手', en: 'AI Assistant' }, desc: { zh: '润色、关键词分析、要点成段，以及 API KEY 的获取与配置。', en: 'Polishing, keyword analysis, bullet expansion, and API KEY setup.' } },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -56,6 +57,7 @@ const PATH_TO_TAB: Record<string, TabId> = {
  * 文档间的跳转链接在抽屉内表现为切换 Tab，而非路由跳转。
  */
 export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const tr = useTr();
   const [tab, setTab] = useState<TabId>('guide');
   const scrollRef = useRef<HTMLDivElement>(null);
   // 统一关闭流程：滑出动画结束后再卸载（抽屉为滑入面板，采用对称滑出）
@@ -91,7 +93,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="使用文档">
+    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={tr({ zh: '使用文档', en: 'Documentation' })}>
       <style>{`
         @keyframes docsDrawerIn {
           from { transform: translateX(100%); }
@@ -116,7 +118,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
       {/* 点击遮罩关闭 */}
       <button
         type="button"
-        aria-label="关闭文档"
+        aria-label={tr({ zh: '关闭文档', en: 'Close docs' })}
         onClick={close}
         className={`absolute inset-0 w-full h-full bg-gray-900/20 cursor-default ${closing ? 'modal-backdrop-out' : ''}`}
       />
@@ -129,12 +131,12 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-primary-600">
               &lt; DOCS /&gt;
             </span>
-            <h2 className="text-[14px] font-semibold text-gray-900">使用文档</h2>
+            <h2 className="text-[14px] font-semibold text-gray-900">{tr({ zh: '使用文档', en: 'Documentation' })}</h2>
           </div>
           <button
             type="button"
             onClick={close}
-            aria-label="关闭"
+            aria-label={tr({ zh: '关闭', en: 'Close' })}
             className="w-7 h-7 inline-flex items-center justify-center rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
           >
             <CloseIcon />
@@ -156,7 +158,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
                     : 'bg-white border-gray-200 text-gray-500 hover:text-gray-900 hover:border-gray-300'
                 }`}
               >
-                {t.label}
+                {tr(t.label)}
               </button>
             ))}
           </div>
@@ -170,8 +172,8 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mb-1.5">
                 {meta.no}
               </p>
-              <h3 className="text-lg font-bold tracking-tight text-gray-900">{meta.title}</h3>
-              <p className="text-[12px] text-gray-500 leading-relaxed mt-1.5">{meta.desc}</p>
+              <h3 className="text-lg font-bold tracking-tight text-gray-900">{tr(meta.title)}</h3>
+              <p className="text-[12px] text-gray-500 leading-relaxed mt-1.5">{tr(meta.desc)}</p>
             </header>
 
             <DrawerNavContext.Provider value={handleNav}>
@@ -194,7 +196,7 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             onClick={onClose}
             className="text-[12px] font-medium text-primary-600 hover:text-primary-700 transition-colors"
           >
-            查看完整文档 →
+            {tr({ zh: '查看完整文档 →', en: 'Full documentation →' })}
           </Link>
         </div>
       </aside>

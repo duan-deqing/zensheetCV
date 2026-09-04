@@ -3,11 +3,14 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useResume } from '@/hooks/useResume';
 import { useUI } from '@/store/UIContext';
 import { useEditorDispatch } from '@/store/EditorContext';
+import { useLang, useTr } from '@/i18n/LangContext';
 
 export function ResumeList() {
   const { resumes, currentResume, setCurrentResume, isLoading } = useResumeStore();
   const { fetchResumes } = useResume();
   const { sidebarOpen } = useUI();
+  const { lang } = useLang();
+  const tr = useTr();
   const editorDispatch = useEditorDispatch();
 
   useEffect(() => { fetchResumes(); }, [fetchResumes]);
@@ -22,7 +25,7 @@ export function ResumeList() {
   return (
     <div className="w-64 h-full bg-white border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
-        <h2 className="text-sm font-semibold text-gray-900">我的简历</h2>
+        <h2 className="text-sm font-semibold text-gray-900">{tr({ zh: '我的简历', en: 'My Resumes' })}</h2>
       </div>
       <div className="flex-1 overflow-auto p-2">
         {isLoading ? (
@@ -30,7 +33,7 @@ export function ResumeList() {
             <div className="w-5 h-5 border-2 border-primary-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : resumes.length === 0 ? (
-          <p className="text-xs text-gray-500 text-center py-8">暂无简历，点击下方创建</p>
+          <p className="text-xs text-gray-500 text-center py-8">{tr({ zh: '暂无简历，点击下方创建', en: 'No resumes yet — create one below' })}</p>
         ) : (
           <div className="flex flex-col gap-1">
             {resumes.map((resume) => (
@@ -45,7 +48,7 @@ export function ResumeList() {
               >
                 <div className="text-sm font-medium text-gray-900 truncate">{resume.title}</div>
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {new Date(resume.updated_at).toLocaleDateString('zh-CN')}
+                  {new Date(resume.updated_at).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US')}
                 </div>
               </button>
             ))}
@@ -53,7 +56,7 @@ export function ResumeList() {
         )}
       </div>
       <div className="p-3 border-t border-gray-200">
-        <button className="w-full btn-secondary text-xs py-2">+ 新建简历</button>
+        <button className="w-full btn-secondary text-xs py-2">{tr({ zh: '+ 新建简历', en: '+ New Resume' })}</button>
       </div>
     </div>
   );

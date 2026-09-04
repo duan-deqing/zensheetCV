@@ -1,6 +1,7 @@
 import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
 import { HoverTip } from '@/components/HoverTip';
+import { useTr } from '@/i18n/LangContext';
 
 /** 调色盘线性图标，颜色跟随 currentColor */
 function PaletteIcon() {
@@ -31,6 +32,7 @@ function PhotoIcon() {
 export function PreviewToolbar() {
   const { scale, setScale, isFullscreen, toggleFullscreen } = usePreview();
   const { themePanelOpen, toggleThemePanel, photoModalOpen, togglePhotoModal } = useUI();
+  const tr = useTr();
 
   return (
     <div className="relative flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200">
@@ -41,7 +43,7 @@ export function PreviewToolbar() {
         {'< PREVIEW />'}
       </p>
       <div className="ml-auto flex items-center gap-1 shrink-0">
-        <HoverTip text="上传照片（证件照比例，可在页面上拖动与缩放）">
+        <HoverTip text={tr({ zh: '上传照片（证件照比例，可在页面上拖动与缩放）', en: 'Upload photo (ID-photo ratio, drag & resize on the page)' })}>
           <button
             onClick={togglePhotoModal}
             className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
@@ -51,10 +53,10 @@ export function PreviewToolbar() {
             }`}
           >
             <PhotoIcon />
-            照片
+            {tr({ zh: '照片', en: 'Photo' })}
           </button>
         </HoverTip>
-        <HoverTip text="主题配置">
+        <HoverTip text={tr({ zh: '主题配置', en: 'Theme settings' })}>
           <button
             onClick={toggleThemePanel}
             className={`h-8 px-2.5 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
@@ -64,11 +66,11 @@ export function PreviewToolbar() {
             }`}
           >
             <PaletteIcon />
-            主题
+            {tr({ zh: '主题', en: 'Theme' })}
           </button>
         </HoverTip>
         <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
-        <HoverTip text="缩小">
+        <HoverTip text={tr({ zh: '缩小', en: 'Zoom out' })}>
           <button
             onClick={() => setScale(Math.max(50, scale - 10))}
             className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -77,7 +79,7 @@ export function PreviewToolbar() {
           </button>
         </HoverTip>
         <span className="font-mono text-[13px] text-gray-500 w-10 text-center tabular-nums">{scale}%</span>
-        <HoverTip text="放大">
+        <HoverTip text={tr({ zh: '放大', en: 'Zoom in' })}>
           <button
             onClick={() => setScale(Math.min(150, scale + 10))}
             className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -85,7 +87,7 @@ export function PreviewToolbar() {
             +
           </button>
         </HoverTip>
-        <HoverTip text={isFullscreen ? '退出全屏' : '全屏预览'}>
+        <HoverTip text={isFullscreen ? tr({ zh: '退出全屏', en: 'Exit fullscreen' }) : tr({ zh: '全屏预览', en: 'Fullscreen' })}>
           <button
             onClick={toggleFullscreen}
             className="font-mono text-[13px] w-7 h-7 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors ml-1"

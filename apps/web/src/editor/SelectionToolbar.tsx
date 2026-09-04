@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { editorViewRef, insertMarkdown } from './insertMarkdown';
-import { BUTTON_GROUPS, ToolbarButtonIcon } from './Toolbar';
+import { BUTTON_GROUPS, ToolbarButtonIcon, snippetOf } from './Toolbar';
+import { useTr } from '@/i18n/LangContext';
 
 /** 悬浮工具栏按钮：深底上的浅字样式（与编辑器工具栏同构，配色反白） */
 const SEL_BUTTON_CLASSES =
@@ -10,6 +11,7 @@ const SEL_BUTTON_CLASSES =
  * 按钮与编辑器工具栏完全一致（BUTTON_GROUPS 复用）。
  * 定位基于原生选区 getBoundingClientRect（fixed 悬浮），mousedown 阻止默认以保住选区 */
 export function SelectionToolbar() {
+  const tr = useTr();
   const [pos, setPos] = useState<{ left: number; top: number; below: boolean } | null>(null);
   /** 鼠标是否正在编辑器内拖拽选择：拖拽过程中 selectionchange 只隐藏不显示 */
   const mouseDownRef = useRef(false);
@@ -94,7 +96,7 @@ export function SelectionToolbar() {
   return (
     <div
       role="toolbar"
-      aria-label="选中文字工具栏"
+      aria-label={tr({ zh: '选中文字工具栏', en: 'Selection toolbar' })}
       onMouseDown={(e) => e.preventDefault()}
       className="selection-toolbar-in fixed z-50 flex items-center gap-0.5 bg-gray-900/95 backdrop-blur-sm rounded-lg shadow-lg px-1 py-1"
       style={{
@@ -121,8 +123,8 @@ export function SelectionToolbar() {
               <button
                 key={btn.label}
                 type="button"
-                onClick={() => insertText(btn.before ?? '', btn.after ?? '', btn.atLineStart)}
-                aria-label={btn.title}
+                onClick={() => insertText(snippetOf(btn.before), btn.after ?? '', btn.atLineStart)}
+                aria-label={tr(btn.title)}
                 className={SEL_BUTTON_CLASSES}
                 style={{ fontWeight: btn.fontWeight, fontStyle: btn.fontStyle }}
               >

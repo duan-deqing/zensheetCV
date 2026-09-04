@@ -10,7 +10,8 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
-import { SAMPLE_MARKDOWN } from '@/sampleResume';
+import { sampleMarkdown } from '@/sampleResume';
+import { useLang, useTr, type Bi } from '@/i18n/LangContext';
 import { CONTENT_PADDING_MM, DEFAULT_CONTENT_PADDING, elementFontSizeVars, fontScale, MARGIN_MM, rehypeWrapH2Text, spacingScale, resumeColsCss, resumeFontSizeCss } from '@/preview/previewShared';
 
 /** 每个浏览器最多可持有的简历份数 */
@@ -76,24 +77,24 @@ function EditIcon({ className }: { className?: string }) {
   );
 }
 
-/** 页脚随缘语录：每次进入页面随机展示一句 */
-const QUOTES = [
-  '纸上得来终觉浅，绝知此事要躬行。',
-  '种一棵树最好的时间是十年前，其次是现在。',
-  '路虽远，行则将至；事虽难，做则必成。',
-  '不积跬步，无以至千里。',
-  '每一份简历，都是过去对未来的自荐信。',
-  '山不让尘，川不辞盈。',
-  '星光不问赶路人，时光不负有心人。',
-  '所谓成长，就是把经历酿成能力。',
-  '机会总是留给有准备的人。',
-  '流水不争先，争的是滔滔不绝。',
-  '工具善用则益，AI 替你落笔，但路要你自己走过。',
-  '机器可以生成文字，唯有你的人生值得书写。',
+/** 页脚随缘语录：每次进入页面随机展示一句（英文为意境翻译） */
+const QUOTES: Bi[] = [
+  { zh: '纸上得来终觉浅，绝知此事要躬行。', en: 'What you read runs shallow — only doing makes it yours.' },
+  { zh: '种一棵树最好的时间是十年前，其次是现在。', en: 'The best time to plant a tree was ten years ago. The second best is now.' },
+  { zh: '路虽远，行则将至；事虽难，做则必成。', en: 'However long the road, walking takes you there; however hard the task, doing gets it done.' },
+  { zh: '不积跬步，无以至千里。', en: 'Great distances are gathered step by step.' },
+  { zh: '每一份简历，都是过去对未来的自荐信。', en: 'Every resume is a letter from your past self to your future.' },
+  { zh: '山不让尘，川不辞盈。', en: 'Mountains rise by welcoming dust; rivers swell by taking in streams.' },
+  { zh: '星光不问赶路人，时光不负有心人。', en: 'The stars never question the traveler, and time rewards a devoted heart.' },
+  { zh: '所谓成长，就是把经历酿成能力。', en: 'Growth is brewing experience into ability.' },
+  { zh: '机会总是留给有准备的人。', en: 'Chance favors the prepared mind.' },
+  { zh: '流水不争先，争的是滔滔不绝。', en: 'Flowing water never races ahead — it wins by simply never stopping.' },
+  { zh: '工具善用则益，AI 替你落笔，但路要你自己走过。', en: 'AI can hold the pen for you, but the road is yours to walk.' },
+  { zh: '机器可以生成文字，唯有你的人生值得书写。', en: 'Machines can generate words; only your life is worth writing.' },
 ];
 
 /** 从语录中随机取一条（每次刷新 / 进入页面都会重新选择） */
-function pickQuote() {
+function pickQuote(): Bi {
   return QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
 
@@ -169,6 +170,8 @@ export function ResumesPage() {
   const { fetchResumes, createResume, copyResume, deleteResume } = useResume();
   const editorDispatch = useEditorDispatch();
   const navigate = useNavigate();
+  const { lang } = useLang();
+  const tr = useTr();
   const [creating, setCreating] = useState(false);
   // 正在复制中的简历 id（按钮显示进行中状态）
   const [copyingId, setCopyingId] = useState<string | null>(null);
@@ -186,8 +189,8 @@ export function ResumesPage() {
     if (atLimit) return;
     setCreating(true);
     const resume = await createResume({
-      title: '未命名简历',
-      markdown: SAMPLE_MARKDOWN,
+      title: tr({ zh: '未命名简历', en: 'Untitled Resume' }),
+      markdown: sampleMarkdown(lang),
     });
     setCreating(false);
     if (resume) {
@@ -226,20 +229,20 @@ export function ResumesPage() {
               &lt; LIBRARY /&gt;
             </p>
             <div className="flex items-baseline gap-4">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">我的简历</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">{tr({ zh: '我的简历', en: 'My Resumes' })}</h1>
               {!isLoading && !error && (
                 <p className="font-mono text-xs uppercase tracking-[0.2em] text-gray-400 tabular-nums">
                   {String(resumes.length).padStart(2, '0')} DOCS
                 </p>
               )}
             </div>
-            <p className="text-sm text-gray-500 mt-2">选择一份简历开始编辑，或创建一份新的简历</p>
+            <p className="text-sm text-gray-500 mt-2">{tr({ zh: '选择一份简历开始编辑，或创建一份新的简历', en: 'Pick a resume to start editing, or create a new one' })}</p>
           </div>
         </div>
 
         {error && (
           <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">加载简历失败：{error}</p>
+            <p className="text-sm text-red-600">{tr({ zh: `加载简历失败：${error}`, en: `Failed to load resumes: ${error}` })}</p>
           </div>
         )}
 
@@ -247,7 +250,10 @@ export function ResumesPage() {
         {atLimit && (
           <div className="mb-6 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
             <p className="text-sm text-amber-600">
-              最多可创建 {MAX_RESUMES} 份简历，已达上限；删除不需要的简历后可继续新建或复制。
+              {tr({
+                zh: `最多可创建 ${MAX_RESUMES} 份简历，已达上限；删除不需要的简历后可继续新建或复制。`,
+                en: `You can keep up to ${MAX_RESUMES} resumes — the limit is reached. Delete one to create or duplicate more.`,
+              })}
             </p>
           </div>
         )}
@@ -276,7 +282,7 @@ export function ResumesPage() {
                 <div className="p-4 flex flex-col gap-1.5 flex-1">
                   <h3 className="text-base font-semibold text-gray-900 truncate">{resume.title}</h3>
                   <p className="font-mono text-[11px] text-gray-400 tabular-nums">
-                    UPDATED {new Date(resume.updated_at).toLocaleString('zh-CN')}
+                    UPDATED {new Date(resume.updated_at).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US')}
                   </p>
                   {/* 操作行：开始编辑 + 复制靠左（同款文字样式），删除靠右 */}
                   <div className="mt-auto pt-3 flex items-center justify-between">
@@ -286,7 +292,7 @@ export function ResumesPage() {
                         className="inline-flex items-center gap-1 text-xs text-primary-600 font-medium hover:text-primary-700 active:scale-[0.98] transition-all"
                       >
                         <EditIcon className="w-3.5 h-3.5" />
-                        开始编辑
+                        {tr({ zh: '开始编辑', en: 'Edit' })}
                       </button>
                       <button
                         onClick={(e) => handleCopy(e, resume)}
@@ -294,14 +300,14 @@ export function ResumesPage() {
                         className="inline-flex items-center gap-1 text-xs text-primary-600 font-medium hover:text-primary-700 active:scale-[0.98] transition-all disabled:cursor-wait disabled:opacity-60"
                       >
                         <CopyIcon className={`w-3.5 h-3.5 ${copyingId === resume.id ? 'animate-pulse' : ''}`} />
-                        {copyingId === resume.id ? '复制中...' : '复制'}
+                        {copyingId === resume.id ? tr({ zh: '复制中...', en: 'Duplicating...' }) : tr({ zh: '复制', en: 'Duplicate' })}
                       </button>
                     </div>
-                    <HoverTip text="删除简历">
+                    <HoverTip text={tr({ zh: '删除简历', en: 'Delete resume' })}>
                       <button
                         onClick={(e) => handleDelete(e, resume.id)}
                         className="p-1.5 -m-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
-                        aria-label={`删除 ${resume.title}`}
+                        aria-label={tr({ zh: `删除 ${resume.title}`, en: `Delete ${resume.title}` })}
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
@@ -335,17 +341,17 @@ export function ResumesPage() {
               <span className="flex flex-col items-center gap-1">
                 <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">
                   {creating
-                    ? '创建中...'
+                    ? tr({ zh: '创建中...', en: 'Creating...' })
                     : atLimit
-                      ? `已达创建上限（${MAX_RESUMES} 份）`
+                      ? tr({ zh: `已达创建上限（${MAX_RESUMES} 份）`, en: `Creation limit reached (${MAX_RESUMES})` })
                       : resumes.length === 0
-                        ? '新建你的第一份简历'
-                        : '新建简历'}
+                        ? tr({ zh: '新建你的第一份简历', en: 'Create your first resume' })
+                        : tr({ zh: '新建简历', en: 'New Resume' })}
                 </span>
                 {atLimit && !creating ? (
-                  <span className="text-xs text-gray-400">删除不需要的简历后可继续创建</span>
+                  <span className="text-xs text-gray-400">{tr({ zh: '删除不需要的简历后可继续创建', en: 'Delete a resume to create more' })}</span>
                 ) : resumes.length === 0 && !creating ? (
-                  <span className="text-xs text-gray-400">写下姓名与经历，其余交给模板</span>
+                  <span className="text-xs text-gray-400">{tr({ zh: '写下姓名与经历，其余交给模板', en: 'Write your name and experience — the template does the rest' })}</span>
                 ) : null}
               </span>
             </button>
@@ -356,7 +362,7 @@ export function ResumesPage() {
       {/* 页脚：固定底部，随机语录，每次刷新换一句 */}
       <footer className="fixed bottom-0 inset-x-0 z-10 bg-white/90 backdrop-blur border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-6 py-3.5 text-center">
-          <p className="text-[13px] text-gray-400 tracking-wide">「 {quote} 」</p>
+          <p className="text-[13px] text-gray-400 tracking-wide">「 {tr(quote)} 」</p>
         </div>
       </footer>
     </div>
