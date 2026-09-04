@@ -209,18 +209,20 @@ export function CoffeeModal() {
           </button>
         </div>
 
-        {/* 内容：感谢卡片（已支持后）/ 收款码（可切换）+ 文案 */}
+        {/* 内容：感谢卡片（已支持后）/ 收款码（可切换）+ 文案，两分支共用同一容器保证比例与对齐一致 */}
         {celebrated ? (
-          <div className="coffee-qr-in w-[270px] h-[330px] flex flex-col items-center justify-center">
-            <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
-              <CheckIcon className="w-7 h-7 text-emerald-500" />
+          <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
+            <div className="coffee-qr-in w-[270px] h-[330px] flex flex-col items-center justify-center">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                <CheckIcon className="w-7 h-7 text-emerald-500" />
+              </div>
+              <p className="mt-4 text-lg font-semibold text-gray-900">感谢支持！</p>
+              <p className="mt-2 text-[13px] text-gray-500 text-center leading-relaxed">
+                你的鼓励是持续更新的动力
+                <br />
+                祝你求职顺利，offer 满满！
+              </p>
             </div>
-            <p className="mt-4 text-lg font-semibold text-gray-900">感谢支持！</p>
-            <p className="mt-2 text-[13px] text-gray-500 text-center leading-relaxed">
-              你的鼓励是持续更新的动力
-              <br />
-              祝你求职顺利，offer 满满！
-            </p>
           </div>
         ) : (
           <div className="px-5 py-4 flex flex-col items-center overflow-y-auto">
