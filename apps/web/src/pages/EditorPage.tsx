@@ -15,6 +15,7 @@ import { useResume } from '@/hooks/useResume';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { usePreview } from '@/store/PreviewContext';
 import { useUI } from '@/store/UIContext';
+import { useModalClose } from '@/hooks/useModalClose';
 import { getTemplateById, toApiTemplate } from '@/templates';
 import type { MarginOption, ThemeConfig } from '@stylan/shared-types';
 import { DEFAULT_CONTENT_PADDING } from '@/preview/previewShared';
@@ -64,7 +65,9 @@ export function EditorPage() {
   const { fetchResume } = useResume();
   const editorDispatch = useEditorDispatch();
   const { setCurrentTemplate, setThemeConfig, themeReady, setThemeReady, isFullscreen, toggleFullscreen } = usePreview();
-  const { aiWindowOpen } = useUI();
+  const { aiWindowOpen, toggleAIWindow } = useUI();
+  // AI 助手统一关闭流程：滑出动画结束后再卸载（wrapper 携拖拽条整体动画）
+  const { closing: aiClosing, close: closeAIWindow } = useModalClose(aiWindowOpen, toggleAIWindow);
 
   // 全屏预览时按 Esc 退出
   useEffect(() => {
@@ -200,8 +203,19 @@ export function EditorPage() {
           to { opacity: 1; transform: translateY(0); }
         }
         .fullscreen-in { animation: fullscreenIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        /* AI 助手侧栏：打开滑入 / 关闭滑出（wrapper 携拖拽条整体） */
+        @keyframes aiWindowIn {
+          from { opacity: 0; transform: translateX(16px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes aiWindowOut {
+          from { opacity: 1; transform: translateX(0); }
+          to { opacity: 0; transform: translateX(16px); }
+        }
+        .ai-window-in { animation: aiWindowIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .ai-window-out { animation: aiWindowOut 0.18s ease-in both; }
         @media (prefers-reduced-motion: reduce) {
-          .editor-fade-up, .fullscreen-in { animation: none; }
+          .editor-fade-up, .fullscreen-in, .ai-window-in, .ai-window-out { animation: none; }
         }
       `}</style>
       {/* 全屏预览：隐藏顶栏与编辑器列，仅保留预览 */}
@@ -233,17 +247,18 @@ export function EditorPage() {
           <div className="editor-fade-up flex-1 min-w-0" style={{ animationDelay: '0.08s' }}>
             <ResumePreview />
           </div>
-          {/* AI 助手聊天窗口：与预览窗口同层级，打开时占据页面右侧 */}
-          {aiWindowOpen && (
-            <>
+          {/* AI 助手聊天窗口：与预览窗口同层级，打开时占据页面右侧；
+              关闭时 wrapper 先播滑出动画（携拖拽条整体），结束后再卸载 */}
+          {(aiWindowOpen || aiClosing) && (
+            <div className={`${aiClosing ? 'ai-window-out' : 'ai-window-in'} flex items-stretch min-w-0 shrink-0`}>
               <HoverTip text="拖拽调整 AI 助手宽度">
                 <div
                   className="w-1.5 my-1 mx-2.5 cursor-col-resize bg-gray-200 hover:bg-primary-400 active:bg-primary-500 transition-colors rounded-full shrink-0"
                   onMouseDown={startAIDrag}
                 />
               </HoverTip>
-              <AIWindow width={aiWidth} resumeId={id} />
-            </>
+              <AIWindow width={aiWidth} resumeId={id} onClose={closeAIWindow} />
+            </div>
           )}
           </div>
         )}

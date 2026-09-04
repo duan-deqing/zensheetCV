@@ -224,8 +224,10 @@ function AIStatus({ meta }: { meta: AIMeta }) {
  * 外观与编辑器/预览同为圆角卡片。多轮流式对话，BYOK 配置随请求携带；
  * Esc / 关闭按钮 / 再次点击 AI 按钮均可关闭。
  */
-export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?: string }) {
+export function AIWindow({ width = 320, resumeId, onClose }: { width?: number; resumeId?: string; onClose?: () => void }) {
   const { aiWindowOpen, toggleAIWindow } = useUI();
+  // 统一关闭入口：由 EditorPage 的关闭流程驱动（滑出动画结束后卸载）
+  const close = onClose ?? toggleAIWindow;
   const { markdown } = useEditor();
   const { user } = useAuth();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -272,11 +274,11 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
   useEffect(() => {
     if (!aiWindowOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') toggleAIWindow();
+      if (e.key === 'Escape') close();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [aiWindowOpen, toggleAIWindow]);
+  }, [aiWindowOpen, close]);
 
   // 打开时聚焦输入框；消息变化时滚动到底部
   useEffect(() => {
@@ -406,21 +408,10 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
 
   return (
     <aside
-      className="ai-side-in relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
+      className="relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col"
       style={{ width }}
       aria-label="AI 助手"
     >
-      <style>{`
-        @keyframes aiSideIn {
-          from { opacity: 0; transform: translateX(16px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .ai-side-in { animation: aiSideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @media (prefers-reduced-motion: reduce) {
-          .ai-side-in { animation: none; }
-        }
-      `}</style>
-
       {/* 顶栏：与主题面板同构（mono 眉标 + 关闭按钮） */}
       <div className="flex items-center gap-3 px-4 py-2 bg-white border-b border-gray-200 shrink-0">
         <p
@@ -431,7 +422,7 @@ export function AIWindow({ width = 320, resumeId }: { width?: number; resumeId?:
         </p>
         <HoverTip text="关闭">
           <button
-            onClick={toggleAIWindow}
+            onClick={close}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
             aria-label="关闭 AI 助手"
           >
