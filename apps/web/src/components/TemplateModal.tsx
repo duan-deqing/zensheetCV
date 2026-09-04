@@ -87,7 +87,7 @@ export function TemplateModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={tr({ zh: '模板库', en: 'Template Library' })}
@@ -123,10 +123,11 @@ export function TemplateModal() {
         onClick={close}
         aria-hidden="true"
       />
-      {/* 面板：宽度按屏幕 16:9 比例计算，顶栏固定、滚动区限制在其下方 */}
+      {/* 面板：宽度按屏幕 16:9 比例计算，顶栏固定、滚动区限制在其下方；
+          宽高均以容器内宽/高为上限（100%），手机 p-2 / 桌面 p-6 下都不会溢出视口 */}
       <div
         className={`${closing ? 'modal-out' : 'tpl-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden`}
-        style={{ width: 'min(1600px, 94vw, calc(82vh * 16 / 9))', maxHeight: '85vh' }}
+        style={{ width: 'min(1600px, 100%, calc(82vh * 16 / 9))', maxHeight: 'min(85vh, calc(100% - 1rem))' }}
       >
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">

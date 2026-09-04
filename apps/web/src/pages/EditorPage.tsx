@@ -303,7 +303,7 @@ export function EditorPage() {
             </div>
           ) : (
             <div
-              className={`fixed inset-0 z-50 p-3 bg-gray-900/30 backdrop-blur-[2px] ${
+              className={`fixed inset-0 z-50 p-3 flex bg-gray-900/30 backdrop-blur-[2px] ${
                 aiClosing ? 'ai-window-out' : 'ai-window-in'
               }`}
             >

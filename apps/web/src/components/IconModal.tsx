@@ -74,7 +74,7 @@ export function IconModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={tr({ zh: '图标库', en: 'Icon Library' })}
@@ -107,8 +107,8 @@ export function IconModal() {
         onClick={close}
         aria-hidden="true"
       />
-      {/* 面板：图标网格 + 底部提示区 */}
-      <div className={`${closing ? 'modal-out' : 'icon-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-[min(760px,92vw)] max-h-[78vh]`}>
+      {/* 面板：图标网格 + 底部提示区；宽高跟随容器内宽/高（100%），手机 p-2 / 桌面 p-6 下都不会溢出视口 */}
+      <div className={`${closing ? 'modal-out' : 'icon-modal-in'} relative flex flex-col bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden w-[min(760px,100%)] max-h-[min(78vh,calc(100%-1rem))]`}>
         {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
         <div className="flex items-center gap-3 px-5 py-2 bg-white border-b border-gray-200 flex-none">
           <p
@@ -129,7 +129,7 @@ export function IconModal() {
           </HoverTip>
         </div>
 
-        <div className="grid grid-cols-6 sm:grid-cols-8 gap-2.5 p-5 overflow-y-auto flex-1 min-h-0 content-start">
+        <div className="grid grid-cols-4 sm:grid-cols-8 gap-2.5 p-5 overflow-y-auto flex-1 min-h-0 content-start">
           {Object.entries(icons).map(([key, svg]) => (
             <HoverTip key={key} text={tr({ zh: `点击复制 icon:${key}`, en: `Click to copy icon:${key}` })}>
               <button
@@ -146,8 +146,8 @@ export function IconModal() {
           ))}
         </div>
 
-        {/* 底部提示：独立区域，说明用法；右侧内联显示复制结果 */}
-        <div className="flex-none border-t border-gray-200 bg-gray-50/70 px-5 py-2.5 flex items-center gap-3">
+        {/* 底部提示：独立区域，说明用法；右侧内联显示复制结果（手机端窄时自动换行） */}
+        <div className="flex-none border-t border-gray-200 bg-gray-50/70 px-5 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1">
           <p className="text-[12px] text-gray-500">
             {tr({ zh: 'Markdown 中写 ', en: 'Write ' })}
             <code className="font-mono text-gray-700">{tr({ zh: 'icon:名称', en: 'icon:name' })}</code>
