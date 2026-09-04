@@ -91,6 +91,37 @@ function ExportIcon() {
 }
 
 
+/** 汉堡 / 关闭图标（手机端折叠菜单按钮），颜色跟随 currentColor */
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+      <line x1="4" y1="7" x2="20" y2="7" />
+      <line x1="4" y1="12" x2="20" y2="12" />
+      <line x1="4" y1="17" x2="20" y2="17" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4" aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
+
+/** 保存图标（手机折叠菜单用），颜色跟随 currentColor */
+function SaveIconMenu() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5" aria-hidden="true">
+      <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" />
+      <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7" />
+      <path d="M7 3v4a1 1 0 0 0 1 1h7" />
+    </svg>
+  );
+}
+
 /** 文件菜单：导入 / 导出 Markdown，弹层与全站下拉风格一致，结果气泡显示在按钮上方 */
 function FileMenu() {
   const { markdown } = useEditor();
@@ -391,7 +422,89 @@ export function TopBar() {
   const tr = useTr();
   const { exportPDF, isExporting } = usePDFExport();
   const { status, exiting, show } = useButtonStatus();
-  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow, toggleCoffeeModal } = useUI();
+  const { toggleTemplateModal, toggleIconModal, toggleUserModal, docsDrawerOpen, toggleDocsDrawer, aiWindowOpen, toggleAIWindow, toggleCoffeeModal, pulseSaved } = useUI();
+  const { markdown, isDirty } = useEditor();
+  const dispatch = useEditorDispatch();
+  const { currentResume } = useResumeStore();
+  const { updateResume } = useResume();
+
+  // 手机端折叠菜单状态与关闭监听（点击外部 / Escape）
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleDown = (e: MouseEvent) => {
+      if (!barRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handleDown);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleDown);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [menuOpen]);
+
+  /** 手机菜单：保存（与 SaveButton 桌面行为一致：提交 markdown + 模板 + 主题） */
+  const handleSave = async () => {
+    if (!currentResume) {
+      show('error', tr({ zh: '请先创建简历', en: 'Create a resume first' }));
+      return;
+    }
+    setSaving(true);
+    const result = await updateResume(currentResume.id, {
+      markdown,
+      template_id: currentResume.template_id,
+      theme_config: currentResume.theme_config,
+    });
+    if (result) {
+      dispatch({ type: 'MARK_CLEAN' });
+      show('success', tr({ zh: '保存成功', en: 'Saved successfully' }));
+      pulseSaved();
+    } else {
+      show('error', tr({ zh: '保存失败', en: 'Save failed' }));
+    }
+    setSaving(false);
+  };
+
+  // 手机折叠菜单项样式（与首页导航折叠菜单一致）
+  const menuItem = 'w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors';
+  const menuItemActive = 'w-full flex items-center gap-2.5 px-4 py-2.5 text-sm bg-primary-50 text-primary-600 font-medium';
+
+  /** 手机菜单：导入 Markdown（与 FileMenu 桌面行为一致） */
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // 允许重复导入同一文件
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (!text.trim()) {
+        show('error', tr({ zh: '文件内容为空', en: 'File is empty' }));
+        return;
+      }
+      dispatch({ type: 'SET_MARKDOWN', payload: text });
+      show('success', tr({ zh: '导入成功', en: 'Imported successfully' }));
+    } catch {
+      show('error', tr({ zh: '文件读取失败', en: 'Failed to read file' }));
+    }
+  };
+
+  /** 手机菜单：导出 Markdown 文件 */
+  const handleExportMd = () => {
+    const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(currentResume?.title || tr({ zh: '简历', en: 'Resume' })).replace(/[\\/:*?"<>|]/g, '_')}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    show('success', tr({ zh: 'Markdown 导出成功', en: 'Markdown exported' }));
+  };
 
   const handleExportPDF = async () => {
     // 纯前端导出：调起浏览器打印（预览分页 → 另存为 PDF）
@@ -424,114 +537,290 @@ export function TopBar() {
           </HoverTip>
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
           <EditableTitle onNotify={show} />
-          <FileMenu />
-          {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
-          <HoverTip text={tr({ zh: '模板库', en: 'Templates' })}>
-            <button
-              type="button"
-              onClick={toggleTemplateModal}
-              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <LayoutIcon />
-              <span className="hidden sm:inline">{tr({ zh: '模板', en: 'Templates' })}</span>
-            </button>
-          </HoverTip>
-          {/* 图标库入口：点击图标复制 icon:名称 语法 */}
-          <HoverTip text={tr({ zh: '图标库', en: 'Icons' })}>
-            <button
-              type="button"
-              onClick={toggleIconModal}
-              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <SmileIcon />
-              <span className="hidden sm:inline">{tr({ zh: '图标', en: 'Icons' })}</span>
-            </button>
-          </HoverTip>
-          {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
-          <HoverTip text={tr({ zh: '使用文档', en: 'Docs' })}>
-            <button
-              type="button"
-              onClick={toggleDocsDrawer}
-              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <BookIcon />
-              <span className="hidden sm:inline">{tr({ zh: '文档', en: 'Docs' })}</span>
-            </button>
-          </HoverTip>
-          {/* AI 助手入口：聊天窗口挤入预览右侧 */}
-          <HoverTip text={tr({ zh: 'AI 助手', en: 'AI Assistant' })}>
-            <button
-              type="button"
-              onClick={toggleAIWindow}
-              aria-pressed={aiWindowOpen}
-              className={`px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
-                aiWindowOpen
-                  ? 'text-primary-700 bg-primary-50'
-                  : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
-              }`}
-            >
-              <SparkleIcon />
-              <span className="hidden sm:inline">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
-            </button>
-          </HoverTip>
-          {/* 请作者喝杯咖啡：收款码弹窗 */}
-          <HoverTip text={tr({ zh: '请作者喝杯咖啡', en: 'Buy Me a Coffee' })}>
-            <button
-              type="button"
-              onClick={toggleCoffeeModal}
-              className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <CoffeeIcon />
-              <span className="hidden sm:inline">Coffee</span>
-            </button>
-          </HoverTip>
+          {/* 以下功能入口手机端收进折叠菜单（md 起恢复栏内直显） */}
+          <div className="hidden md:flex items-center gap-1 sm:gap-3 min-w-0">
+            <FileMenu />
+            {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
+            <HoverTip text={tr({ zh: '模板库', en: 'Templates' })}>
+              <button
+                type="button"
+                onClick={toggleTemplateModal}
+                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <LayoutIcon />
+                <span className="hidden sm:inline">{tr({ zh: '模板', en: 'Templates' })}</span>
+              </button>
+            </HoverTip>
+            {/* 图标库入口：点击图标复制 icon:名称 语法 */}
+            <HoverTip text={tr({ zh: '图标库', en: 'Icons' })}>
+              <button
+                type="button"
+                onClick={toggleIconModal}
+                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <SmileIcon />
+                <span className="hidden sm:inline">{tr({ zh: '图标', en: 'Icons' })}</span>
+              </button>
+            </HoverTip>
+            {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
+            <HoverTip text={tr({ zh: '使用文档', en: 'Docs' })}>
+              <button
+                type="button"
+                onClick={toggleDocsDrawer}
+                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <BookIcon />
+                <span className="hidden sm:inline">{tr({ zh: '文档', en: 'Docs' })}</span>
+              </button>
+            </HoverTip>
+            {/* AI 助手入口：聊天窗口挤入预览右侧 */}
+            <HoverTip text={tr({ zh: 'AI 助手', en: 'AI Assistant' })}>
+              <button
+                type="button"
+                onClick={toggleAIWindow}
+                aria-pressed={aiWindowOpen}
+                className={`px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+                  aiWindowOpen
+                    ? 'text-primary-700 bg-primary-50'
+                    : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
+                }`}
+              >
+                <SparkleIcon />
+                <span className="hidden sm:inline">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
+              </button>
+            </HoverTip>
+            {/* 请作者喝杯咖啡：收款码弹窗 */}
+            <HoverTip text={tr({ zh: '请作者喝杯咖啡', en: 'Buy Me a Coffee' })}>
+              <button
+                type="button"
+                onClick={toggleCoffeeModal}
+                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <CoffeeIcon />
+                <span className="hidden sm:inline">Coffee</span>
+              </button>
+            </HoverTip>
+          </div>
         </div>
 
         <div className="flex items-center gap-1 sm:gap-1.5">
-          <span className="relative inline-flex">
-            <SaveButton />
-            {/* 导出结果气泡与保存结果共用同一区域：保存按钮左侧 */}
-            <ButtonStatus status={status} exiting={exiting} placement="left" />
-          </span>
-          <button
-          onClick={handleExportPDF}
-          disabled={isExporting}
-          className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
-        >
-          <ExportIcon />
-          <span className="hidden sm:inline">
-            {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
-          </span>
-        </button>
-        <div className="flex items-center gap-2 ml-0.5 sm:ml-1.5 pl-2 sm:pl-3 border-l border-gray-200">
-          {/* 头像 + 用户名，点击打开用户信息弹窗 */}
-          <HoverTip text={tr({ zh: '用户信息', en: 'User info' })}>
+          {/* 保存 / 导出 / 用户：手机端收进折叠菜单（md 起恢复栏内直显） */}
+          <div className="hidden md:flex items-center gap-1 sm:gap-1.5">
+            <span className="relative inline-flex">
+              <SaveButton />
+              {/* 导出结果气泡与保存结果共用同一区域：保存按钮左侧 */}
+              <ButtonStatus status={status} exiting={exiting} placement="left" />
+            </span>
             <button
-              onClick={toggleUserModal}
-              className="flex items-center gap-2 group"
-              aria-haspopup="dialog"
+              onClick={handleExportPDF}
+              disabled={isExporting}
+              className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+            >
+              <ExportIcon />
+              <span className="hidden sm:inline">
+                {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
+              </span>
+            </button>
+            <div className="flex items-center gap-2 ml-0.5 sm:ml-1.5 pl-2 sm:pl-3 border-l border-gray-200">
+              {/* 头像 + 用户名，点击打开用户信息弹窗 */}
+              <HoverTip text={tr({ zh: '用户信息', en: 'User info' })}>
+                <button
+                  onClick={toggleUserModal}
+                  className="flex items-center gap-2 group"
+                  aria-haspopup="dialog"
+                >
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={tr({ zh: `${user.name} 的头像`, en: `${user.name}'s avatar` })}
+                      className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                    />
+                  ) : (
+                    <span
+                      className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                      aria-hidden="true"
+                    >
+                      {user.name.slice(0, 1).toUpperCase()}
+                    </span>
+                  )}
+                  <span className="hidden sm:inline text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
+                    {user.name}
+                  </span>
+                </button>
+              </HoverTip>
+            </div>
+          </div>
+          {/* 手机端折叠按钮：汉堡 ↔ 关闭 */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((p) => !p)}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? tr({ zh: '关闭菜单', en: 'Close menu' }) : tr({ zh: '打开菜单', en: 'Open menu' })}
+            className="md:hidden flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            {menuOpen ? <CloseIcon /> : <MenuIcon />}
+          </button>
+        </div>
+
+        {/* 手机端折叠菜单：收纳文件 / 功能 / 保存导出 / 用户全部入口（md 起隐藏） */}
+        {menuOpen && (
+          <div
+            role="menu"
+            className="nav-menu-pop md:hidden absolute left-2 right-2 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
+          >
+            <style>{`
+              @keyframes navMenuIn {
+                from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+                to { opacity: 1; transform: none; }
+              }
+              .nav-menu-pop { animation: navMenuIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: top right; }
+              @media (prefers-reduced-motion: reduce) {
+                .nav-menu-pop { animation: none; }
+              }
+            `}</style>
+            {/* 隐藏的文件选择框：导入 Markdown */}
+            <input ref={importInputRef} type="file" accept=".md,.markdown,.txt" className="hidden" onChange={handleImportFile} />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                importInputRef.current?.click();
+              }}
+              className={menuItem}
+            >
+              <FileIcon />
+              {tr({ zh: '导入 Markdown', en: 'Import Markdown' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                handleExportMd();
+              }}
+              className={menuItem}
+            >
+              <FileIcon />
+              {tr({ zh: '导出 Markdown', en: 'Export Markdown' })}
+            </button>
+            <div className="my-1.5 h-px bg-gray-100" aria-hidden="true" />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleTemplateModal();
+              }}
+              className={menuItem}
+            >
+              <LayoutIcon />
+              {tr({ zh: '模板库', en: 'Templates' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleIconModal();
+              }}
+              className={menuItem}
+            >
+              <SmileIcon />
+              {tr({ zh: '图标库', en: 'Icons' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleDocsDrawer();
+              }}
+              className={menuItem}
+            >
+              <BookIcon />
+              {tr({ zh: '使用文档', en: 'Docs' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleAIWindow();
+              }}
+              className={aiWindowOpen ? menuItemActive : menuItem}
+            >
+              <SparkleIcon />
+              {tr({ zh: 'AI 助手', en: 'AI Assistant' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleCoffeeModal();
+              }}
+              className={menuItem}
+            >
+              <CoffeeIcon />
+              Coffee
+            </button>
+            <div className="my-1.5 h-px bg-gray-100" aria-hidden="true" />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                void handleSave();
+              }}
+              disabled={!isDirty && !saving}
+              className={`${menuItem} disabled:opacity-40 disabled:hover:bg-transparent`}
+            >
+              <SaveIconMenu />
+              {saving
+                ? tr({ zh: '保存中...', en: 'Saving…' })
+                : isDirty
+                  ? tr({ zh: '保存', en: 'Save' })
+                  : tr({ zh: '已保存', en: 'Saved' })}
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                void handleExportPDF();
+              }}
+              disabled={isExporting}
+              className={`${menuItem} disabled:opacity-40 disabled:hover:bg-transparent`}
+            >
+              <ExportIcon />
+              {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
+            </button>
+            <div className="my-1.5 h-px bg-gray-100" aria-hidden="true" />
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMenuOpen(false);
+                toggleUserModal();
+              }}
+              className={menuItem}
             >
               {user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={tr({ zh: `${user.name} 的头像`, en: `${user.name}'s avatar` })}
-                  className="w-6 h-6 rounded-full object-cover border border-gray-200"
-                />
+                <img src={user.avatar} alt="" className="w-5 h-5 rounded-full object-cover border border-gray-200" />
               ) : (
                 <span
-                  className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
+                  className="w-5 h-5 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[10px] font-semibold select-none"
                   aria-hidden="true"
                 >
                   {user.name.slice(0, 1).toUpperCase()}
                 </span>
               )}
-              <span className="hidden sm:inline text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
-                {user.name}
-              </span>
+              {user.name || tr({ zh: '用户信息', en: 'User info' })}
             </button>
-          </HoverTip>
-        </div>
-        </div>
+          </div>
+        )}
       </div>
       <DocsDrawer open={docsDrawerOpen} onClose={toggleDocsDrawer} />
       {/* 请作者喝杯咖啡（收款码）弹窗 */}
