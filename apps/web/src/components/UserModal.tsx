@@ -57,6 +57,25 @@ const TABS: { id: UserTab; label: string }[] = [
   { id: 'about', label: '关于' },
 ];
 
+/** 线性铅笔图标：用户名编辑入口，颜色跟随 currentColor */
+function PencilIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-3.5 h-3.5"
+      aria-hidden="true"
+    >
+      <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+      <path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z" />
+    </svg>
+  );
+}
+
 /** 获取模型列表按钮：加载中禁用 */
 function FetchModelsButton({
   state,
@@ -469,6 +488,21 @@ export function UserModal() {
   const [resumeCount, setResumeCount] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 用户名行内编辑：点击铅笔进入编辑态，Enter / 失焦保存，Esc 取消
+  const [editingName, setEditingName] = useState(false);
+  const [nameDraft, setNameDraft] = useState('');
+
+  const startEditName = () => {
+    setNameDraft(user.name);
+    setEditingName(true);
+  };
+
+  const commitName = () => {
+    const trimmed = nameDraft.trim();
+    if (trimmed) updateUser({ name: trimmed });
+    setEditingName(false);
+  };
+
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = ''; // 允许重复选择同一文件
@@ -634,7 +668,34 @@ export function UserModal() {
                       </span>
                     </button>
                   </HoverTip>
-                  <p className="text-base font-semibold text-gray-900 truncate">{user.name}</p>
+                  {editingName ? (
+                    <input
+                      autoFocus
+                      value={nameDraft}
+                      onChange={(e) => setNameDraft(e.target.value)}
+                      onBlur={commitName}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitName();
+                        if (e.key === 'Escape') setEditingName(false);
+                      }}
+                      className="flex-1 min-w-0 text-base font-semibold text-gray-900 bg-white border-b border-primary-400 outline-none px-0.5 py-0"
+                      maxLength={20}
+                      placeholder="输入用户名"
+                      aria-label="用户名"
+                    />
+                  ) : (
+                    <HoverTip text="修改用户名">
+                      <button
+                        onClick={startEditName}
+                        className="flex items-center gap-1 min-w-0 text-base font-semibold text-gray-900 hover:text-primary-700 transition-colors"
+                      >
+                        <span className="truncate">{user.name}</span>
+                        <span className="shrink-0">
+                          <PencilIcon />
+                        </span>
+                      </button>
+                    </HoverTip>
+                  )}
                 </div>
                 {avatarError && (
                   <p className="mt-2 text-[12px] text-red-500" role="alert">
@@ -684,7 +745,7 @@ export function UserModal() {
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       当前版本
                     </dt>
-                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.12.0</dd>
+                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.1.0</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">

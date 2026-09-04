@@ -11,7 +11,7 @@ const PROFILE_KEY = 'stylan.profile';
 const DEFAULT_USER: User = {
   id: 'local',
   email: '',
-  name: '用户',
+  name: 'ZENSHEET',
   avatar: '',
   created_at: '',
 };
@@ -21,7 +21,10 @@ function loadProfile(): User {
     const raw = localStorage.getItem(PROFILE_KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Partial<User>;
-      return { ...DEFAULT_USER, ...saved, id: 'local' };
+      const next = { ...DEFAULT_USER, ...saved, id: 'local' };
+      // 旧版默认名「用户」自动升级为 ZENSHEET（仍可随时在设置中自定义）
+      if (next.name === '用户') next.name = DEFAULT_USER.name;
+      return next;
     }
   } catch {
     // 数据损坏时回退默认访客
