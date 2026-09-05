@@ -1,5 +1,7 @@
 # 在线简历编辑器 - 设计与技术规格
 
+> **适用范围（2026-09 标注）**：本文档为立项时的 **master 全栈版**历史设计（FastAPI + SQLite + Playwright 服务端 PDF + JWT 用户系统 + Docker）。当前发布的 **static 免登录版**（static 分支）为纯前端实现——IndexedDB 本地存储、浏览器直连 OpenAI 兼容供应商、浏览器端 PDF 导出（打印 / html2canvas + jsPDF 智能降级）、GitHub Pages 部署，架构与本文档描述不对应；全栈版设计仅适用于 master 分支。
+
 ## 1. 项目概述
 
 ### 1.1 定位

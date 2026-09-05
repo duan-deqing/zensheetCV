@@ -1,5 +1,7 @@
 # 在线简历编辑器 - Phase 5 打磨与部署实施计划
 
+> **适用范围（2026-09 标注）**：本系列 Phase 1-5 计划为立项时的 **master 全栈版**历史计划。当前发布的 **static 免登录版**（static 分支）部署为 GitHub Pages 纯前端静态站点，无 Docker/CI 后端环节，架构不对应；全栈版计划仅适用于 master 分支。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task.
 
 **Goal:** 完善测试覆盖、性能优化、Docker 容器化、CI/CD 流水线，生产可用

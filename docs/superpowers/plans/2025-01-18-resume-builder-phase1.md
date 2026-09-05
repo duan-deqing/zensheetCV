@@ -1,5 +1,7 @@
 # 在线简历编辑器 - Phase 1 核心骨架实施计划
 
+> **适用范围（2026-09 标注）**：本系列 Phase 1-5 计划为立项时的 **master 全栈版**历史计划（FastAPI + SQLite + Playwright + JWT + Docker）。当前发布的 **static 免登录版**（static 分支）为纯前端实现（IndexedDB 本地存储 / 浏览器直连 AI / 浏览器端 PDF 导出 / GitHub Pages），架构不对应；全栈版计划仅适用于 master 分支。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 搭建前后端分离的 Monorepo 基础架构，实现 Markdown 编辑 → 实时预览 → PDF 导出的核心链路

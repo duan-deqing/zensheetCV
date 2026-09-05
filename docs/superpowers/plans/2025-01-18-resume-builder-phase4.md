@@ -1,5 +1,7 @@
 # 在线简历编辑器 - Phase 4 AI 功能实施计划
 
+> **适用范围（2026-09 标注）**：本系列 Phase 1-5 计划为立项时的 **master 全栈版**历史计划。当前发布的 **static 免登录版**（static 分支）AI 为浏览器直连 OpenAI 兼容供应商（密钥仅存本地），不经后端代理，架构不对应；全栈版计划仅适用于 master 分支。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan task-by-task.
 
 **Goal:** 实现 AI 内容润色、关键词优化分析、智能内容生成，支持 SSE 流式输出
