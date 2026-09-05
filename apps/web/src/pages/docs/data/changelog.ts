@@ -155,6 +155,18 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.5.0',
+    date: '2026-09-05',
+    title: { zh: '渲染性能与代码质量优化', en: 'Rendering Performance & Code Quality' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '编辑器渲染性能优化：弹窗开关状态合并管理、操作提示独立更新，不再因提示弹出而重渲染全部界面；简历数据上下文不再随键入重建，长文档输入更跟手', en: 'Editor rendering performance: modal states merged and toasts isolated so popups no longer re-render the whole UI; the resume context no longer rebuilds on every keystroke, keeping long documents smooth' },
+      { zh: '全站弹窗关闭行为统一为共享逻辑：外部点击、Esc 关闭与关闭动画走同一套 Hook，各弹窗表现更一致', en: 'Unified modal dismissal site-wide: outside clicks, Esc and close animations now share one hook for consistent behavior' },
+      { zh: '全站动画定义收敛到统一样式文件，单一入口维护；偏好减弱动效的用户继续自动跳过', en: 'All animation definitions consolidated into a single stylesheet for one-place maintenance; reduced-motion users are still skipped automatically' },
+      { zh: '界面组件模块化重构：顶栏、文档子页与首页拆分为独立模块与数据文件，不改变任何界面与功能', en: 'Modular refactoring of UI code: top bar, docs sub-pages and home page split into standalone modules and data files — with no visual or functional changes' },
+    ],
+  },
+  {
     version: 'v0.4.1',
     date: '2026-09-05',
     title: { zh: '手机端 PDF 导出', en: 'Mobile PDF Export' },
