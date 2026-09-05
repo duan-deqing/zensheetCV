@@ -74,3 +74,5 @@ playwright/.cache/
 
 # 运行时上传文件（头像等）
 apps/api/uploads/
+# 后端运行时数据（PDF 缓存等）
+apps/api/data/
