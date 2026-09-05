@@ -50,6 +50,11 @@ export function SpikeDompdf() {
   const pdfUrlRef = useRef<string | null>(null);
   /** 样本重复 3 份制造 3~4 页长内容：单页样本测不到分页一致性 */
   const [triple, setTriple] = useState(false);
+  /** 圆点位置修复实验：真机反馈引擎自绘 marker 位置不对。
+   *  引擎把 ::marker 变成内容流内 span（贴在文字前），而浏览器原生
+   *  outside marker 画在 li 缩进区左侧。改为导出前把 marker 用绝对定位
+   *  span 画进缩进区，导出后还原 DOM（onclone 仅兼容空壳不可用） */
+  const [fixMarkers, setFixMarkers] = useState(true);
   const [fontSrcId, setFontSrcId] = useState<string>(FONT_SOURCES[0].id);
   const sourceRef = useRef<HTMLDivElement>(null);
   const fontCacheRef = useRef<Map<string, Uint8Array>>(new Map());
@@ -161,9 +166,41 @@ export function SpikeDompdf() {
     log(`li ::marker：content=${JSON.stringify(markerCs.content)}`);
   };
 
+  /** 导出前给无序列表的 li 手工绘制 marker（绝对定位到缩进区左侧，
+   *  模拟浏览器原生 outside 位置），返回还原函数。有序列表保留引擎
+   *  原生序号（decimal 宽度可变，不适合固定偏移，spike 阶段不动） */
+  const patchListMarkers = (): (() => void) => {
+    const root = sourceRef.current;
+    if (!root) return () => {};
+    const patched: Array<{ el: HTMLElement; style: string }> = [];
+    const inserted: HTMLElement[] = [];
+    root.querySelectorAll('ul li').forEach((li) => {
+      const el = li as HTMLElement;
+      const type = getComputedStyle(el).listStyleType;
+      if (type === 'none') return;
+      patched.push({ el, style: el.getAttribute('style') ?? '' });
+      el.style.listStyleType = 'none';
+      el.style.position = 'relative';
+      const s = document.createElement('span');
+      s.textContent = type === 'square' ? '▪' : '•';
+      // 右缘距内容盒约 0.5em（浏览器原生 marker 的视觉间隙），宽度按需收缩
+      s.style.cssText = 'position:absolute;left:-0.85em;width:0.6em;top:0;line-height:inherit;white-space:nowrap;';
+      el.insertBefore(s, el.firstChild);
+      inserted.push(s);
+    });
+    return () => {
+      inserted.forEach((s) => s.remove());
+      patched.forEach(({ el, style }) => {
+        if (style) el.setAttribute('style', style);
+        else el.removeAttribute('style');
+      });
+    };
+  };
+
   /** dompdf 矢量导出：下载 PDF 并记录耗时/体积/页数 */
   const runDompdf = async () => {
     setBusy('dompdf');
+    const restore = fixMarkers ? patchListMarkers() : null;
     try {
       checkEnv();
       const fontBytes = await ensureFont();
@@ -199,6 +236,7 @@ export function SpikeDompdf() {
     } catch (err) {
       log(`dompdf 导出失败：${err instanceof Error ? err.message : String(err)}`);
     } finally {
+      restore?.();
       setBusy(null);
     }
   };
@@ -227,6 +265,10 @@ export function SpikeDompdf() {
         <label className="ml-2 flex items-center gap-1.5 text-[12px] text-gray-600 cursor-pointer select-none">
           <input type="checkbox" checked={triple} onChange={(e) => setTriple(e.target.checked)} className="accent-primary-600" />
           内容 ×3（测多页分页）
+        </label>
+        <label className="ml-2 flex items-center gap-1.5 text-[12px] text-gray-600 cursor-pointer select-none">
+          <input type="checkbox" checked={fixMarkers} onChange={(e) => setFixMarkers(e.target.checked)} className="accent-primary-600" />
+          修复圆点位置（实验）
         </label>
       </div>
 
