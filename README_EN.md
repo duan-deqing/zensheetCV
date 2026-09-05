@@ -47,7 +47,7 @@ ZENSHEET Resume is a Markdown-based online resume builder: write Markdown on the
 | ----------------- | ---------------------------------------------- | ----------------------------------------- |
 | Getting started   | Open and use, no sign-up                       | Register / log in (JWT)                   |
 | Data storage      | Browser IndexedDB (in-memory in private mode)  | Server-side SQLite                        |
-| PDF export        | Browser print → "Save as PDF"                  | Server-side Playwright rendering          |
+| PDF export        | Browser print → "Save as PDF"; smart mobile fallback | Server-side Playwright rendering          |
 | AI assistance     | Browser connects directly to OpenAI-compatible providers (BYOK) | Server-side proxy (CORS-free) |
 | Cross-device sync | Not supported (data stays in the local browser)| Supported                                 |
 | UI language       | Bilingual (site-wide 中文 / EN toggle)         | Chinese                                   |
@@ -83,7 +83,7 @@ ZENSHEET Resume is a Markdown-based online resume builder: write Markdown on the
 #### Localization & Experience
 
 - **Local-first data**: resumes and chat history live in browser IndexedDB, falling back to in-memory storage in private mode; up to 15 resumes per browser
-- **PDF export**: opens the browser print dialog — choose "Save as PDF"; page layout matches the preview exactly
+- **PDF export**: on desktop and mainstream mobile browsers, opens the print dialog — choose "Save as PDF"; page layout matches the preview exactly. In-app browsers (WeChat / QQ) and some mobile browsers fall back automatically to assembling a PDF from page snapshots, ready to download or share (snapshot precision is reduced automatically for very long resumes)
 - **Bilingual UI**: one-tap 中文 / EN toggle covering the interface, docs, sample resume and error messages, with the preference saved locally
 - **Mobile support**: single-column editor (Edit / Preview toggle), folding navigation and action menus, and mobile-friendly modals throughout
 - **Documentation center**: user guide / Markdown tutorial / theme settings / icon library / AI assistant / changelog
@@ -286,6 +286,7 @@ zensheetCV/
 │   │   │   ├── components/        # Shared UI components
 │   │   │   │   ├── AIWindow.tsx           # AI chat window
 │   │   │   │   ├── AvatarCropModal.tsx    # Avatar crop & upload modal
+│   │   │   │   ├── BrowserHint.tsx        # Browser export hint modal (auto-opens in WebViews)
 │   │   │   │   ├── CoffeeModal.tsx        # Buy-me-a-coffee modal
 │   │   │   │   ├── HoverTip.tsx           # Site-wide hover tooltip
 │   │   │   │   ├── IconModal.tsx          # Icon library modal

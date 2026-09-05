@@ -157,11 +157,13 @@ export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
     version: 'v0.6.0',
     date: '2026-09-06',
-    title: { zh: 'WebView 提示弹窗化与关于页精简', en: 'WebView Hint Dialog & About Page Cleanup' },
+    title: { zh: 'WebView 提示弹窗化与手机端导出说明', en: 'WebView Hint Dialog & Mobile Export Notes' },
     tag: { zh: '免登录版', en: 'Login-free' },
     items: [
-      { zh: '微信等 App 内打开时的「复制链接到浏览器」提示改为屏幕居中弹窗，与全站弹窗风格一致：支持点击遮罩、Esc 或关闭按钮关闭，复制结果在弹窗内反馈', en: 'The "copy link to open in browser" hint shown inside WeChat and other in-app browsers becomes a centered dialog matching the site-wide modal style — dismissible via backdrop click, Esc or the close button, with inline copy feedback' },
+      { zh: '微信等 App 内打开时的「复制链接到浏览器」提示改为屏幕居中弹窗，与全站弹窗风格一致：琥珀色注意图标与「请在浏览器中打开」标题点明来意，说明文字左对齐更易读，等宽双按钮手机端更好点按；支持点击遮罩、Esc 或关闭按钮关闭，复制结果在弹窗内反馈', en: 'The "copy link to open in browser" hint shown inside WeChat and other in-app browsers becomes a centered dialog matching the site-wide modal style — an amber attention icon and an "Open in a Browser" title state the purpose at a glance, with left-aligned text for easier reading and full-width buttons that are easier to tap on mobile; dismissible via backdrop click, Esc or the close button, with inline copy feedback' },
       { zh: '设置窗口「关于」页精简：移除项目名称、技术栈与 AI 接入信息，介绍文案简化', en: 'The About page in Settings is streamlined: project name, tech stack and AI integration details removed, intro text simplified' },
+      { zh: '使用指南新增「手机端导出注意事项」板块：推荐浏览器（安卓 Chrome / iOS Safari）、微信 / QQ 等内置浏览器与其他手机浏览器的自动降级说明、折叠菜单「导出 PDF」旁的「?」帮助入口与超长简历截图精度提示', en: 'The guide gains a "Mobile Export Notes" section: recommended browsers (Chrome on Android / Safari on iOS), automatic fallback behavior in in-app (WeChat / QQ) and other mobile browsers, the "?" help entry next to "Export PDF" in the folded menu, and the snapshot-precision note for long resumes' },
+      { zh: 'README（中英文）同步更新：版本对比表与功能特性补充移动端智能降级说明，项目结构补充 BrowserHint 组件', en: 'README (both Chinese and English) updated in sync: the comparison table and feature list now mention the smart mobile fallback, and the BrowserHint component is added to the project structure' },
     ],
   },
   {

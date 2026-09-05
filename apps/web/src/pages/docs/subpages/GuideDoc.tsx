@@ -8,7 +8,7 @@ const QUICK_STEPS: { no: string; title: Bi; desc: Bi }[] = [
   { no: 'STEP 1', title: { zh: '打开即用', en: 'Open and Use' }, desc: { zh: '免注册登录，打开网站即可使用，默认用户名为 ZENSHEET；简历与配置仅保存在当前浏览器本地。点击导航栏用户名打开设置，可自定义用户名。', en: 'No sign-up required — open the site and start working. Your default username is ZENSHEET; resumes and settings are stored only in your current browser. Click your username in the navbar to open Settings and customize it.' } },
   { no: 'STEP 2', title: { zh: '创建简历', en: 'Create a Resume' }, desc: { zh: '进入「我的简历」页面，点击新建简历，会得到一份示例内容，随后在编辑器中替换为自己的经历。', en: 'Go to "My Resumes" and click New Resume. A sample resume is created for you — replace it with your own experience in the editor.' } },
   { no: 'STEP 3', title: { zh: '编辑内容', en: 'Edit Content' }, desc: { zh: '左侧为 Markdown 编辑器，右侧实时预览。使用标题、列表、分栏等语法组织内容，详见《Markdown 简历教程》。', en: 'Write Markdown on the left and preview live on the right. Organize content with headings, lists, columns and more — see the Markdown Resume Tutorial.' } },
-  { no: 'STEP 4', title: { zh: '调样式并导出', en: 'Style & Export' }, desc: { zh: '通过「主题」面板选择模板与视觉风格；完成后点击「导出 PDF」——桌面与主流手机浏览器在打印窗口中「另存为 PDF」，逐页与预览一致；微信等内置浏览器会自动改用本机生成 PDF 并下载 / 分享。', en: 'Pick a template and visual style in the Theme panel, then click "Export PDF" — on desktop and mainstream mobile browsers, choose "Save as PDF" in the print dialog and every page matches the preview; in in-app browsers like WeChat, a PDF is generated on-device automatically for download or sharing.' } },
+  { no: 'STEP 4', title: { zh: '调样式并导出', en: 'Style & Export' }, desc: { zh: '通过「主题」面板选择模板与视觉风格；完成后点击「导出 PDF」——桌面与主流手机浏览器在打印窗口中「另存为 PDF」，逐页与预览一致；微信等内置浏览器会自动改用本机生成 PDF 并下载 / 分享。手机端各浏览器的差异详见下方「手机端导出注意事项」。', en: 'Pick a template and visual style in the Theme panel, then click "Export PDF" — on desktop and mainstream mobile browsers, choose "Save as PDF" in the print dialog and every page matches the preview; in in-app browsers like WeChat, a PDF is generated on-device automatically for download or sharing. See "Mobile Export Notes" below for browser-specific differences.' } },
 ];
 
 const GUIDE_LINKS: { to: string; no: string; title: Bi; desc: Bi }[] = [
@@ -46,6 +46,22 @@ export function GuideContent() {
             { t: { zh: '实时预览', en: 'Live Preview' }, d: { zh: 'A4 纸张逐页渲染，与导出 PDF 效果一致；顶栏可缩放与全屏', en: 'Page-by-page A4 rendering identical to the exported PDF; zoom and fullscreen on the toolbar' } },
             { t: { zh: '主题面板', en: 'Theme Panel' }, d: { zh: '点击预览顶栏「主题」打开，切换模板、配色、字体与页边距', en: 'Open via "Theme" on the preview toolbar — switch templates, colors, fonts and margins' } },
             { t: { zh: 'AI 聊天窗', en: 'AI Chat' }, d: { zh: '点击顶栏「AI 助手」在预览右侧展开，支持流式回复与历史记录', en: 'Click "AI Assistant" on the toolbar to open beside the preview; streaming replies and history supported' } },
+          ].map((item) => (
+            <div key={tr(item.t)} className="rounded-xl border border-gray-200 p-4">
+              <p className="font-medium text-gray-900 text-sm">{tr(item.t)}</p>
+              <p className="text-[13px] text-gray-500 leading-relaxed mt-1">{tr(item.d)}</p>
+            </div>
+          ))}
+        </div>
+      </DocBlock>
+
+      <DocBlock title={tr({ zh: '手机端导出注意事项', en: 'Mobile Export Notes' })} desc={tr({ zh: '手机浏览器环境差异较大，导出 PDF 前请先了解：', en: 'Mobile browsers vary widely — a few things to know before exporting PDF:' })}>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            { t: { zh: '推荐环境', en: 'Recommended' }, d: { zh: '安卓推荐 Chrome，iOS 推荐 Safari：走系统打印生成矢量 PDF，文字清晰、体积小，逐页与预览一致。', en: 'Chrome on Android and Safari on iOS are recommended: they use system printing to produce vector PDFs — sharp text, small size, every page identical to the preview.' } },
+            { t: { zh: '微信 / QQ 内置浏览器', en: 'In-App Browsers' }, d: { zh: '微信、QQ 等内置浏览器无法调起打印，打开页面时会弹窗提醒；导出时自动改用截图合成 PDF，完成后可下载或唤起系统分享。', en: 'In-app browsers like WeChat and QQ cannot open the print dialog and will show a reminder on open. Exporting falls back to assembling a PDF from snapshots, then downloads or shares via the system.' } },
+            { t: { zh: '其他第三方浏览器', en: 'Other Browsers' }, d: { zh: 'iOS 的第三方浏览器与安卓国产浏览器（UC、夸克、小米等）同样自动降级为截图合成 PDF；折叠菜单「导出 PDF」旁的「?」可随时查看提示并复制链接。', en: 'Third-party iOS browsers and Android domestic browsers (UC, Quark, Xiaomi, etc.) also fall back to snapshot-based PDFs. The "?" next to "Export PDF" in the folded menu shows the hint and lets you copy the link anytime.' } },
+            { t: { zh: '长简历提醒', en: 'Long Resumes' }, d: { zh: '截图方案逐页生成，页数越多耗时越长；超过 6 页时会自动降低截图精度以平衡速度与体积。长简历建议优先使用 Chrome / Safari 或电脑端导出。', en: 'Snapshot-based export renders page by page — more pages mean longer waits; over 6 pages, snapshot precision is reduced automatically. For long resumes, prefer Chrome / Safari or desktop.' } },
           ].map((item) => (
             <div key={tr(item.t)} className="rounded-xl border border-gray-200 p-4">
               <p className="font-medium text-gray-900 text-sm">{tr(item.t)}</p>
