@@ -218,6 +218,7 @@
 
 /* ---------- 头像裁剪弹窗 ---------- */
 .avatar-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.avatar-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
 
 /* ---------- 编辑器顶栏：简历名称行内编辑 ---------- */
 @keyframes titleEditIn {
@@ -277,6 +278,7 @@
   .user-modal-in,
   .user-backdrop-in,
   .avatar-modal-in,
+  .avatar-backdrop-in,
   .title-edit-in,
   .title-edit-out,
   .hover-tip-in {

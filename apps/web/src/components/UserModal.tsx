@@ -558,14 +558,23 @@ export function UserModal() {
     });
   };
 
-  const handleAvatarUpload = async (blob: Blob) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      updateUser({ avatar: e.target?.result as string });
-      closeAvatarCrop();
-    };
-    reader.readAsDataURL(blob);
-  };
+  // 上传 = 读文件为 data URL 后写入用户资料；返回 Promise 供裁剪弹窗的
+  // uploading 状态与错误提示驱动（读取失败 reject）。关闭不再在此直卸载，
+  // 由 AvatarCropModal 上传成功后走统一淡出动画，动画结束经 onCancel 回收 URL
+  const handleAvatarUpload = (blob: Blob) =>
+    new Promise<void>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          updateUser({ avatar: e.target?.result as string });
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
 
   // 每次打开重置到第一个分类，并从本地存储读取简历数量
   useEffect(() => {

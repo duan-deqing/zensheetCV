@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useTr } from '@/i18n/LangContext';
+import { useModalClose } from '@/hooks/useModalClose';
 
 const BOX = 320; // 预览区边长（px）
 const CIRCLE = 240; // 裁剪圆直径（px）
@@ -30,6 +31,11 @@ export function AvatarCropModal({
   const tr = useTr();
   const imgRef = useRef<HTMLImageElement>(null);
   const dragRef = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
+
+  // 统一关闭流程（✕ / Esc / 遮罩 / 取消共用）：淡出动画结束后再由父组件卸载。
+  // 本组件由父组件条件渲染，被渲染即打开；上传中 open 置 false 屏蔽 Esc（与
+  // 按钮 disabled、遮罩点击短路一致，保持「上传中不可关闭」的原有语义）
+  const { closing, close } = useModalClose(!uploading, onCancel);
 
   // 注意：不在此处 revoke object URL —— StrictMode 下 effect 会先执行一次清理，
   // 导致图片加载失败；URL 由父组件在关闭/上传成功时统一回收
@@ -78,19 +84,23 @@ export function AvatarCropModal({
     }
     setUploading(true);
     setError('');
+    let ok = false;
     try {
       await onConfirm(blob);
+      ok = true;
     } catch {
       setError(tr({ zh: '上传失败，请重试', en: 'Upload failed, please try again' }));
-    } finally {
-      setUploading(false);
     }
+    // 先复位 uploading（close 的 open 依赖 !uploading），再播统一淡出：
+    // 动画结束后 onCancel 卸载本组件，由父组件回收 object URL
+    setUploading(false);
+    if (ok) close();
   };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={tr({ zh: '调整头像', en: 'Adjust avatar' })}>
-      <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[2px]" onClick={uploading ? undefined : onCancel} aria-hidden="true" />
-      <div className="avatar-modal-in relative w-[min(400px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+      <div className={`${closing ? 'modal-backdrop-out' : 'avatar-backdrop-in'} absolute inset-0 bg-gray-900/50 backdrop-blur-[2px]`} onClick={uploading ? undefined : close} aria-hidden="true" />
+      <div className={`${closing ? 'modal-out' : 'avatar-modal-in'} relative w-[min(400px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden`}>
         {/* 顶栏：与其他弹窗同构 */}
         <div className="flex items-center gap-3 px-5 py-2 border-b border-gray-200">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-primary-600 shrink-0" aria-hidden="true">
@@ -98,7 +108,7 @@ export function AvatarCropModal({
           </p>
           <h3 className="text-sm font-semibold text-gray-900">{tr({ zh: '调整头像', en: 'Adjust avatar' })}</h3>
           <button
-            onClick={onCancel}
+            onClick={close}
             disabled={uploading}
             className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm disabled:opacity-50"
             aria-label={tr({ zh: '关闭头像裁剪', en: 'Close avatar cropping' })}
@@ -198,7 +208,7 @@ export function AvatarCropModal({
 
           <div className="mt-4 w-full flex gap-2">
             <button
-              onClick={onCancel}
+              onClick={close}
               disabled={uploading}
               className="flex-1 h-9 rounded-lg border border-gray-300 text-[13px] font-medium text-gray-600 hover:border-gray-400 transition-colors disabled:opacity-50"
             >
@@ -206,7 +216,7 @@ export function AvatarCropModal({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={uploading || !dims}
+              disabled={uploading || closing || !dims}
               className="flex-1 h-9 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 disabled:opacity-70 transition-colors"
             >
               {uploading ? tr({ zh: '上传中…', en: 'Uploading…' }) : tr({ zh: '确定', en: 'Confirm' })}
