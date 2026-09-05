@@ -35,12 +35,6 @@ importers:
       canvas-confetti:
         specifier: ^1.9.4
         version: 1.9.4
-      dompdf.js:
-        specifier: ^2.0.4
-        version: 2.0.4
-      github-markdown-css:
-        specifier: ^5.5.0
-        version: 5.9.0
       html2canvas-pro:
         specifier: ^2.4.1
         version: 2.4.1
@@ -1212,10 +1206,6 @@ packages:
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
 
-  dompdf.js@2.0.4:
-    resolution: {integrity: sha512-sAH68CA9BFJ0xaXIQQ5T0UixHTK5l4xuJ/KhoeVw/y7LXDpEwlCbuLxoeU6AUtu77I3YCTMGd1A3ohpJ19gbGg==}
-    engines: {node: '>=18'}
-
   dompurify@3.4.14:
     resolution: {integrity: sha512-dVoH9z+MY+C9IilgGCk3YfFqjLi3fChm2OiKJMzh6axrJ5qwxqWaZamgmHrpv22CN/KdbZJuGEGgfQoL00LTdg==}
 
@@ -1430,10 +1420,6 @@ packages:
   get-stream@8.0.1:
     resolution: {integrity: sha512-VaUJspBffn/LMCJVoMvSAdmscJyS1auj5Zulnn5UoYcY531UWmdwhRWkcGKnGU93m5HSXP9LP2usOryrBtQowA==}
     engines: {node: '>=16'}
-
-  github-markdown-css@5.9.0:
-    resolution: {integrity: sha512-tmT5sY+zvg2302XLYEfH2mtkViIM1SWf2nvYoF5N1ZsO0V6B2qZTiw3GOzw4vpjLygK/KG35qRlPFweHqfzz5w==}
-    engines: {node: '>=10'}
 
   glob-parent@5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
@@ -3744,8 +3730,6 @@ snapshots:
 
   dom-accessibility-api@0.6.3: {}
 
-  dompdf.js@2.0.4: {}
-
   dompurify@3.4.14:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
@@ -4004,8 +3988,6 @@ snapshots:
       es-object-atoms: 1.1.2
 
   get-stream@8.0.1: {}
-
-  github-markdown-css@5.9.0: {}
 
   glob-parent@5.1.2:
     dependencies:

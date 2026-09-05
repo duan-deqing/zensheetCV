@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/%E5%85%8D%E7%99%BB%E5%BD%95%E7%89%88-v0.4.0-2563EB?style=flat-square" alt="Login-free Version" />
+  <img src="https://img.shields.io/badge/%E5%85%8D%E7%99%BB%E5%BD%95%E7%89%88-v0.6.0-2563EB?style=flat-square" alt="Login-free Version" />
   <img src="https://img.shields.io/badge/%E5%85%A8%E6%A0%88%E7%89%88-v0.12.0-7C3AED?style=flat-square" alt="Full-stack Version" />
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
