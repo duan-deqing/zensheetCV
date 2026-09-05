@@ -3,6 +3,15 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useTr } from '@/i18n/LangContext';
 
 /**
+ * 是否处于 App 内置 WebView（微信 / QQ / 钉钉 / 企业微信 / 微博等）：
+ * 无独立地址栏，无法在应用内唤起系统浏览器，需复制链接跳出。
+ * 同时也是导出提示（BrowserHint）的显示条件。
+ */
+export function isInAppWebView(ua: string = navigator.userAgent): boolean {
+  return /MicroMessenger|QQ\/[\d.]+|MQQBrowser|DingTalk|Weibo/i.test(ua);
+}
+
+/**
  * 判定当前环境能否使用「浏览器打印」导出 PDF：
  *  - 微信 / QQ / 钉钉等 App 内置 WebView 完全不响应 window.print()；
  *  - iOS 上仅自带 Safari 会弹出打印面板，Chrome / UC / 夸克等第三方浏览器（WKWebView）无反应；
@@ -14,7 +23,7 @@ export function canUsePrintExport(
   touchDocument: { hasOwnProperty(key: string): boolean } = document,
 ): boolean {
   // App 内置 WebView（微信 / QQ / 钉钉 / 企业微信等）
-  if (/MicroMessenger|QQ\/[\d.]+|MQQBrowser|DingTalk|Weibo/i.test(ua)) return false;
+  if (isInAppWebView(ua)) return false;
   const isIOS =
     /iPad|iPhone|iPod/.test(ua) ||
     (/Macintosh/.test(ua) && Object.prototype.hasOwnProperty.call(touchDocument, 'ontouchend'));

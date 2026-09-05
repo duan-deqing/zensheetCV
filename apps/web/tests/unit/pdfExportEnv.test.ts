@@ -1,5 +1,29 @@
 import { describe, expect, it } from 'vitest';
-import { canUsePrintExport } from '@/hooks/usePDFExport';
+import { canUsePrintExport, isInAppWebView } from '@/hooks/usePDFExport';
+
+/** App 内置 WebView 检测：BrowserHint 提示条的显示条件 */
+describe('isInAppWebView', () => {
+  it('桌面浏览器非 WebView', () => {
+    const ua =
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+    expect(isInAppWebView(ua)).toBe(false);
+  });
+
+  it('微信 / QQ / 钉钉 / 微博内置 WebView 命中', () => {
+    const wechat =
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.49';
+    const qq =
+      'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/126.0.0.0 Mobile Safari/537.36 V1_AND_SQ_8.9.63 QQ/8.9.63';
+    const dingtalk =
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 DingTalk/7.0.0';
+    const weibo =
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Weibo/13.0.0';
+    expect(isInAppWebView(wechat)).toBe(true);
+    expect(isInAppWebView(qq)).toBe(true);
+    expect(isInAppWebView(dingtalk)).toBe(true);
+    expect(isInAppWebView(weibo)).toBe(true);
+  });
+});
 
 /** UA 环境检测：决定 PDF 导出走「浏览器打印」还是降级「截图生成」 */
 describe('canUsePrintExport', () => {

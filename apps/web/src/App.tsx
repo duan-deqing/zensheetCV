@@ -11,6 +11,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Navbar } from '@/components/Navbar';
 import { UserModal } from '@/components/UserModal';
+import { BrowserHint } from '@/components/BrowserHint';
 import { HomePage } from '@/pages/HomePage';
 
 const EditorPage = lazy(() => import('@/pages/EditorPage').then((m) => ({ default: m.EditorPage })));
@@ -22,8 +23,6 @@ const ThemeDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => 
 const IconsDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.IconsDocPage })));
 const AIDocPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.AIDocPage })));
 const ChangelogPage = lazy(() => import('@/pages/docs/DocsSubPages').then((m) => ({ default: m.ChangelogPage })));
-/** 【Spike 实验页】dompdf.js 手机端导出验证，URL 直达不入导航 */
-const SpikeDompdf = lazy(() => import('@/pages/spike/SpikeDompdf').then((m) => ({ default: m.SpikeDompdf })));
 
 function App() {
   return (
@@ -37,6 +36,8 @@ function App() {
                 <ResumeProvider>
                   <PreviewProvider>
                     <Navbar />
+                    {/* 微信等 App 内 WebView 的「复制链接到浏览器」提示（仅该环境渲染） */}
+                    <BrowserHint />
                     <Suspense fallback={<LoadingSpinner />}>
                       <Routes>
                         <Route path="/" element={<HomePage />} />
@@ -50,7 +51,6 @@ function App() {
                         <Route path="/docs/changelog" element={<ChangelogPage />} />
                         <Route path="/editor" element={<Navigate to="/resumes" replace />} />
                         <Route path="/editor/:id" element={<EditorPage />} />
-                        <Route path="/spike-dompdf" element={<SpikeDompdf />} />
                       </Routes>
                     </Suspense>
                     {/* 全局用户信息/设置弹窗：编辑页 TopBar 与首页导航栏共用 */}

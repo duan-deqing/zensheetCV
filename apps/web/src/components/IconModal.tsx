@@ -5,32 +5,7 @@ import { getIconMap } from '@/preview/resumeIcons';
 import { HoverTip } from '@/components/HoverTip';
 import { useModalClose } from '@/hooks/useModalClose';
 import { useTr } from '@/i18n/LangContext';
-
-/** 复制文本：优先 Clipboard API（仅安全上下文可用），
- *  非安全上下文（如局域网 IP 访问 dev server）或 API 失败时回退 execCommand */
-async function copyText(text: string): Promise<boolean> {
-  if (window.isSecureContext && navigator.clipboard) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      /* 权限被拒或文档失焦时走回退方案 */
-    }
-  }
-  try {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    const ok = document.execCommand('copy');
-    ta.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
+import { copyText } from '@/utils/clipboard';
 
 /** 图标库弹窗：展示全部可用图标（内置 + 当前简历自定义），点击复制 `icon:名称` 语法。
  *  编辑导航栏「图标」按钮打开，替代原主题侧边栏的图标管理 */
