@@ -88,9 +88,11 @@ export function usePDFExport() {
         ]);
 
         const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+        // 长简历逐页位图累积易触顶移动端内存：页数多时降低采样倍率
+        const scale = built.clones.length > 6 ? 1.5 : 2;
         for (let i = 0; i < built.clones.length; i++) {
           const canvas = await html2canvas(built.clones[i], {
-            scale: 2, // 2 倍采样：1588×2245 px/页，文字边缘清晰
+            scale, // 2 倍采样（1588×2245 px/页）文字边缘清晰；长简历降至 1.5 控制峰值
             backgroundColor: '#ffffff',
             useCORS: true,
             logging: false,
@@ -98,6 +100,9 @@ export function usePDFExport() {
           if (i > 0) pdf.addPage();
           // 页面本身即 210×297mm（含页边距 padding），整页铺满 A4
           pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 210, 297);
+          // GC 时机不定，显式清零立即释放位图缓冲（2x A4 ≈ 14MB/页，多页累积可观）
+          canvas.width = 0;
+          canvas.height = 0;
         }
         const blob = pdf.output('blob');
         const fileName = `${currentResume?.title || 'resume'}.pdf`;
@@ -120,7 +125,13 @@ export function usePDFExport() {
       } catch (err: any) {
         // 用户取消系统分享面板属正常操作，不算失败
         if (err?.name === 'AbortError') return true;
-        setError(err?.message || tr({ zh: 'PDF 导出失败', en: 'PDF export failed' }));
+        // 不透出底层英文报错（Canvas/图片解码等技术细节），统一友好提示
+        setError(
+          tr({
+            zh: 'PDF 生成失败，请重试；若持续失败可改用系统浏览器导出',
+            en: 'PDF generation failed — please retry, or use your system browser instead',
+          }),
+        );
         return false;
       } finally {
         stage?.remove();
@@ -192,7 +203,8 @@ export function usePDFExport() {
     } catch (err: any) {
       document.getElementById('print-root')?.remove();
       document.body.classList.remove('print-mode');
-      setError(err.message || tr({ zh: 'PDF 导出失败', en: 'PDF export failed' }));
+      // 不透出底层英文报错，统一友好提示
+      setError(tr({ zh: '打印导出失败，请重试', en: 'Print export failed, please try again' }));
       return false;
     } finally {
       // 清理可能仍由 afterprint 兜底，但按钮态先恢复
