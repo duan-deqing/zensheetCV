@@ -353,6 +353,10 @@ export function ResumePreview() {
                         width: `${A4_WIDTH_MM}mm`,
                         height: `${A4_HEIGHT_MM}mm`,
                         padding: `${padYMM}mm ${padXMM}mm`,
+                        // 屏外页让浏览器跳过布局与绘制（每页含整份内容克隆，长简历开销 × 页数）；
+                        // 显式尺寸兜底占位，不支持的浏览器自动忽略该属性；导出克隆时会剥离此属性
+                        contentVisibility: 'auto',
+                        containIntrinsicSize: `${A4_WIDTH_MM}mm ${A4_HEIGHT_MM}mm`,
                         boxShadow:
                           '0 0 1px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.08), 0 12px 28px -12px rgba(0,0,0,0.12)',
                       }}

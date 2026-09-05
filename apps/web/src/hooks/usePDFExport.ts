@@ -47,6 +47,9 @@ function buildStage(pages: HTMLElement[]): { stage: HTMLElement; clones: HTMLEle
     .forEach((s) => stage.appendChild(s.cloneNode(true)));
   const clones = pages.map((p) => {
     const clone = p.cloneNode(true) as HTMLElement;
+    // 预览页带 content-visibility:auto（屏外跳过渲染），克隆到屏外舞台后必须
+    // 解除，否则内容被浏览器跳过排版，html2canvas 读取到空布局输出空白页
+    clone.style.setProperty('content-visibility', 'visible');
     // 隐藏照片交互控件（删除按钮 / 缩放手柄），同打印导出行为
     clone.querySelectorAll('.resume-photo button, .cursor-nwse-resize').forEach((el) => {
       (el as HTMLElement).style.display = 'none';
@@ -170,7 +173,12 @@ export function usePDFExport() {
       document
         .querySelectorAll('.resume-export-root style')
         .forEach((s) => printRoot.appendChild(s.cloneNode(true)));
-      pages.forEach((p) => printRoot.appendChild(p.cloneNode(true)));
+      // 克隆页解除预览的 content-visibility:auto，确保打印布局完整渲染
+      pages.forEach((p) => {
+        const clone = p.cloneNode(true) as HTMLElement;
+        clone.style.setProperty('content-visibility', 'visible');
+        printRoot.appendChild(clone);
+      });
       document.body.appendChild(printRoot);
       document.body.classList.add('print-mode');
 
