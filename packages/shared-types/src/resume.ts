@@ -71,6 +71,8 @@ export const defaultTheme: ThemeConfig = {
   contentPadding: 'normal',
 };
 
+/** 简历完整记录：全栈版 user_id 为登录用户标识；
+ *  免登录版（static 分支）恒为 'local'，仅用于与后端 API 结构保持同型 */
 export interface Resume {
   id: string;
   user_id: string;
