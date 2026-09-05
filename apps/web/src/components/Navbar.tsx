@@ -4,7 +4,17 @@ import { useAuth } from '@/store/AuthContext';
 import { useUI } from '@/store/UIContext';
 import { useLang, useTr } from '@/i18n/LangContext';
 import { HoverTip } from '@/components/HoverTip';
+import { UserAvatar } from '@/components/UserAvatar';
 import { useDismissable } from '@/hooks/useDismissable';
+import {
+  MenuPanel,
+  MenuDivider,
+  MenuButton,
+  MenuUserItem,
+  MenuToggleButton,
+  menuItemClass,
+  menuItemActiveClass,
+} from '@/components/MenuPanel';
 
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
@@ -65,23 +75,30 @@ function GlobeIcon() {
   );
 }
 
-/** 汉堡菜单 / 关闭图标（手机端导航折叠按钮） */
-function MenuIcon() {
+/** 手机端折叠菜单的导航链接项：激活高亮 + 点击收起菜单 */
+function MenuNavLink({
+  to,
+  active,
+  onNavigate,
+  icon,
+  children,
+}: {
+  to: string;
+  active: boolean;
+  onNavigate: () => void;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
-    <NavIcon>
-      <line x1="4" y1="7" x2="20" y2="7" />
-      <line x1="4" y1="12" x2="20" y2="12" />
-      <line x1="4" y1="17" x2="20" y2="17" />
-    </NavIcon>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <NavIcon>
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </NavIcon>
+    <Link
+      to={to}
+      role="menuitem"
+      onClick={onNavigate}
+      className={active ? menuItemActiveClass : menuItemClass}
+    >
+      {icon}
+      {children}
+    </Link>
   );
 }
 
@@ -149,6 +166,8 @@ export function Navbar() {
       isActive(path) ? 'text-primary-600 font-medium' : 'text-gray-500 hover:text-gray-900'
     }`;
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <>
       {/* 浮动胶囊不占文档流，用占位块避免遮挡页面内容 */}
@@ -211,120 +230,54 @@ export function Navbar() {
               aria-haspopup="dialog"
               aria-label={tr({ zh: '用户信息', en: 'User' })}
             >
-              {user?.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={tr({ zh: `${user?.name ?? '用户'} 的头像`, en: `Avatar of ${user?.name ?? 'user'}` })}
-                  className="w-6 h-6 rounded-full object-cover border border-gray-200"
-                />
-              ) : (
-                <span
-                  className="w-6 h-6 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[11px] font-semibold select-none"
-                  aria-hidden="true"
-                >
-                  {(user?.name ?? '?').slice(0, 1).toUpperCase()}
-                </span>
-              )}
+              <UserAvatar user={user} />
               <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-24 lg:max-w-[10rem]">
                 {user?.name}
               </span>
             </button>
             {/* 手机端导航折叠按钮：点击展开下拉菜单（收纳全部导航入口） */}
-            <button
-              type="button"
-              onClick={() => setMenuOpen((p) => !p)}
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? tr({ zh: '关闭菜单', en: 'Close menu' }) : tr({ zh: '打开菜单', en: 'Open menu' })}
-              className="md:hidden flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              {menuOpen ? <CloseIcon /> : <MenuIcon />}
-            </button>
+            <MenuToggleButton open={menuOpen} onToggle={() => setMenuOpen((p) => !p)} />
           </div>
 
           {/* 手机端折叠菜单：导航链接 + 语言切换 + 用户信息（md 起隐藏，恢复栏内直显） */}
           {menuOpen && (
-            <div
-              role="menu"
-              className="nav-menu-pop md:hidden absolute right-2 w-60 max-w-[calc(100%-1rem)] top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
-            >
-              <Link
-                to="/"
-                role="menuitem"
-                onClick={() => setMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-                  isActive('/') ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <HomeIcon />
+            <MenuPanel>
+              <MenuNavLink to="/" active={isActive('/')} onNavigate={closeMenu} icon={<HomeIcon />}>
                 {tr({ zh: '首页', en: 'Home' })}
-              </Link>
-              <Link
+              </MenuNavLink>
+              <MenuNavLink
                 to="/resumes"
-                role="menuitem"
-                onClick={() => setMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-                  isActive('/resumes') ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                active={isActive('/resumes')}
+                onNavigate={closeMenu}
+                icon={<FileTextIcon />}
               >
-                <FileTextIcon />
                 {tr({ zh: '我的简历', en: 'My Resumes' })}
-              </Link>
-              <Link
-                to="/docs"
-                role="menuitem"
-                onClick={() => setMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
-                  isActive('/docs') ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <BookIcon />
+              </MenuNavLink>
+              <MenuNavLink to="/docs" active={isActive('/docs')} onNavigate={closeMenu} icon={<BookIcon />}>
                 {tr({ zh: '文档', en: 'Docs' })}
-              </Link>
-              <div className="my-1.5 h-px bg-gray-100" aria-hidden="true" />
+              </MenuNavLink>
+              <MenuDivider />
               {/* 语言切换：显示目标语言，点击即切换并收起菜单 */}
-              <button
-                type="button"
-                role="menuitem"
+              <MenuButton
+                icon={<GlobeIcon />}
                 onClick={() => {
                   setLang(lang === 'zh' ? 'en' : 'zh');
-                  setMenuOpen(false);
+                  closeMenu();
                 }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
               >
-                <GlobeIcon />
                 {lang === 'zh' ? 'English' : tr({ zh: '中文', en: '中文' })}
                 <span className="ml-auto font-mono text-[11px] tracking-wide text-gray-400">
                   {lang === 'zh' ? 'EN' : '中'}
                 </span>
-              </button>
+              </MenuButton>
               {/* 用户信息：头像 + 名称，点击打开设置弹窗 */}
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => {
-                  setMenuOpen(false);
+              <MenuUserItem
+                onSelect={() => {
+                  closeMenu();
                   toggleUserModal();
                 }}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-              >
-                {user?.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt=""
-                    className="w-5 h-5 rounded-full object-cover border border-gray-200"
-                  />
-                ) : (
-                  <span
-                    className="w-5 h-5 rounded-full bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center text-[10px] font-semibold select-none"
-                    aria-hidden="true"
-                  >
-                    {(user?.name ?? '?').slice(0, 1).toUpperCase()}
-                  </span>
-                )}
-                {user?.name || tr({ zh: '用户信息', en: 'User info' })}
-              </button>
-            </div>
+              />
+            </MenuPanel>
           )}
         </div>
       </nav>
