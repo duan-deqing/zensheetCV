@@ -90,37 +90,42 @@ export function BrowserHint() {
           </HoverTip>
         </div>
 
-        {/* 主体：图标 + 提示文案 */}
-        <div className="flex flex-col items-center text-center">
+        {/* 主体：注意图标 + 标题 + 说明（图文左右排布，文案左对齐更好读） */}
+        <div className="flex items-start gap-3">
           <div
-            className="w-12 h-12 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center mb-3"
+            className="shrink-0 w-11 h-11 rounded-full bg-amber-50 text-amber-500 border border-amber-100 flex items-center justify-center"
             aria-hidden="true"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <path d="M15 3h6v6" />
-              <path d="M10 14 21 3" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
             </svg>
           </div>
-          <p className="text-[13px] leading-relaxed text-gray-600">
-            {tr({
-              zh: '在微信等应用内无法导出 PDF，请复制链接到浏览器中打开（推荐 Chrome）后再导出。',
-              en: 'PDF export isn’t available inside WeChat etc. Copy the link and open it in a browser (Chrome recommended) to export.',
-            })}
-          </p>
+          <div className="flex-1 min-w-0">
+            <h4 className="text-[14px] font-semibold text-gray-900 leading-6">
+              {tr({ zh: '请在浏览器中打开', en: 'Open in a Browser' })}
+            </h4>
+            <p className="mt-1 text-[13px] leading-relaxed text-gray-600">
+              {tr({
+                zh: '在微信等应用内无法导出 PDF，请复制链接到浏览器中打开（推荐 Chrome）后再导出。',
+                en: 'PDF export isn’t available inside WeChat etc. Copy the link and open it in a browser (Chrome recommended) to export.',
+              })}
+            </p>
+          </div>
         </div>
 
-        {/* 底部操作：知道了（关闭） / 复制链接（主按钮） */}
-        <div className="w-full flex items-center justify-end gap-2 mt-5">
+        {/* 底部操作：等宽双按钮，手机端点按面积更大 */}
+        <div className="w-full flex items-stretch gap-2 mt-5">
           <button
             onClick={close}
-            className="h-8 px-4 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 text-[13px] font-medium transition-colors"
+            className="flex-1 h-9 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400 text-[13px] font-medium transition-colors"
           >
             {tr({ zh: '知道了', en: 'Got it' })}
           </button>
           <button
             onClick={copyLink}
-            className="h-8 px-4 rounded-md bg-primary-600 hover:bg-primary-700 text-white text-[13px] font-medium transition-colors"
+            className="flex-1 h-9 rounded-md bg-primary-600 hover:bg-primary-700 text-white text-[13px] font-medium transition-colors"
           >
             {tr({ zh: '复制链接', en: 'Copy Link' })}
           </button>
