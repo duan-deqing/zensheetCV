@@ -4,6 +4,7 @@ import { useAuth } from '@/store/AuthContext';
 import { useUI } from '@/store/UIContext';
 import { useLang, useTr } from '@/i18n/LangContext';
 import { HoverTip } from '@/components/HoverTip';
+import { useDismissable } from '@/hooks/useDismissable';
 
 const SHOW_THRESHOLD = 80; // 近顶部时始终显示
 const HIDE_DELTA = 4; // 忽略微小抖动
@@ -102,22 +103,8 @@ export function Navbar() {
     lastY.current = window.scrollY;
   }, [pathname]);
 
-  // 折叠菜单打开时：点击外部 / Escape 关闭
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handleDown = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setMenuOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handleDown);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.removeEventListener('mousedown', handleDown);
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [menuOpen]);
+  // 折叠菜单打开时：点击外部 / Escape 关闭（公共 hook）
+  useDismissable(menuOpen, rootRef, () => setMenuOpen(false));
 
   // rAF 节流的滚动方向检测：向下滚动收起，向上滚动显示
   // 仅在 hidden 状态翻转时触发重渲染，滚动帧本身不更新 React 状态
@@ -261,16 +248,6 @@ export function Navbar() {
               role="menu"
               className="nav-menu-pop md:hidden absolute right-2 w-60 max-w-[calc(100%-1rem)] top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
             >
-              <style>{`
-                @keyframes navMenuIn {
-                  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-                  to { opacity: 1; transform: none; }
-                }
-                .nav-menu-pop { animation: navMenuIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: top right; }
-                @media (prefers-reduced-motion: reduce) {
-                  .nav-menu-pop { animation: none; }
-                }
-              `}</style>
               <Link
                 to="/"
                 role="menuitem"

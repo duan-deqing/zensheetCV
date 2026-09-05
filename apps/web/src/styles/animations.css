@@ -1,0 +1,290 @@
+/*
+ * 全站动画与弹层静态样式（自各组件内嵌 <style> 收敛而来）。
+ * 仅收录与主题无关的固定动画；依赖主题变量的动态样式仍在组件中按需注入。
+ * 所有动画在 prefers-reduced-motion: reduce 下停用。
+ */
+
+:root {
+  /* 全站统一缓动曲线：快出缓停的「弹簧感」 */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- 通用弹窗：卡片入 + 遮罩入 ---------- */
+@keyframes modalCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes modalBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- 顶部胶囊提示：滑入 / 淡出（模板库 / 图标库 / 咖啡弹窗等） ---------- */
+@keyframes pillIn {
+  from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pillOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+}
+
+/* ---------- 通用下拉菜单（ThemeConfigPanel / UserModal / ThemeDoc 模型选择等） ---------- */
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dropdownInUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dropdown-pop { animation: dropdownIn 0.15s ease-out both; }
+.dropdown-pop.dropdown-down { animation: dropdownIn 0.15s ease-out both; }
+.dropdown-pop.dropdown-up { animation: dropdownInUp 0.15s ease-out both; }
+
+/* ---------- 折叠菜单（Navbar / TopBar 手机端） ---------- */
+@keyframes navMenuIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.nav-menu-pop {
+  animation: navMenuIn 0.18s var(--ease-spring) both;
+  transform-origin: top right;
+}
+
+/* ---------- 文档抽屉：右侧滑入 / 滑出 + Tab 内容淡入 ---------- */
+@keyframes docsDrawerIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+@keyframes docsDrawerOut {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+@keyframes docsTabIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.docs-drawer-panel { animation: docsDrawerIn 0.28s var(--ease-spring) both; }
+.docs-drawer-out { animation: docsDrawerOut 0.2s ease-in both; }
+.docs-drawer-tabpane { animation: docsTabIn 0.3s var(--ease-spring) both; }
+
+/* ---------- 编辑器页：主体进场 / 全屏预览 / AI 助手滑入滑出 ---------- */
+@keyframes editorFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.editor-fade-up { animation: editorFadeUp 0.5s var(--ease-spring) both; }
+
+@keyframes fullscreenIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fullscreen-in { animation: fullscreenIn 0.35s var(--ease-spring) both; }
+
+@keyframes aiWindowIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes aiWindowOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(16px); }
+}
+.ai-window-in { animation: aiWindowIn 0.25s var(--ease-spring) both; }
+.ai-window-out { animation: aiWindowOut 0.18s ease-in both; }
+
+/* ---------- 编辑器选中悬浮工具栏 ---------- */
+@keyframes selectionToolbarIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.selection-toolbar-in { animation: selectionToolbarIn 0.12s ease-out; }
+
+/* ---------- 文档中心页：进场淡入上浮 + 滚动揭示 ---------- */
+@keyframes docsFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.docs-enter { animation: docsFadeUp 0.6s var(--ease-spring) both; }
+.docs-enter-1 { animation-delay: 0.06s; }
+.docs-enter-2 { animation-delay: 0.14s; }
+.docs-enter-3 { animation-delay: 0.22s; }
+.docs-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s var(--ease-spring), transform 0.55s var(--ease-spring);
+}
+.docs-reveal.docs-reveal-in { opacity: 1; transform: none; }
+
+/* ---------- 首页 section 进场 ---------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.6s var(--ease-spring) both; }
+
+/* ---------- 咖啡弹窗：卡片出入 / 遮罩出入 / 胶囊 / 收款码 ---------- */
+@keyframes coffeeModalOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(10px) scale(0.97); }
+}
+@keyframes coffeeBackdropOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes coffeeQrIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+.coffee-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
+.coffee-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
+.coffee-pill-in { animation: pillIn 0.28s var(--ease-spring) both; }
+.coffee-pill-out { animation: pillOut 0.3s ease-in both; }
+.coffee-qr-in { animation: coffeeQrIn 0.22s ease-out both; }
+
+/* ---------- 主题配置面板：侧滑出入 + 调色盘弹层 ---------- */
+@keyframes themeSideIn {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes themeSideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(16px); }
+}
+@keyframes colorPickerIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.theme-side-in { animation: themeSideIn 0.25s var(--ease-spring) both; }
+.theme-side-out { animation: themeSideOut 0.18s ease-in both; }
+.color-picker-pop { animation: colorPickerIn 0.16s ease-out; }
+
+/* 色相滑杆：胶囊彩虹轨道 + 白色圆点滑块 */
+.hue-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  outline: none;
+  cursor: pointer;
+}
+.hue-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.hue-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- 图标库：内联图标基样式 + 复制提示 ---------- */
+.tp-icon { display: inline-flex; align-items: center; vertical-align: -0.125em; }
+.tp-icon svg { width: 1em; height: 1em; fill: currentColor; }
+@keyframes iconTipIn {
+  from { opacity: 0; transform: translateX(4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.icon-tip-in { animation: iconTipIn 0.15s ease-out both; }
+
+/* ---------- 图标库弹窗（复用通用卡片 / 遮罩 / 胶囊动画） ---------- */
+.icon-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.icon-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+
+/* ---------- 照片弹窗 ---------- */
+.ph-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.ph-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+
+/* ---------- 模板库弹窗（复用通用卡片 / 遮罩 / 胶囊动画） ---------- */
+.tpl-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.tpl-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.tpl-pill-in { animation: pillIn 0.28s var(--ease-spring) both; }
+.tpl-pill-out { animation: pillOut 0.3s ease-in both; }
+
+/* ---------- 用户设置弹窗 ---------- */
+.user-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.user-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+
+/* ---------- 头像裁剪弹窗 ---------- */
+.avatar-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+
+/* ---------- 编辑器顶栏：简历名称行内编辑 ---------- */
+@keyframes titleEditIn {
+  from { opacity: 0; transform: translateY(3px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes titleEditOut {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(3px) scale(0.97); }
+}
+.title-edit-in { animation: titleEditIn 0.18s var(--ease-spring) both; }
+.title-edit-out { animation: titleEditOut 0.16s ease both; }
+
+/* ---------- 全站悬停提示气泡 ---------- */
+@keyframes hoverTipIn {
+  from { opacity: 0; transform: translateX(-3px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.hover-tip-in { animation: hoverTipIn 0.12s ease-out both; }
+
+/* ---------- 减少动态效果：全部动画停用 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .dropdown-pop,
+  .dropdown-pop.dropdown-down,
+  .dropdown-pop.dropdown-up,
+  .nav-menu-pop,
+  .docs-drawer-panel,
+  .docs-drawer-out,
+  .docs-drawer-tabpane,
+  .editor-fade-up,
+  .fullscreen-in,
+  .ai-window-in,
+  .ai-window-out,
+  .selection-toolbar-in,
+  .docs-enter,
+  .docs-reveal,
+  .fade-up,
+  .coffee-modal-in,
+  .coffee-modal-out,
+  .coffee-backdrop-in,
+  .coffee-backdrop-out,
+  .coffee-pill-in,
+  .coffee-pill-out,
+  .coffee-qr-in,
+  .theme-side-in,
+  .theme-side-out,
+  .color-picker-pop,
+  .icon-modal-in,
+  .icon-backdrop-in,
+  .icon-tip-in,
+  .ph-modal-in,
+  .ph-backdrop-in,
+  .tpl-modal-in,
+  .tpl-backdrop-in,
+  .tpl-pill-in,
+  .tpl-pill-out,
+  .user-modal-in,
+  .user-backdrop-in,
+  .avatar-modal-in,
+  .title-edit-in,
+  .title-edit-out,
+  .hover-tip-in {
+    animation: none;
+  }
+  .docs-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

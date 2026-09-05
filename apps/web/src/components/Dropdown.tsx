@@ -1,5 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useTr } from '@/i18n/LangContext';
+import { useDismissable } from '@/hooks/useDismissable';
 
 export interface DropdownOption<T extends string> {
   value: T;
@@ -45,22 +46,8 @@ export function Dropdown<T extends string>({
     );
   }, [open, options.length]);
 
-  // 点击外部 / Escape 关闭
-  useEffect(() => {
-    if (!open) return;
-    const handleDown = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', handleDown);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.removeEventListener('mousedown', handleDown);
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [open]);
+  // 点击外部 / Escape 关闭（公共 hook）
+  useDismissable(open, rootRef, () => setOpen(false));
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -101,21 +88,6 @@ export function Dropdown<T extends string>({
             dir === 'up' ? 'bottom-full mb-1 dropdown-up' : 'top-full mt-1 dropdown-down'
           }`}
         >
-          <style>{`
-            @keyframes dropdownIn {
-              from { opacity: 0; transform: translateY(-4px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes dropdownInUp {
-              from { opacity: 0; transform: translateY(4px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            .dropdown-pop.dropdown-down { animation: dropdownIn 0.15s ease-out both; }
-            .dropdown-pop.dropdown-up { animation: dropdownInUp 0.15s ease-out both; }
-            @media (prefers-reduced-motion: reduce) {
-              .dropdown-pop.dropdown-down, .dropdown-pop.dropdown-up { animation: none; }
-            }
-          `}</style>
           {options.map((opt) => {
             const selected = opt.value === value;
             return (

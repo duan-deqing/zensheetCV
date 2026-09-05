@@ -577,15 +577,7 @@ export function UserModal() {
     }
   }, [userModalOpen]);
 
-  // Esc 关闭
-  useEffect(() => {
-    if (!userModalOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [userModalOpen, close]);
+  // Esc 关闭由 useModalClose 内置监听
 
   if (!userModalOpen || !user) return null;
 
@@ -596,21 +588,6 @@ export function UserModal() {
       aria-modal="true"
       aria-label={tr({ zh: '设置', en: 'Settings' })}
     >
-      <style>{`
-        @keyframes userModalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes userBackdropIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .user-modal-in { animation: userModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .user-backdrop-in { animation: userBackdropIn 0.2s ease-out both; }
-        @media (prefers-reduced-motion: reduce) {
-          .user-modal-in, .user-backdrop-in { animation: none; }
-        }
-      `}</style>
       {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
       <div
         className={`${closing ? 'modal-backdrop-out' : 'user-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}

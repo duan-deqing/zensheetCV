@@ -98,18 +98,6 @@ export function PhotoModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={tr({ zh: '上传照片', en: 'Upload Photo' })}>
-      <style>{`
-        @keyframes phModalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes phBackdropIn { from { opacity: 0; } to { opacity: 1; } }
-        .ph-modal-in { animation: phModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .ph-backdrop-in { animation: phBackdropIn 0.2s ease-out both; }
-        @media (prefers-reduced-motion: reduce) {
-          .ph-modal-in, .ph-backdrop-in { animation: none; }
-        }
-      `}</style>
       {/* 遮罩：背景变灰聚焦，点击取消 */}
       <div className={`${closing ? 'modal-backdrop-out' : 'ph-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`} onClick={close} aria-hidden="true" />
       <div className={`${closing ? 'modal-out' : 'ph-modal-in'} relative flex flex-col items-center bg-white border border-gray-200 rounded-2xl shadow-xl px-6 pt-5 pb-6`}>

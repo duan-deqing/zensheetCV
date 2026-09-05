@@ -1,7 +1,7 @@
-import { useUI } from '@/store/UIContext';
+import { useToastValue } from '@/store/ToastContext';
 
 export function Toast() {
-  const { toasts, removeToast } = useUI();
+  const { toasts, removeToast } = useToastValue();
 
   if (toasts.length === 0) return null;
 

@@ -197,33 +197,6 @@ export function EditorPage() {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-white">
-      <style>{`
-        @keyframes editorFadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .editor-fade-up { animation: editorFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        /* 全屏预览入场：淡入上浮，与编辑视图回到时的动画语言一致 */
-        @keyframes fullscreenIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .fullscreen-in { animation: fullscreenIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        /* AI 助手侧栏：打开滑入 / 关闭滑出（wrapper 携拖拽条整体） */
-        @keyframes aiWindowIn {
-          from { opacity: 0; transform: translateX(16px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes aiWindowOut {
-          from { opacity: 1; transform: translateX(0); }
-          to { opacity: 0; transform: translateX(16px); }
-        }
-        .ai-window-in { animation: aiWindowIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .ai-window-out { animation: aiWindowOut 0.18s ease-in both; }
-        @media (prefers-reduced-motion: reduce) {
-          .editor-fade-up, .fullscreen-in, .ai-window-in, .ai-window-out { animation: none; }
-        }
-      `}</style>
       {/* 全屏预览：隐藏顶栏与编辑器列，仅保留预览 */}
       {!isFullscreen && <TopBar />}
       {/* 手机端视图切换（分段控件）：编辑 ↔ 预览；桌面分栏布局下隐藏 */}

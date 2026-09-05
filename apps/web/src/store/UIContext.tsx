@@ -1,10 +1,17 @@
-import { createContext, useContext, useState, useCallback, useRef, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
+import { useToastValue } from '@/store/ToastContext';
 
-interface ToastMessage {
-  id: string;
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
+/** 弹窗 / 面板开关的唯一标识：UIContext 内部以单个 record 持有全部开关状态 */
+export type PanelId =
+  | 'sidebar'
+  | 'themePanel'
+  | 'aiWindow'
+  | 'templateModal'
+  | 'photoModal'
+  | 'iconModal'
+  | 'userModal'
+  | 'coffeeModal'
+  | 'docsDrawer';
 
 interface UIContextType {
   sidebarOpen: boolean;
@@ -23,7 +30,6 @@ interface UIContextType {
   savedPulse: number;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
   addedTemplates: string[];
-  toasts: ToastMessage[];
   toggleSidebar: () => void;
   toggleThemePanel: () => void;
   toggleAIWindow: () => void;
@@ -36,8 +42,8 @@ interface UIContextType {
   pulseSaved: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
+  /** 兼容保留：toast 已拆分至 ToastContext，此处透传供既有调用点使用 */
   addToast: (message: string, type?: 'success' | 'error' | 'info') => void;
-  removeToast: (id: string) => void;
 }
 
 const UIContext = createContext<UIContextType | null>(null);
@@ -46,16 +52,9 @@ const UIContext = createContext<UIContextType | null>(null);
 const ADDED_TEMPLATES_KEY = 'stylan.added_templates';
 
 export function UIProvider({ children }: { children: ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [themePanelOpen, setThemePanelOpen] = useState(false);
-  const [aiWindowOpen, setAIWindowOpen] = useState(false);
-  const [templateModalOpen, setTemplateModalOpen] = useState(false);
-  const [photoModalOpen, setPhotoModalOpen] = useState(false);
-  const [iconModalOpen, setIconModalOpen] = useState(false);
-  const [userModalOpen, setUserModalOpen] = useState(false);
-  const [coffeeModalOpen, setCoffeeModalOpen] = useState(false);
-  const [docsDrawerOpen, setDocsDrawerOpen] = useState(false);
-  // 保存成功脉冲：手动与自动保存共用，保存按钮监听计数变化播放落定回弹
+  // 全部弹窗 / 面板开关收进单个 record：一次 useState 管理 9 个开关，
+  // sidebar 默认展开，其余默认关闭
+  const [openPanels, setOpenPanels] = useState<Partial<Record<PanelId, boolean>>>({ sidebar: true });
   const [savedPulse, setSavedPulse] = useState(0);
   // 已添加模板持久化在 localStorage：模板库「添加」后写入，主题面板下拉读取
   const [addedTemplates, setAddedTemplates] = useState<string[]>(() => {
@@ -65,18 +64,31 @@ export function UIProvider({ children }: { children: ReactNode }) {
       return [];
     }
   });
-  const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
-  const toggleSidebar = useCallback(() => setSidebarOpen((p) => !p), []);
-  const toggleThemePanel = useCallback(() => setThemePanelOpen((p) => !p), []);
-  const toggleAIWindow = useCallback(() => setAIWindowOpen((p) => !p), []);
-  const toggleTemplateModal = useCallback(() => setTemplateModalOpen((p) => !p), []);
-  const togglePhotoModal = useCallback(() => setPhotoModalOpen((p) => !p), []);
-  const toggleIconModal = useCallback(() => setIconModalOpen((p) => !p), []);
-  const toggleUserModal = useCallback(() => setUserModalOpen((p) => !p), []);
-  const toggleCoffeeModal = useCallback(() => setCoffeeModalOpen((p) => !p), []);
-  const toggleDocsDrawer = useCallback(() => setDocsDrawerOpen((p) => !p), []);
+  const togglePanel = useCallback((id: PanelId) => {
+    setOpenPanels((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
+
+  // —— 以下全部由 record 派生，保持既有对外 API 不变 ——
+  const sidebarOpen = !!openPanels.sidebar;
+  const themePanelOpen = !!openPanels.themePanel;
+  const aiWindowOpen = !!openPanels.aiWindow;
+  const templateModalOpen = !!openPanels.templateModal;
+  const photoModalOpen = !!openPanels.photoModal;
+  const iconModalOpen = !!openPanels.iconModal;
+  const userModalOpen = !!openPanels.userModal;
+  const coffeeModalOpen = !!openPanels.coffeeModal;
+  const docsDrawerOpen = !!openPanels.docsDrawer;
+
+  const toggleSidebar = useCallback(() => togglePanel('sidebar'), [togglePanel]);
+  const toggleThemePanel = useCallback(() => togglePanel('themePanel'), [togglePanel]);
+  const toggleAIWindow = useCallback(() => togglePanel('aiWindow'), [togglePanel]);
+  const toggleTemplateModal = useCallback(() => togglePanel('templateModal'), [togglePanel]);
+  const togglePhotoModal = useCallback(() => togglePanel('photoModal'), [togglePanel]);
+  const toggleIconModal = useCallback(() => togglePanel('iconModal'), [togglePanel]);
+  const toggleUserModal = useCallback(() => togglePanel('userModal'), [togglePanel]);
+  const toggleCoffeeModal = useCallback(() => togglePanel('coffeeModal'), [togglePanel]);
+  const toggleDocsDrawer = useCallback(() => togglePanel('docsDrawer'), [togglePanel]);
   const pulseSaved = useCallback(() => setSavedPulse((p) => p + 1), []);
 
   const addTemplate = useCallback((id: string) => {
@@ -104,64 +116,68 @@ export function UIProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-    const timer = timersRef.current.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      timersRef.current.delete(id);
-    }
-  }, []);
+  // toast 状态在独立的 ToastContext 中；此处透传 addToast（引用稳定），
+  // toast 弹出只重渲染 Toast 组件，不再波及订阅 UIContext 的组件
+  const { addToast } = useToastValue();
 
-  const addToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    const id = Date.now().toString();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    const timer = setTimeout(() => removeToast(id), 3000);
-    timersRef.current.set(id, timer);
-  }, [removeToast]);
-
-  useEffect(() => {
-    const timers = timersRef.current;
-    return () => {
-      timers.forEach((timer) => clearTimeout(timer));
-      timers.clear();
-    };
-  }, []);
-
-  return (
-    <UIContext.Provider
-      value={{
-        sidebarOpen,
-        themePanelOpen,
-        aiWindowOpen,
-        templateModalOpen,
-        photoModalOpen,
-        iconModalOpen,
-        userModalOpen,
-        coffeeModalOpen,
-        docsDrawerOpen,
-        savedPulse,
-        addedTemplates,
-        toasts,
-        toggleSidebar,
-        toggleThemePanel,
-        toggleAIWindow,
-        toggleTemplateModal,
-        togglePhotoModal,
-        toggleIconModal,
-        toggleUserModal,
-        toggleCoffeeModal,
-        toggleDocsDrawer,
-        pulseSaved,
-        addTemplate,
-        removeTemplate,
-        addToast,
-        removeToast,
-      }}
-    >
-      {children}
-    </UIContext.Provider>
+  // value 记忆化：仅开关 / 脉冲 / 模板列表真正变化时才更新引用，
+  // Provider 因父级重渲染而重跑时消费者不再连带重渲染
+  const value = useMemo(
+    () => ({
+      sidebarOpen,
+      themePanelOpen,
+      aiWindowOpen,
+      templateModalOpen,
+      photoModalOpen,
+      iconModalOpen,
+      userModalOpen,
+      coffeeModalOpen,
+      docsDrawerOpen,
+      savedPulse,
+      addedTemplates,
+      toggleSidebar,
+      toggleThemePanel,
+      toggleAIWindow,
+      toggleTemplateModal,
+      togglePhotoModal,
+      toggleIconModal,
+      toggleUserModal,
+      toggleCoffeeModal,
+      toggleDocsDrawer,
+      pulseSaved,
+      addTemplate,
+      removeTemplate,
+      addToast,
+    }),
+    [
+      sidebarOpen,
+      themePanelOpen,
+      aiWindowOpen,
+      templateModalOpen,
+      photoModalOpen,
+      iconModalOpen,
+      userModalOpen,
+      coffeeModalOpen,
+      docsDrawerOpen,
+      savedPulse,
+      addedTemplates,
+      toggleSidebar,
+      toggleThemePanel,
+      toggleAIWindow,
+      toggleTemplateModal,
+      togglePhotoModal,
+      toggleIconModal,
+      toggleUserModal,
+      toggleCoffeeModal,
+      toggleDocsDrawer,
+      pulseSaved,
+      addTemplate,
+      removeTemplate,
+      addToast,
+    ],
   );
+
+  return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
 }
 
 export function useUI() {

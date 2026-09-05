@@ -43,15 +43,7 @@ export function IconModal() {
   // 复制结果内联提示：显示在底部提示区右侧，2 秒后自动消失
   const [copied, setCopied] = useState<{ text: string; ok: boolean } | null>(null);
 
-  // Esc 关闭
-  useEffect(() => {
-    if (!iconModalOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [iconModalOpen, close]);
+  // Esc 关闭由 useModalClose 内置监听
 
   // 提示自动消失
   useEffect(() => {
@@ -79,28 +71,6 @@ export function IconModal() {
       aria-modal="true"
       aria-label={tr({ zh: '图标库', en: 'Icon Library' })}
     >
-      <style>{`
-        @keyframes iconModalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes iconBackdropIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .icon-modal-in { animation: iconModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .icon-backdrop-in { animation: iconBackdropIn 0.2s ease-out both; }
-        .tp-icon { display: inline-flex; align-items: center; vertical-align: -0.125em; }
-        .tp-icon svg { width: 1em; height: 1em; fill: currentColor; }
-        @keyframes iconTipIn {
-          from { opacity: 0; transform: translateX(4px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .icon-tip-in { animation: iconTipIn 0.15s ease-out both; }
-        @media (prefers-reduced-motion: reduce) {
-          .icon-modal-in, .icon-backdrop-in, .icon-tip-in { animation: none; }
-        }
-      `}</style>
       {/* 遮罩：点击关闭 */}
       <div
         className={`${closing ? 'modal-backdrop-out' : 'icon-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}

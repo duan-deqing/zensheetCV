@@ -75,16 +75,7 @@ export function CoffeeModal() {
   // 卸载时清理胶囊相关定时器
   useEffect(() => () => timersRef.current.forEach((t) => window.clearTimeout(t)), []);
 
-  // Esc 关闭
-  useEffect(() => {
-    if (!coffeeModalOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [coffeeModalOpen]);
+  // Esc 关闭由 useModalClose 内置监听
 
   if (!coffeeModalOpen && !thanks) return null;
 
@@ -127,47 +118,6 @@ export function CoffeeModal() {
       aria-modal="true"
       aria-label={tr({ zh: '请作者喝杯咖啡', en: 'Buy me a coffee' })}
     >
-      <style>{`
-        @keyframes coffeeModalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes coffeeModalOut {
-          from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(10px) scale(0.97); }
-        }
-        @keyframes coffeeBackdropIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes coffeeBackdropOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-        @keyframes coffeePillIn {
-          from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes coffeePillOut {
-          from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(-10px) scale(0.95); }
-        }
-        @keyframes coffeeQrIn {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .coffee-modal-in { animation: coffeeModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
-        .coffee-backdrop-in { animation: coffeeBackdropIn 0.2s ease-out both; }
-        .coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
-        .coffee-pill-in { animation: coffeePillIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .coffee-pill-out { animation: coffeePillOut 0.3s ease-in both; }
-        .coffee-qr-in { animation: coffeeQrIn 0.22s ease-out both; }
-        @media (prefers-reduced-motion: reduce) {
-          .coffee-modal-in, .coffee-modal-out, .coffee-backdrop-in, .coffee-backdrop-out,
-          .coffee-pill-in, .coffee-pill-out, .coffee-qr-in { animation: none; }
-        }
-      `}</style>
       {/* 遮罩：点击关闭（胶囊停留期间弹窗已卸载，遮罩不渲染且容器不拦截点击） */}
       {coffeeModalOpen && (
         <div

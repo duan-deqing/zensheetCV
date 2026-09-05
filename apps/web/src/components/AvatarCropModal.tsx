@@ -90,14 +90,6 @@ export function AvatarCropModal({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-label={tr({ zh: '调整头像', en: 'Adjust avatar' })}>
-      <style>{`
-        @keyframes avatarModalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        .avatar-modal-in { animation: avatarModalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @media (prefers-reduced-motion: reduce) { .avatar-modal-in { animation: none; } }
-      `}</style>
       <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[2px]" onClick={uploading ? undefined : onCancel} aria-hidden="true" />
       <div className="avatar-modal-in relative w-[min(400px,calc(100vw-2rem))] bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
         {/* 顶栏：与其他弹窗同构 */}

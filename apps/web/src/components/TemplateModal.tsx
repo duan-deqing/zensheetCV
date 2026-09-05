@@ -72,15 +72,7 @@ export function TemplateModal() {
   // 卸载时清理胶囊定时器
   useEffect(() => () => pillTimersRef.current.forEach((t) => window.clearTimeout(t)), []);
 
-  // Esc 关闭
-  useEffect(() => {
-    if (!templateModalOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [templateModalOpen, close]);
+  // Esc 关闭由 useModalClose 内置监听
 
   if (!templateModalOpen) return null;
   const currentId = currentTemplate?.id || 'classic';
@@ -92,31 +84,6 @@ export function TemplateModal() {
       aria-modal="true"
       aria-label={tr({ zh: '模板库', en: 'Template Library' })}
     >
-      <style>{`
-        @keyframes modalIn {
-          from { opacity: 0; transform: translateY(12px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes backdropIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes tplPillIn {
-          from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes tplPillOut {
-          from { opacity: 1; transform: translateY(0) scale(1); }
-          to { opacity: 0; transform: translateY(-10px) scale(0.95); }
-        }
-        .tpl-modal-in { animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .tpl-backdrop-in { animation: backdropIn 0.2s ease-out both; }
-        .tpl-pill-in { animation: tplPillIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .tpl-pill-out { animation: tplPillOut 0.3s ease-in both; }
-        @media (prefers-reduced-motion: reduce) {
-          .tpl-modal-in, .tpl-backdrop-in, .tpl-pill-in, .tpl-pill-out { animation: none; }
-        }
-      `}</style>
       {/* 遮罩：打开后背景变灰聚焦，点击关闭 */}
       <div
         className={`${closing ? 'modal-backdrop-out' : 'tpl-backdrop-in'} absolute inset-0 bg-gray-900/40 backdrop-blur-[2px]`}

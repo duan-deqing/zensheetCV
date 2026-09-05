@@ -12,17 +12,6 @@ export interface TipAnchor {
   centerY: number;
 }
 
-const TIP_KEYFRAMES = `
-  @keyframes hoverTipIn {
-    from { opacity: 0; transform: translateX(-3px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .hover-tip-in { animation: hoverTipIn 0.12s ease-out both; }
-  @media (prefers-reduced-motion: reduce) {
-    .hover-tip-in { animation: none; }
-  }
-`;
-
 /** 气泡本体：HoverTip 内部使用，也可配合自有状态逻辑使用（如编辑器工具栏「更多」折叠） */
 export function TipBubble({ text, anchor }: { text: string; anchor: TipAnchor }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +38,6 @@ export function TipBubble({ text, anchor }: { text: string; anchor: TipAnchor })
       style={pos ?? { left: anchor.right, top: anchor.centerY, visibility: 'hidden' }}
     >
       <span className="hover-tip-in block whitespace-nowrap px-2 py-1 rounded-md bg-gray-900/90 text-white text-[12px] leading-4 shadow-lg">
-        <style>{TIP_KEYFRAMES}</style>
         {text}
       </span>
     </div>,

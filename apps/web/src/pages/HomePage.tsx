@@ -212,17 +212,6 @@ export function HomePage() {
   const tr = useTr();
   return (
     <div className="bg-white text-gray-900">
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @media (prefers-reduced-motion: reduce) {
-          .fade-up { animation: none; }
-        }
-      `}</style>
-
       {/* Hero：左文右真实简历预览 */}
       <section className="max-w-7xl mx-auto px-6 pt-14 pb-16 lg:pt-20 grid lg:grid-cols-2 gap-12 items-center">
         <div>

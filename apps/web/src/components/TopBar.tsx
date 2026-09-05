@@ -13,6 +13,7 @@ import { CoffeeModal, CoffeeIcon } from '@/components/CoffeeModal';
 import { useUI } from '@/store/UIContext';
 import { usePDFExport } from '@/hooks/usePDFExport';
 import { useTr } from '@/i18n/LangContext';
+import { useDismissable } from '@/hooks/useDismissable';
 
 /** 文档图标，颜色跟随 currentColor */
 function FileIcon() {
@@ -133,22 +134,8 @@ function FileMenu() {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 点击外部 / Escape 关闭
-  useEffect(() => {
-    if (!open) return;
-    const handleDown = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('mousedown', handleDown);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.removeEventListener('mousedown', handleDown);
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [open]);
+  // 点击外部 / Escape 关闭（公共 hook）
+  useDismissable(open, rootRef, () => setOpen(false));
 
   const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -197,16 +184,6 @@ function FileMenu() {
           role="menu"
           className="dropdown-pop absolute left-0 top-full mt-1.5 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-30"
         >
-          <style>{`
-            @keyframes dropdownIn {
-              from { opacity: 0; transform: translateY(-4px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            .dropdown-pop { animation: dropdownIn 0.15s ease-out both; }
-            @media (prefers-reduced-motion: reduce) {
-              .dropdown-pop { animation: none; }
-            }
-          `}</style>
           <button
             type="button"
             role="menuitem"
@@ -307,24 +284,7 @@ function textWidth(s: string) {
   return [...s].reduce((w, c) => w + (c.charCodeAt(0) > 0x2e80 ? 1 : 0.55), 0);
 }
 
-const TITLE_EDIT_MS = 160; // 退出动画时长，需与 titleEditOut 保持一致
-
-/** 标题行内编辑的进入/退出动画：轻微上移缩放 + 淡入淡出（与全站动效曲线一致） */
-const TITLE_EDIT_KEYFRAMES = `
-  @keyframes titleEditIn {
-    from { opacity: 0; transform: translateY(3px) scale(0.97); }
-    to { opacity: 1; transform: none; }
-  }
-  @keyframes titleEditOut {
-    from { opacity: 1; transform: none; }
-    to { opacity: 0; transform: translateY(3px) scale(0.97); }
-  }
-  .title-edit-in { animation: titleEditIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .title-edit-out { animation: titleEditOut 0.16s ease both; }
-  @media (prefers-reduced-motion: reduce) {
-    .title-edit-in, .title-edit-out { animation: none; }
-  }
-`;
+const TITLE_EDIT_MS = 160; // 退出动画时长，需与 animations.css 中 titleEditOut 保持一致
 
 /** 可编辑简历标题：点击进入行内编辑，Enter/失焦保存，Esc 取消；
  *  进入/退出编辑态均带过渡动画（退出先播淡出，动画结束后再切回名称按钮） */
@@ -379,7 +339,6 @@ function EditableTitle({ onNotify }: { onNotify: (kind: 'success' | 'error', tex
 
   return (
     <>
-      <style>{TITLE_EDIT_KEYFRAMES}</style>
       {editing ? (
         <input
           ref={inputRef}
@@ -428,27 +387,13 @@ export function TopBar() {
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
 
-  // 手机端折叠菜单状态与关闭监听（点击外部 / Escape）
+  // 手机端折叠菜单开关；点击外部 / Escape 关闭走公共 hook
   const [menuOpen, setMenuOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   const importInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handleDown = (e: MouseEvent) => {
-      if (!barRef.current?.contains(e.target as Node)) setMenuOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
-    };
-    document.addEventListener('mousedown', handleDown);
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.removeEventListener('mousedown', handleDown);
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [menuOpen]);
+  useDismissable(menuOpen, barRef, () => setMenuOpen(false));
 
   /** 手机菜单：保存（与 SaveButton 桌面行为一致：提交 markdown + 模板 + 主题） */
   const handleSave = async () => {
@@ -684,16 +629,6 @@ export function TopBar() {
             role="menu"
             className="nav-menu-pop md:hidden absolute right-2 w-60 max-w-[calc(100%-1rem)] top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-[0_16px_44px_rgba(17,24,39,0.12)] py-2 z-40"
           >
-            <style>{`
-              @keyframes navMenuIn {
-                from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-                to { opacity: 1; transform: none; }
-              }
-              .nav-menu-pop { animation: navMenuIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: top right; }
-              @media (prefers-reduced-motion: reduce) {
-                .nav-menu-pop { animation: none; }
-              }
-            `}</style>
             {/* 隐藏的文件选择框：导入 Markdown */}
             <input ref={importInputRef} type="file" accept=".md,.markdown,.txt" className="hidden" onChange={handleImportFile} />
             <button

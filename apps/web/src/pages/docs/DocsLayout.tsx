@@ -45,26 +45,6 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="bg-white text-gray-900 flex flex-col min-h-screen">
-      <style>{`
-        @keyframes docsFadeUp {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: none; }
-        }
-        .docs-enter { animation: docsFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        .docs-enter-1 { animation-delay: 0.06s; }
-        .docs-enter-2 { animation-delay: 0.14s; }
-        .docs-enter-3 { animation-delay: 0.22s; }
-        .docs-reveal {
-          opacity: 0;
-          transform: translateY(18px);
-          transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .docs-reveal.docs-reveal-in { opacity: 1; transform: none; }
-        @media (prefers-reduced-motion: reduce) {
-          .docs-enter, .docs-reveal { animation: none; opacity: 1; transform: none; transition: none; }
-        }
-      `}</style>
-
       {/* 页头 */}
       <header className="max-w-7xl mx-auto w-full px-6 pt-14 pb-10">
         <p className="docs-enter font-mono text-xs uppercase tracking-[0.22em] text-primary-600 mb-4">

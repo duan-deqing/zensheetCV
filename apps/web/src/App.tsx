@@ -4,6 +4,7 @@ import { EditorProvider } from '@/store/EditorContext';
 import { ResumeProvider } from '@/store/ResumeContext';
 import { PreviewProvider } from '@/store/PreviewContext';
 import { UIProvider } from '@/store/UIContext';
+import { ToastProvider } from '@/store/ToastContext';
 import { AuthProvider } from '@/store/AuthContext';
 import { LangProvider } from '@/i18n/LangContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -28,7 +29,8 @@ function App() {
       <HashRouter>
         <LangProvider>
           <AuthProvider>
-            <UIProvider>
+            <ToastProvider>
+              <UIProvider>
               <EditorProvider>
                 <ResumeProvider>
                   <PreviewProvider>
@@ -53,7 +55,8 @@ function App() {
                   </PreviewProvider>
                 </ResumeProvider>
               </EditorProvider>
-            </UIProvider>
+              </UIProvider>
+            </ToastProvider>
           </AuthProvider>
         </LangProvider>
       </HashRouter>

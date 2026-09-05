@@ -28,5 +28,15 @@ export function useModalClose(open: boolean, onClose: () => void) {
     }
   }, [open]);
 
+  // Escape 关闭：走统一 close（含两段式动画与 closingRef 防抖），各弹窗无需自行监听
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, close]);
+
   return { closing, close };
 }

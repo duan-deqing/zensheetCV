@@ -306,15 +306,7 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Esc 关闭（面板打开时）
-  useEffect(() => {
-    if (!aiWindowOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [aiWindowOpen, close]);
+  // Esc 关闭由 useModalClose 内置监听
 
   // 打开时聚焦输入框；消息变化时滚动到底部
   useEffect(() => {

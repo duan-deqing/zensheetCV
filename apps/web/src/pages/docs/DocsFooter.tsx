@@ -118,7 +118,7 @@ export function DocsFooter({ dark = false }: { dark?: boolean }) {
             ZENSHEET{tr({ zh: ' · 简历', en: ' · Resume' })}
           </p>
           <p className={`text-sm ${tone.credit}`}>
-            {tr({ zh: '在线 Markdown 简历编辑器 · 模板 · AI · PDF · 由', en: 'Online Markdown resume editor · Templates · AI · PDF · Built by' })}{' '}
+            {tr({ zh: '由', en: 'Built by' })}{' '}
             <a
               href={AUTHOR_URL}
               target="_blank"

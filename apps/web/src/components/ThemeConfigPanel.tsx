@@ -268,55 +268,6 @@ export function ThemeConfigPanel() {
       className={`${closing ? 'theme-side-out' : 'theme-side-in'} absolute right-2 top-2 bottom-2 z-10 w-[min(24rem,calc(100%-1rem))] rounded-xl border border-gray-200 shadow-sm bg-white flex flex-col overflow-y-auto`}
       aria-label={tr({ zh: '主题配置', en: 'Theme settings' })}
     >
-      <style>{`
-        @keyframes themeSideIn {
-          from { opacity: 0; transform: translateX(16px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        .theme-side-in { animation: themeSideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @keyframes themeSideOut {
-          from { opacity: 1; transform: translateX(0); }
-          to { opacity: 0; transform: translateX(16px); }
-        }
-        .theme-side-out { animation: themeSideOut 0.18s ease-in both; }
-        @media (prefers-reduced-motion: reduce) {
-          .theme-side-in, .theme-side-out { animation: none; }
-        }
-        /* 自定义调色盘弹层入场动画 */
-        @keyframes colorPickerIn {
-          from { opacity: 0; transform: translateY(4px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .color-picker-pop { animation: colorPickerIn 0.16s ease-out; }
-        /* 色相滑杆：胶囊彩虹轨道 + 白色圆点滑块 */
-        .hue-slider {
-          -webkit-appearance: none;
-          appearance: none;
-          display: block;
-          height: 10px;
-          border-radius: 999px;
-          background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
-          outline: none;
-          cursor: pointer;
-        }
-        .hue-slider::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          background: #fff;
-          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
-        }
-        .hue-slider::-moz-range-thumb {
-          width: 16px;
-          height: 16px;
-          border: none;
-          border-radius: 50%;
-          background: #fff;
-          box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
-        }
-      `}</style>
-
       {/* 顶栏：与预览顶栏同构（mono 眉标 + py-2 + h-7 按钮 = 44px 等高） */}
       <div className="flex items-center gap-3 px-4 py-2 bg-white border-b border-gray-200 shrink-0">
         <p

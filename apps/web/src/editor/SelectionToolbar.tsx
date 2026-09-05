@@ -105,16 +105,6 @@ export function SelectionToolbar() {
         transform: pos.below ? 'translate(-50%, 0)' : 'translate(-50%, -100%)',
       }}
     >
-      <style>{`
-        @keyframes selectionToolbarIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .selection-toolbar-in { animation: selectionToolbarIn 0.12s ease-out; }
-        @media (prefers-reduced-motion: reduce) {
-          .selection-toolbar-in { animation: none; }
-        }
-      `}</style>
       {BUTTON_GROUPS.map((group, i) => (
         <Fragment key={i}>
           {i > 0 && <span className="w-px h-4 bg-white/20 shrink-0" aria-hidden="true" />}

@@ -63,20 +63,15 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   // 统一关闭流程：滑出动画结束后再卸载（抽屉为滑入面板，采用对称滑出）
   const { closing, close } = useModalClose(open, onClose);
 
-  // 打开时锁定 body 滚动，Esc 关闭
+  // 打开时锁定 body 滚动（Esc 关闭由 useModalClose 内置监听）
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', handleKey);
     return () => {
       document.body.style.overflow = prevOverflow;
-      document.removeEventListener('keydown', handleKey);
     };
-  }, [open, close]);
+  }, [open]);
 
   // 切换 Tab 回到滚动顶部
   useEffect(() => {
@@ -94,27 +89,6 @@ export function DocsDrawer({ open, onClose }: { open: boolean; onClose: () => vo
 
   return createPortal(
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={tr({ zh: '使用文档', en: 'Documentation' })}>
-      <style>{`
-        @keyframes docsDrawerIn {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        .docs-drawer-panel { animation: docsDrawerIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @keyframes docsDrawerOut {
-          from { transform: translateX(0); }
-          to { transform: translateX(100%); }
-        }
-        .docs-drawer-out { animation: docsDrawerOut 0.2s ease-in both; }
-        @keyframes docsTabIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: none; }
-        }
-        .docs-drawer-tabpane { animation: docsTabIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
-        @media (prefers-reduced-motion: reduce) {
-          .docs-drawer-panel, .docs-drawer-out, .docs-drawer-tabpane { animation: none; }
-        }
-      `}</style>
-
       {/* 点击遮罩关闭 */}
       <button
         type="button"
