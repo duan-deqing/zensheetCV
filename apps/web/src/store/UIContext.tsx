@@ -11,7 +11,8 @@ export type PanelId =
   | 'iconModal'
   | 'userModal'
   | 'coffeeModal'
-  | 'docsDrawer';
+  | 'docsDrawer'
+  | 'browserHint';
 
 interface UIContextType {
   sidebarOpen: boolean;
@@ -26,6 +27,8 @@ interface UIContextType {
   coffeeModalOpen: boolean;
   /** 编辑器右侧文档抽屉 */
   docsDrawerOpen: boolean;
+  /** 「复制链接到浏览器」导出提示弹窗：WebView 自动弹出 / 导出菜单问号手动打开 */
+  browserHintOpen: boolean;
   /** 保存成功脉冲计数：手动/自动保存落库成功后递增，驱动保存按钮落定回弹动画 */
   savedPulse: number;
   /** 模板库中已添加的模板 id，决定主题面板下拉中可选项（当前模板始终可选） */
@@ -39,6 +42,7 @@ interface UIContextType {
   toggleUserModal: () => void;
   toggleCoffeeModal: () => void;
   toggleDocsDrawer: () => void;
+  toggleBrowserHint: () => void;
   pulseSaved: () => void;
   addTemplate: (id: string) => void;
   removeTemplate: (id: string) => void;
@@ -52,7 +56,7 @@ const UIContext = createContext<UIContextType | null>(null);
 const ADDED_TEMPLATES_KEY = 'stylan.added_templates';
 
 export function UIProvider({ children }: { children: ReactNode }) {
-  // 全部弹窗 / 面板开关收进单个 record：一次 useState 管理 9 个开关，
+  // 全部弹窗 / 面板开关收进单个 record：一次 useState 管理 10 个开关，
   // sidebar 默认展开，其余默认关闭
   const [openPanels, setOpenPanels] = useState<Partial<Record<PanelId, boolean>>>({ sidebar: true });
   const [savedPulse, setSavedPulse] = useState(0);
@@ -79,6 +83,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const userModalOpen = !!openPanels.userModal;
   const coffeeModalOpen = !!openPanels.coffeeModal;
   const docsDrawerOpen = !!openPanels.docsDrawer;
+  const browserHintOpen = !!openPanels.browserHint;
 
   const toggleSidebar = useCallback(() => togglePanel('sidebar'), [togglePanel]);
   const toggleThemePanel = useCallback(() => togglePanel('themePanel'), [togglePanel]);
@@ -89,6 +94,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const toggleUserModal = useCallback(() => togglePanel('userModal'), [togglePanel]);
   const toggleCoffeeModal = useCallback(() => togglePanel('coffeeModal'), [togglePanel]);
   const toggleDocsDrawer = useCallback(() => togglePanel('docsDrawer'), [togglePanel]);
+  const toggleBrowserHint = useCallback(() => togglePanel('browserHint'), [togglePanel]);
   const pulseSaved = useCallback(() => setSavedPulse((p) => p + 1), []);
 
   const addTemplate = useCallback((id: string) => {
@@ -133,6 +139,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       userModalOpen,
       coffeeModalOpen,
       docsDrawerOpen,
+      browserHintOpen,
       savedPulse,
       addedTemplates,
       toggleSidebar,
@@ -144,6 +151,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       toggleUserModal,
       toggleCoffeeModal,
       toggleDocsDrawer,
+      toggleBrowserHint,
       pulseSaved,
       addTemplate,
       removeTemplate,
@@ -159,6 +167,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       userModalOpen,
       coffeeModalOpen,
       docsDrawerOpen,
+      browserHintOpen,
       savedPulse,
       addedTemplates,
       toggleSidebar,
@@ -170,6 +179,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       toggleUserModal,
       toggleCoffeeModal,
       toggleDocsDrawer,
+      toggleBrowserHint,
       pulseSaved,
       addTemplate,
       removeTemplate,

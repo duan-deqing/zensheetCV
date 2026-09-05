@@ -4,6 +4,7 @@ import { useResumeStore } from '@/store/ResumeContext';
 import { useResume } from '@/hooks/useResume';
 import { useUI } from '@/store/UIContext';
 import { useTr } from '@/i18n/LangContext';
+import { isChromeOrEdge } from '@/hooks/usePDFExport';
 import { useMarkdownFileIO } from '@/hooks/useMarkdownFileIO';
 import { MenuPanel, MenuDivider, MenuButton, MenuUserItem } from '@/components/MenuPanel';
 import type { TopBarStatus } from '@/components/topbar/DesktopActions';
@@ -31,6 +32,7 @@ export function MobileMenu({ onClose, buttonStatus, onExportPDF, isExporting }: 
     toggleAIWindow,
     aiWindowOpen,
     pulseSaved,
+    toggleBrowserHint,
   } = useUI();
   const { markdown, isDirty } = useEditor();
   const dispatch = useEditorDispatch();
@@ -146,6 +148,30 @@ export function MobileMenu({ onClose, buttonStatus, onExportPDF, isExporting }: 
         }}
       >
         {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
+        {/* 非 Chrome / Edge 浏览器提示问号：点击打开「使用浏览器打开」弹窗（不触发导出） */}
+        {!isChromeOrEdge() && (
+          <span
+            role="button"
+            tabIndex={0}
+            aria-label={tr({ zh: '导出 PDF 帮助', en: 'Export PDF help' })}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+              toggleBrowserHint();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                onClose();
+                toggleBrowserHint();
+              }
+            }}
+            className="ml-auto -mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-300 text-[11px] font-semibold text-gray-400 transition-colors hover:border-primary-300 hover:text-primary-600"
+          >
+            ?
+          </span>
+        )}
       </MenuButton>
       <MenuDivider />
       <MenuUserItem

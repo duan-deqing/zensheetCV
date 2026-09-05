@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTr } from '@/i18n/LangContext';
+import { useUI } from '@/store/UIContext';
 import { isInAppWebView } from '@/hooks/usePDFExport';
 import { copyText } from '@/utils/clipboard';
 import { useModalClose } from '@/hooks/useModalClose';
@@ -8,36 +9,38 @@ import { HoverTip } from '@/components/HoverTip';
 /** 本会话内已关闭提示的 sessionStorage 标记 */
 const DISMISSED_KEY = 'stylan.browser_hint_dismissed';
 
-/** App 内置 WebView（微信 / QQ 等无地址栏环境）打开时的居中提示弹窗：
- *  引导复制链接到系统浏览器打开（推荐 Chrome）——导出 PDF 仅浏览器支持。
- *  每次 WebView 会话提示一次，关闭后本会话不再显示 */
+/** 「复制链接到浏览器」导出提示弹窗：
+ *  - App 内置 WebView（微信 / QQ 等无地址栏环境）打开时自动弹出，每次会话一次；
+ *  - 手机端导出菜单的问号按钮在非 Chrome / Edge 浏览器下也可手动打开。
+ *  引导使用 Chrome（推荐）或电脑端打开——导出 PDF 仅这些环境可靠支持 */
 export function BrowserHint() {
   const tr = useTr();
-  const [visible, setVisible] = useState(false);
+  const { browserHintOpen, toggleBrowserHint } = useUI();
   // 复制结果内联提示：2 秒后自动消失（toast 仅在编辑页渲染，此处用内联反馈）
   const [copied, setCopied] = useState<{ text: string; ok: boolean } | null>(null);
 
+  // WebView 自动提示：本会话内手动关闭过（含问号入口关闭）则不再自动弹出
   useEffect(() => {
     try {
-      if (isInAppWebView() && !sessionStorage.getItem(DISMISSED_KEY)) setVisible(true);
+      if (sessionStorage.getItem(DISMISSED_KEY)) return;
     } catch {
-      /* sessionStorage 不可用（隐私模式）时仍提示，由用户手动关闭 */
-      setVisible(true);
+      /* sessionStorage 不可用（隐私模式）时仍提示 */
     }
-  }, []);
+    if (isInAppWebView()) toggleBrowserHint();
+  }, [toggleBrowserHint]);
 
-  /** 真正卸载：记住本会话内不再打扰 */
-  const dismiss = useCallback(() => {
-    setVisible(false);
+  /** 统一关闭：记住本会话内不再自动打扰 */
+  const handleClose = useCallback(() => {
     try {
       sessionStorage.setItem(DISMISSED_KEY, '1');
     } catch {
       /* 忽略持久化失败 */
     }
-  }, []);
+    toggleBrowserHint();
+  }, [toggleBrowserHint]);
 
   // 统一关闭流程：✕ / Esc / 遮罩点击 → 淡出动画结束后卸载
-  const { closing, close } = useModalClose(visible, dismiss);
+  const { closing, close } = useModalClose(browserHintOpen, handleClose);
 
   // 内联提示自动消失
   useEffect(() => {
@@ -46,7 +49,7 @@ export function BrowserHint() {
     return () => window.clearTimeout(timer);
   }, [copied]);
 
-  if (!visible) return null;
+  if (!browserHintOpen) return null;
 
   const copyLink = async () => {
     const ok = await copyText(window.location.href);
@@ -108,8 +111,8 @@ export function BrowserHint() {
             </h4>
             <p className="mt-1 text-[13px] leading-relaxed text-gray-600">
               {tr({
-                zh: '在微信等应用内无法导出 PDF，请复制链接到浏览器中打开（推荐 Chrome）后再导出。',
-                en: 'PDF export isn’t available inside WeChat etc. Copy the link and open it in a browser (Chrome recommended) to export.',
+                zh: '如需导出为 PDF，请使用 Chrome 浏览器打开，又或者使用电脑端打开；其余浏览器无法导出为 PDF。',
+                en: 'To export as PDF, open this page in Chrome, or use a desktop browser. Other browsers cannot export PDF.',
               })}
             </p>
           </div>

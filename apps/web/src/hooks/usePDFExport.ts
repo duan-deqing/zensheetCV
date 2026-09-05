@@ -12,6 +12,23 @@ export function isInAppWebView(ua: string = navigator.userAgent): boolean {
 }
 
 /**
+ * 是否 Chrome / Edge「正主」浏览器：导出提示问号按钮的显隐条件——
+ * Chrome / Edge 不提示，其余浏览器（Safari / Firefox / 国产浏览器 / App WebView）提示。
+ * 众多国产浏览器与 WebView 的 UA 同样携带 Chrome/ 标记，需按品牌令牌逐一排除。
+ */
+export function isChromeOrEdge(ua: string = navigator.userAgent): boolean {
+  // Edge：桌面 / Android（Edg/、EdgA/）与 iOS（EdgiOS/）
+  if (/Edg(iOS|A)?\//.test(ua)) return true;
+  // Chrome iOS
+  if (/CriOS\//.test(ua)) return true;
+  // 借用 Chromium 内核的第三方浏览器与 App WebView 一律不算 Chrome 正主
+  const impostor =
+    /MicroMessenger|QQ\/[\d.]+|MQQBrowser|DingTalk|Weibo|UCBrowser|Quark|HeyTapBrowser|HuaweiBrowser|HMSCore|VivoBrowser|MiuiBrowser|SamsungBrowser|OPR\/|Opera|Baidu|Sogou|QIHU|LieBao|LBBROWSER|FlyFlow|AliApp|HeyTap|HiBrowser|AsiBrowser|Firefox/i;
+  if (impostor.test(ua)) return false;
+  return /Chrome\//.test(ua);
+}
+
+/**
  * 判定当前环境能否使用「浏览器打印」导出 PDF：
  *  - 微信 / QQ / 钉钉等 App 内置 WebView 完全不响应 window.print()；
  *  - iOS 上仅自带 Safari 会弹出打印面板，Chrome / UC / 夸克等第三方浏览器（WKWebView）无反应；
