@@ -654,6 +654,15 @@ export function TopBar() {
               </HoverTip>
             </div>
           </div>
+          {/* 手机端 Coffee 快捷入口：位于汉堡按钮左侧 */}
+          <button
+            type="button"
+            onClick={() => toggleCoffeeModal()}
+            aria-label="Coffee"
+            className="md:hidden flex items-center justify-center w-8 h-8 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <CoffeeIcon />
+          </button>
           {/* 手机端折叠按钮：汉堡 ↔ 关闭 */}
           <button
             type="button"
@@ -757,18 +766,6 @@ export function TopBar() {
             >
               <SparkleIcon />
               {tr({ zh: 'AI 助手', en: 'AI Assistant' })}
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                setMenuOpen(false);
-                toggleCoffeeModal();
-              }}
-              className={menuItem}
-            >
-              <CoffeeIcon />
-              Coffee
             </button>
             <div className="my-1.5 h-px bg-gray-100" aria-hidden="true" />
             <button
