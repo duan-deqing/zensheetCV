@@ -69,8 +69,8 @@ playwright/.cache/
 # Firecrawl scrape artifacts
 .firecrawl/
 
-# Data directory
-data/
+# Data directory（仅根级运行时数据，避免误伤源码 data/ 目录）
+/data/
 
 # 运行时上传文件（头像等）
 apps/api/uploads/
