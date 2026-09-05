@@ -18,8 +18,22 @@ import { collectBlocks, paginate } from '@/preview/pagination';
  */
 
 const MM_TO_PX = 96 / 25.4;
-/** spike 阶段中文 TTF 来源：dompdf.js 官方示例字体（思源黑体 Regular，约 16MB） */
-const CN_FONT_URL = 'https://cdn.jsdelivr.net/gh/lmn1919/dompdf.js@main/examples/SourceHanSansSC-Regular.ttf';
+/** spike 阶段中文 TTF 候选源（生产方案应换子集化字体 + 走自有 CDN）。
+ *  官方示例字体疑似子集化：中文正常但 U+2022(•)/U+2014(—) 等符号字形缺失，
+ *  WASM 引擎对缺字形字符 fallback 到 Helvetica（WinAnsi 编码）后彻底丢弃，
+ *  疑为「列表圆点丢失」根因；备选 expo 完整版 Google Fonts TTF 用于对照 */
+interface FontSource {
+  id: string;
+  label: string;
+  url: string;
+  disabled?: boolean;
+}
+
+const FONT_SOURCES: FontSource[] = [
+  { id: 'dompdf-examples', label: '官方示例 4.5MB（桌面实测圆点正常）', url: 'https://cdn.jsdelivr.net/gh/lmn1919/dompdf.js@main/examples/SourceHanSansSC-Regular.ttf' },
+  { id: 'expo-400', label: 'Noto Sans SC 5.5MB（桌面实测圆点正常）', url: 'https://cdn.jsdelivr.net/npm/@expo-google-fonts/noto-sans-sc/400Regular/NotoSansSC_400Regular.ttf' },
+  { id: 'expo-root', label: 'Noto Sans SC 7.2MB（实测乱码禁用）', url: 'https://cdn.jsdelivr.net/npm/@expo-google-fonts/noto-sans-sc/NotoSansSC_400Regular.ttf', disabled: true },
+];
 
 interface LogEntry {
   time: string;
@@ -31,10 +45,14 @@ export function SpikeDompdf() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [fontKB, setFontKB] = useState<number | null>(null);
+  /** 最近一次导出的 PDF blob 预览地址（页面内嵌人眼比对，不用翻下载目录） */
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const pdfUrlRef = useRef<string | null>(null);
   /** 样本重复 3 份制造 3~4 页长内容：单页样本测不到分页一致性 */
   const [triple, setTriple] = useState(false);
+  const [fontSrcId, setFontSrcId] = useState<string>(FONT_SOURCES[0].id);
   const sourceRef = useRef<HTMLDivElement>(null);
-  const fontBytesRef = useRef<Uint8Array | null>(null);
+  const fontCacheRef = useRef<Map<string, Uint8Array>>(new Map());
 
   const tpl = builtinTemplates.find((t) => t.id === templateId) ?? builtinTemplates[0];
   const theme = { ...defaultTheme, ...tpl.defaultTheme };
@@ -67,17 +85,22 @@ export function SpikeDompdf() {
   const contentWMM = A4_WIDTH_MM - 2 * padXMM;
   const windowPx = (A4_HEIGHT_MM - 2 * padYMM) * MM_TO_PX;
 
-  /** 中文字体懒加载并缓存（生产方案应换子集化字体 + 走自有 CDN） */
+  /** 中文字体懒加载并缓存（按字体源分别缓存；生产方案应换子集化字体 + 走自有 CDN） */
   const ensureFont = async (): Promise<Uint8Array> => {
-    if (fontBytesRef.current) return fontBytesRef.current;
-    log(`开始拉取中文字体（思源黑体 Regular，约 16MB）…`);
+    const src = FONT_SOURCES.find((s) => s.id === fontSrcId) ?? FONT_SOURCES[0];
+    const cached = fontCacheRef.current.get(src.id);
+    if (cached) {
+      log(`使用缓存字体：${src.label}（${Math.round(cached.length / 1024)} KB）`);
+      return cached;
+    }
+    log(`开始拉取字体：${src.label} …`);
     const t0 = performance.now();
-    const res = await fetch(CN_FONT_URL);
+    const res = await fetch(src.url);
     if (!res.ok) throw new Error(`字体拉取失败 HTTP ${res.status}`);
     const bytes = new Uint8Array(await res.arrayBuffer());
-    fontBytesRef.current = bytes;
+    fontCacheRef.current.set(src.id, bytes);
     setFontKB(Math.round(bytes.length / 1024));
-    log(`字体就绪：${Math.round(bytes.length / 1024)} KB，耗时 ${Math.round(performance.now() - t0)}ms`);
+    log(`字体就绪：${src.label}，${Math.round(bytes.length / 1024)} KB，耗时 ${Math.round(performance.now() - t0)}ms`);
     return bytes;
   };
 
@@ -117,6 +140,27 @@ export function SpikeDompdf() {
     }
   };
 
+  /** 诊断列表圆点丢失：读取排版源首个 ul li 的关键计算样式。
+   *  dompdf buildMarkerClone 在 display!=='list-item' 或 list-style-image
+   *  非 none 时放弃 marker 克隆，是已知丢失路径 */
+  const diagnoseList = () => {
+    const el = sourceRef.current;
+    if (!el) return;
+    const li = el.querySelector('ul li');
+    if (!li) {
+      log('未找到 ul li，无法诊断');
+      return;
+    }
+    const cs = getComputedStyle(li);
+    const ulCs = getComputedStyle(li.parentElement!);
+    log(`ul  计算：list-style-type=${ulCs.listStyleType}, display=${ulCs.display}`);
+    log(`li  计算：list-style-type=${cs.listStyleType}, display=${cs.display}, list-style-image=${cs.listStyleImage}, position=${cs.listStylePosition}`);
+    const beforeCs = getComputedStyle(li, '::before');
+    log(`li ::before：content=${JSON.stringify(beforeCs.content)}`);
+    const markerCs = getComputedStyle(li, '::marker');
+    log(`li ::marker：content=${JSON.stringify(markerCs.content)}`);
+  };
+
   /** dompdf 矢量导出：下载 PDF 并记录耗时/体积/页数 */
   const runDompdf = async () => {
     setBusy('dompdf');
@@ -142,13 +186,16 @@ export function SpikeDompdf() {
         },
       });
       const ms = Math.round(performance.now() - t1);
+      // 页面内嵌预览（复用旧地址前先释放）
+      if (pdfUrlRef.current) URL.revokeObjectURL(pdfUrlRef.current);
       const url = URL.createObjectURL(blob);
+      pdfUrlRef.current = url;
+      setPdfUrl(url);
       const a = document.createElement('a');
       a.href = url;
       a.download = `spike-dompdf-${templateId}.pdf`;
       a.click();
-      window.setTimeout(() => URL.revokeObjectURL(url), 30_000);
-      log(`导出成功：${(blob.size / 1024).toFixed(1)} KB，耗时 ${ms}ms${totalPages ? `，${totalPages} 页` : ''}，已触发下载`);
+      log(`导出成功：${(blob.size / 1024).toFixed(1)} KB，耗时 ${ms}ms${totalPages ? `，${totalPages} 页` : ''}，已触发下载（页面底部可内嵌预览）`);
     } catch (err) {
       log(`dompdf 导出失败：${err instanceof Error ? err.message : String(err)}`);
     } finally {
@@ -199,12 +246,28 @@ export function SpikeDompdf() {
           {busy === 'pagination' ? '对比中…' : '分页对比'}
         </button>
         <button
+          onClick={diagnoseList}
+          className="px-4 h-9 rounded-lg border border-gray-300 text-[13px] font-medium text-gray-700 hover:border-gray-400 transition-colors"
+        >
+          诊断列表样式
+        </button>
+        <button
           onClick={runDompdf}
           disabled={busy != null}
           className="px-4 h-9 rounded-lg bg-primary-600 text-white text-[13px] font-medium hover:bg-primary-700 transition-colors disabled:opacity-60"
         >
           {busy === 'dompdf' ? '导出中…' : 'dompdf 导出 PDF'}
         </button>
+        <select
+          value={fontSrcId}
+          onChange={(e) => setFontSrcId(e.target.value)}
+          className="h-9 rounded-lg border border-gray-300 bg-white px-2 text-[12px] text-gray-700"
+          aria-label="字体源"
+        >
+          {FONT_SOURCES.map((s) => (
+            <option key={s.id} value={s.id} disabled={s.disabled}>{s.label}</option>
+          ))}
+        </select>
         {fontKB != null && <span className="text-[12px] text-gray-500">字体已缓存 {fontKB} KB</span>}
       </div>
 
@@ -249,6 +312,14 @@ export function SpikeDompdf() {
           </ReactMarkdown>
         </div>
       </div>
+
+      {/* 导出产物内嵌预览：人眼比对圆点/图标/分页与页面上方排版源是否一致 */}
+      {pdfUrl && (
+        <div className="mt-6">
+          <p className="text-[13px] text-gray-500 mb-2">导出 PDF 内嵌预览（与上方排版源逐项比对，重点看列表圆点）：</p>
+          <iframe src={pdfUrl} title="导出 PDF 预览" className="w-full h-[720px] rounded-xl border border-gray-200 bg-white" />
+        </div>
+      )}
     </div>
   );
 }
