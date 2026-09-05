@@ -12,6 +12,11 @@ import { defaultTheme } from '@stylan/shared-types';
 import type { ResumeCreate, ResumeUpdate, Resume } from '@stylan/shared-types';
 import { getLang } from '@/i18n/LangContext';
 
+/** IndexedDB 异常不透出底层英文报错（浏览器技术细节），统一映射为当前语言的友好提示 */
+function dbError(message: { zh: string; en: string }): string {
+  return getLang() === 'en' ? message.en : message.zh;
+}
+
 export function useResume() {
   const { setCurrentResume, setResumes, setLoading, setError } = useResumeStore();
 
@@ -21,7 +26,7 @@ export function useResume() {
     try {
       setResumes(await listResumes());
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch resumes');
+      setError(dbError({ zh: '读取简历列表失败，请刷新重试', en: 'Failed to load your resumes — please refresh and retry' }));
     } finally {
       setLoading(false);
     }
@@ -39,7 +44,7 @@ export function useResume() {
       setCurrentResume(found);
       return found;
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch resume');
+      setError(dbError({ zh: '读取简历失败，请重试', en: 'Failed to open the resume — please retry' }));
       return null;
     } finally {
       setLoading(false);
@@ -65,7 +70,7 @@ export function useResume() {
       setCurrentResume(resume);
       return resume;
     } catch (err: any) {
-      setError(err.message || 'Failed to create resume');
+      setError(dbError({ zh: '创建简历失败，请重试', en: 'Failed to create the resume — please retry' }));
       return null;
     } finally {
       setLoading(false);
@@ -94,7 +99,7 @@ export function useResume() {
       setCurrentResume(merged);
       return merged;
     } catch (err: any) {
-      setError(err.message || 'Failed to update resume');
+      setError(dbError({ zh: '保存失败，请重试；若持续失败请勿关闭页面', en: 'Failed to save — please retry and keep this page open' }));
       return null;
     }
   }, [setCurrentResume, setError]);
@@ -105,7 +110,7 @@ export function useResume() {
       await removeResume(id);
       return true;
     } catch (err: any) {
-      setError(err.message || 'Failed to delete resume');
+      setError(dbError({ zh: '删除简历失败，请重试', en: 'Failed to delete the resume — please retry' }));
       return false;
     }
   }, [setError]);
