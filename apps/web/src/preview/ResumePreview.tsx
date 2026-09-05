@@ -268,6 +268,21 @@ export function ResumePreview() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeReady]);
 
+  // 水平滚动居中：纸张加两侧留白超出可视宽度时（手机端常见），
+  // 每次滚动容器从隐藏变为可见（手机切到「预览」页）都把水平滚动位置设到中间，
+  // 让用户先看到页面中部而非偏在左侧；无溢出时设值为 0 无影响
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2);
+      }
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       <PreviewToolbar />
