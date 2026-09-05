@@ -662,6 +662,21 @@ const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.4.0',
+    date: '2026-09-05',
+    title: { zh: '手机端全面适配', en: 'Full Mobile Support' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '编辑器手机单列布局：编辑 / 预览分段切换（切换不丢失输入），AI 助手改为全屏覆盖，保存 / 导出 / 模板等功能收进汉堡折叠菜单，Coffee 快捷入口置于汉堡左侧', en: 'Single-column editor on mobile: Edit / Preview segmented toggle (typing is kept on switch), fullscreen AI assistant, all actions folded into a hamburger menu with a Coffee shortcut beside it' },
+      { zh: '首页与编辑器导航栏窄屏折叠：汉堡按钮展开下拉菜单收纳全部入口，当前页高亮，点击外部 / Esc 关闭', en: 'Collapsing navbars on narrow screens: a hamburger button expands a dropdown holding every entry, with the current page highlighted, closing on outside click or Esc' },
+      { zh: '弹窗全面适配小屏：用户信息、模板库、图标库与 AI 助手窗口手机端不再溢出，模板卡片保证预览与按钮完整展示，列表可滚动', en: 'Modals fully adapted for small screens: user settings, template library, icon library and AI assistant no longer overflow on mobile, with template cards fully visible and scrollable lists' },
+      { zh: '预览滚动体验：滚动条按缩放后的视觉宽度自适应——窗口更宽时无水平滚动条且纸张居中，更窄时出滚动条并初始定位到页面中部', en: 'Preview scrolling: scrollbars adapt to the visually scaled width — no horizontal bar and a centered sheet on wide windows, with the scroll position centered on narrower ones' },
+      { zh: '简历名称行内编辑加入进入 / 退出过渡动画，输入框宽度随内容平滑变化', en: 'Inline resume renaming gained enter / exit transitions, with the input width easing as you type' },
+      { zh: '中英文切换按钮悬浮提示与编辑器统一为气泡样式', en: 'The language toggle now shares the editor\'s bubble-style hover tip' },
+      { zh: '修复：手机端折叠菜单项无法点击、模板库手机端显示不完全等问题', en: 'Fixed: folded menu items not clickable on mobile and the template library being cut off on small screens' },
+    ],
+  },
+  {
     version: 'v0.3.0',
     date: '2026-09-05',
     title: { zh: '全站英语模式', en: 'Site-wide English Mode' },
