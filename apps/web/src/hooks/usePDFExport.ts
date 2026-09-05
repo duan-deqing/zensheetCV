@@ -16,7 +16,8 @@ export function canUsePrintExport(
   // App 内置 WebView（微信 / QQ / 钉钉 / 企业微信等）
   if (/MicroMessenger|QQ\/[\d.]+|MQQBrowser|DingTalk|Weibo/i.test(ua)) return false;
   const isIOS =
-    /iPad|iPhone|iPod/.test(ua) || (/Macintosh/.test(ua) && touchDocument.hasOwnProperty('ontouchend'));
+    /iPad|iPhone|iPod/.test(ua) ||
+    (/Macintosh/.test(ua) && Object.prototype.hasOwnProperty.call(touchDocument, 'ontouchend'));
   const isMobile = isIOS || /Mobi|Android/i.test(ua);
   if (!isMobile) return true; // 桌面环境一律使用打印（矢量文字、体积小）
   if (isIOS) {
@@ -125,9 +126,10 @@ export function usePDFExport() {
           window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
         }
         return true;
-      } catch (err: any) {
+      } catch (err) {
         // 用户取消系统分享面板属正常操作，不算失败
-        if (err?.name === 'AbortError') return true;
+        const errName = (err as { name?: string } | null)?.name;
+        if (errName === 'AbortError') return true;
         // 不透出底层英文报错（Canvas/图片解码等技术细节），统一友好提示
         setError(
           tr({
@@ -208,7 +210,7 @@ export function usePDFExport() {
       // window.print() 在 Chromium 同步阻塞至对话框关闭，返回后立即恢复按钮态
       window.setTimeout(cleanup, 60_000);
       return true;
-    } catch (err: any) {
+    } catch {
       document.getElementById('print-root')?.remove();
       document.body.classList.remove('print-mode');
       // 不透出底层英文报错，统一友好提示

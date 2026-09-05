@@ -4,6 +4,7 @@ import { useResume } from '@/hooks/useResume';
 import { useUI } from '@/store/UIContext';
 import { useEditorDispatch } from '@/store/EditorContext';
 import { useLang, useTr } from '@/i18n/LangContext';
+import type { Resume } from '@stylan/shared-types';
 
 export function ResumeList() {
   const { resumes, currentResume, setCurrentResume, isLoading } = useResumeStore();
@@ -17,9 +18,9 @@ export function ResumeList() {
 
   if (!sidebarOpen) return null;
 
-  const handleSelectResume = (resume: any) => {
+  const handleSelectResume = (resume: Resume) => {
     setCurrentResume(resume);
-    editorDispatch({ type: 'RESET', payload: resume.markdown });
+    editorDispatch({ type: 'RESET', payload: resume.markdown ?? '' });
   };
 
   return (

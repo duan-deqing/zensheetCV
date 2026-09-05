@@ -210,7 +210,6 @@ export function ResumePreview() {
     const tops = blocks.map((b) => (b.getBoundingClientRect().top - rootRect.top) / s);
     const bottoms = blocks.map((b) => (b.getBoundingClientRect().bottom - rootRect.top) / s);
     setPages(paginate(tops, bottoms, rootRect.height / s, windowPx));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contentHtml, contentHeight, windowPx, themeReady]);
 
   // 逐页渲染：每页克隆整份内容上移裁切；不属于本页的块透明抹除，

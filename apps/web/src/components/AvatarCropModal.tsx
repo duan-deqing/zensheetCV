@@ -80,9 +80,8 @@ export function AvatarCropModal({
     setError('');
     try {
       await onConfirm(blob);
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      setError(detail ? String(detail) : tr({ zh: '上传失败，请重试', en: 'Upload failed, please try again' }));
+    } catch {
+      setError(tr({ zh: '上传失败，请重试', en: 'Upload failed, please try again' }));
     } finally {
       setUploading(false);
     }

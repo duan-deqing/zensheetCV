@@ -214,8 +214,8 @@ export function ResumesPage() {
     if (copy) fetchResumes();
   };
 
-  const handleEdit = (resume: any) => {
-    editorDispatch({ type: 'RESET', payload: resume.markdown });
+  const handleEdit = (resume: Resume) => {
+    editorDispatch({ type: 'RESET', payload: resume.markdown ?? '' });
     navigate(`/editor/${resume.id}`);
   };
 

@@ -85,7 +85,6 @@ export function SelectionToolbar() {
       window.removeEventListener('scroll', onScroll, true);
       window.removeEventListener('resize', onScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const insertText = (before: string, after = '', atLineStart = false) =>

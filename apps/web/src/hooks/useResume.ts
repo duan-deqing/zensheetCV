@@ -25,7 +25,7 @@ export function useResume() {
     setError(null);
     try {
       setResumes(await listResumes());
-    } catch (err: any) {
+    } catch {
       setError(dbError({ zh: '读取简历列表失败，请刷新重试', en: 'Failed to load your resumes — please refresh and retry' }));
     } finally {
       setLoading(false);
@@ -43,7 +43,7 @@ export function useResume() {
       }
       setCurrentResume(found);
       return found;
-    } catch (err: any) {
+    } catch {
       setError(dbError({ zh: '读取简历失败，请重试', en: 'Failed to open the resume — please retry' }));
       return null;
     } finally {
@@ -69,7 +69,7 @@ export function useResume() {
       await putResume(resume);
       setCurrentResume(resume);
       return resume;
-    } catch (err: any) {
+    } catch {
       setError(dbError({ zh: '创建简历失败，请重试', en: 'Failed to create the resume — please retry' }));
       return null;
     } finally {
@@ -98,7 +98,7 @@ export function useResume() {
       }
       setCurrentResume(merged);
       return merged;
-    } catch (err: any) {
+    } catch {
       setError(dbError({ zh: '保存失败，请重试；若持续失败请勿关闭页面', en: 'Failed to save — please retry and keep this page open' }));
       return null;
     }
@@ -109,7 +109,7 @@ export function useResume() {
     try {
       await removeResume(id);
       return true;
-    } catch (err: any) {
+    } catch {
       setError(dbError({ zh: '删除简历失败，请重试', en: 'Failed to delete the resume — please retry' }));
       return false;
     }

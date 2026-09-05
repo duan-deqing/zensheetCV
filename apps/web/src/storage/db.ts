@@ -43,7 +43,6 @@ export function onStorageDegraded(listener: DegradedListener): () => void {
 function enterDegraded(reason: unknown) {
   if (degraded) return;
   degraded = true;
-  // eslint-disable-next-line no-console
   console.warn('[stylan] IndexedDB 不可用，数据仅保存在本次会话', reason);
   degradedListeners.forEach((listener) => listener(reason));
 }
