@@ -186,10 +186,10 @@ function FileMenu() {
         onClick={() => setOpen((p) => !p)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="px-2 sm:px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+        className="px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors whitespace-nowrap"
       >
         <FileIcon />
-        <span className="hidden sm:inline">{tr({ zh: '文件', en: 'File' })}</span>
+        <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: '文件', en: 'File' })}</span>
       </button>
       <ButtonStatus status={status} exiting={exiting} />
       {open && (
@@ -536,23 +536,24 @@ export function TopBar() {
               className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-primary-600 transition-colors shrink-0"
             >
               <span className="font-mono text-primary-500" aria-hidden="true">&lt;</span>
-              <span className="hidden sm:inline">{tr({ zh: '我的简历', en: 'My Resumes' })}</span>
+              <span className="hidden sm:inline md:hidden lg:inline whitespace-nowrap">{tr({ zh: '我的简历', en: 'My Resumes' })}</span>
             </Link>
           </HoverTip>
           <span className="w-px h-4 bg-gray-200 shrink-0" aria-hidden="true" />
           <EditableTitle onNotify={show} />
-          {/* 以下功能入口手机端收进折叠菜单（md 起恢复栏内直显） */}
-          <div className="hidden md:flex items-center gap-1 sm:gap-3 min-w-0">
+          {/* 以下功能入口手机端收进折叠菜单（md 起恢复栏内直显）；
+              md-lg 区间只显示图标（避免文字换行/拥挤），lg 起显示文字 */}
+          <div className="hidden md:flex items-center gap-1 lg:gap-3 min-w-0">
             <FileMenu />
             {/* 模板库入口：卡片式模板选择弹窗，「添加」后进入主题面板下拉 */}
             <HoverTip text={tr({ zh: '模板库', en: 'Templates' })}>
               <button
                 type="button"
                 onClick={toggleTemplateModal}
-                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors whitespace-nowrap"
               >
                 <LayoutIcon />
-                <span className="hidden sm:inline">{tr({ zh: '模板', en: 'Templates' })}</span>
+                <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: '模板', en: 'Templates' })}</span>
               </button>
             </HoverTip>
             {/* 图标库入口：点击图标复制 icon:名称 语法 */}
@@ -560,10 +561,10 @@ export function TopBar() {
               <button
                 type="button"
                 onClick={toggleIconModal}
-                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors whitespace-nowrap"
               >
                 <SmileIcon />
-                <span className="hidden sm:inline">{tr({ zh: '图标', en: 'Icons' })}</span>
+                <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: '图标', en: 'Icons' })}</span>
               </button>
             </HoverTip>
             {/* 使用文档入口：右侧抽屉展示，不跳转文档页 */}
@@ -571,10 +572,10 @@ export function TopBar() {
               <button
                 type="button"
                 onClick={toggleDocsDrawer}
-                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors whitespace-nowrap"
               >
                 <BookIcon />
-                <span className="hidden sm:inline">{tr({ zh: '文档', en: 'Docs' })}</span>
+                <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: '文档', en: 'Docs' })}</span>
               </button>
             </HoverTip>
             {/* AI 助手入口：聊天窗口挤入预览右侧 */}
@@ -583,14 +584,14 @@ export function TopBar() {
                 type="button"
                 onClick={toggleAIWindow}
                 aria-pressed={aiWindowOpen}
-                className={`px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors ${
+                className={`px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors whitespace-nowrap ${
                   aiWindowOpen
                     ? 'text-primary-700 bg-primary-50'
                     : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
                 }`}
               >
                 <SparkleIcon />
-                <span className="hidden sm:inline">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
+                <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
               </button>
             </HoverTip>
             {/* 请作者喝杯咖啡：收款码弹窗 */}
@@ -598,18 +599,19 @@ export function TopBar() {
               <button
                 type="button"
                 onClick={toggleCoffeeModal}
-                className="px-2 sm:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors"
+                className="px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-full transition-colors whitespace-nowrap"
               >
                 <CoffeeIcon />
-                <span className="hidden sm:inline">Coffee</span>
+                <span className="hidden lg:inline whitespace-nowrap">Coffee</span>
               </button>
             </HoverTip>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* 保存 / 导出 / 用户：手机端收进折叠菜单（md 起恢复栏内直显） */}
-          <div className="hidden md:flex items-center gap-1 sm:gap-1.5">
+        <div className="flex items-center gap-1 lg:gap-1.5">
+          {/* 保存 / 导出 / 用户：手机端收进折叠菜单（md 起恢复栏内直显）；
+              md-lg 区间只显示图标，lg 起显示文字 */}
+          <div className="hidden md:flex items-center gap-1 lg:gap-1.5">
             <span className="relative inline-flex">
               <SaveButton />
               {/* 导出结果气泡与保存结果共用同一区域：保存按钮左侧 */}
@@ -618,10 +620,10 @@ export function TopBar() {
             <button
               onClick={handleExportPDF}
               disabled={isExporting}
-              className="px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50"
+              className="px-2 lg:px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full border border-primary-300 bg-white text-primary-700 hover:bg-primary-50 transition-colors disabled:opacity-50 whitespace-nowrap"
             >
               <ExportIcon />
-              <span className="hidden sm:inline">
+              <span className="hidden lg:inline whitespace-nowrap">
                 {isExporting ? tr({ zh: '导出中...', en: 'Exporting...' }) : tr({ zh: '导出 PDF', en: 'Export PDF' })}
               </span>
             </button>
@@ -647,7 +649,7 @@ export function TopBar() {
                       {user.name.slice(0, 1).toUpperCase()}
                     </span>
                   )}
-                  <span className="hidden sm:inline text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors">
+                  <span className="hidden sm:inline md:hidden lg:inline text-[13px] text-gray-600 group-hover:text-primary-600 transition-colors max-w-24 truncate">
                     {user.name}
                   </span>
                 </button>

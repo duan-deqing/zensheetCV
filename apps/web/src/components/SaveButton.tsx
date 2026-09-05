@@ -63,7 +63,7 @@ export function SaveButton() {
     <button
       onClick={handleSave}
       disabled={!isDirty || saving}
-      className={`relative px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full transition-all duration-300 ${
+      className={`relative px-3.5 h-8 inline-flex items-center gap-1.5 text-[13px] font-medium rounded-full transition-all duration-300 whitespace-nowrap ${
         justSaved ? 'save-settle' : ''
       } ${
         isDirty
@@ -72,11 +72,11 @@ export function SaveButton() {
       }`}
     >
       {saving ? (
-        // 手机端仅图标：保存中给图标加脉冲示意进行状态
-        <span className="hidden sm:inline">{tr({ zh: '保存中...', en: 'Saving…' })}</span>
+        // md-lg 区间仅图标：保存中给图标加脉冲示意进行状态
+        <span className="hidden lg:inline">{tr({ zh: '保存中...', en: 'Saving…' })}</span>
       ) : (
         // key 变化触发文案重挂载：保存 ↔ 已保存 切换时淡入上浮
-        <span key={isDirty ? 'dirty' : 'clean'} className={`save-label-in hidden sm:inline ${saving ? 'animate-pulse' : ''}`}>
+        <span key={isDirty ? 'dirty' : 'clean'} className={`save-label-in hidden lg:inline ${saving ? 'animate-pulse' : ''}`}>
           {isDirty ? tr({ zh: '保存', en: 'Save' }) : tr({ zh: '已保存', en: 'Saved' })}
         </span>
       )}

@@ -158,7 +158,7 @@ export function Navbar() {
   };
 
   const linkClass = (path: string) =>
-    `inline-flex items-center gap-1.5 text-sm transition-colors ${
+    `inline-flex items-center gap-1.5 text-sm whitespace-nowrap transition-colors ${
       isActive(path) ? 'text-primary-600 font-medium' : 'text-gray-500 hover:text-gray-900'
     }`;
 
@@ -238,7 +238,7 @@ export function Navbar() {
                   {(user?.name ?? '?').slice(0, 1).toUpperCase()}
                 </span>
               )}
-              <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-[10rem]">
+              <span className="hidden sm:inline text-sm text-gray-700 group-hover:text-primary-600 transition-colors truncate max-w-24 lg:max-w-[10rem]">
                 {user?.name}
               </span>
             </button>
