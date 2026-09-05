@@ -755,54 +755,22 @@ export function UserModal() {
                 </p>
                 <p className="mt-2 text-[13px] text-gray-600 leading-relaxed">
                   {tr({
-                    zh: '一个在线 Markdown 简历编辑器：左侧书写 Markdown，右侧实时预览排版，内置多套模板与 AI 润色能力。桌面端浏览器打印直出 PDF，微信等手机环境自动改为本机生成。纯前端版本，数据仅保存在本地浏览器，无需注册登录。',
-                    en: 'An online Markdown resume builder: write Markdown on the left with a live preview on the right, built-in templates and AI polishing. PDFs print straight from your browser on desktop and are generated on-device in mobile browsers like WeChat. Pure frontend — data stays in your local browser, no sign-up required.',
+                    zh: '一个在线 Markdown 简历编辑器：左侧书写，右侧实时预览排版，内置多套模板。纯前端应用，数据仅保存在本地浏览器，无需注册登录。',
+                    en: 'An online Markdown resume builder: write on the left with a live preview on the right, and built-in templates. Pure frontend — data stays in your local browser, no sign-up required.',
                   })}
                 </p>
                 <dl className="mt-4 rounded-lg border border-gray-200 divide-y divide-gray-100 overflow-hidden">
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      {tr({ zh: '项目名称', en: 'Project' })}
-                    </dt>
-                    <dd className="text-[13px] text-gray-700">
-                      {tr({
-                        zh: 'ZENSHEET · 简历 — 在线 Markdown 简历编辑器',
-                        en: 'ZENSHEET · Resume — Online Markdown Resume Editor',
-                      })}
-                    </dd>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-2.5">
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       {tr({ zh: '当前版本', en: 'Version' })}
                     </dt>
-                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.5.0</dd>
+                    <dd className="font-mono text-[13px] text-gray-700 tabular-nums">v0.6.0</dd>
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2.5">
                     <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
                       {tr({ zh: '作者', en: 'Author' })}
                     </dt>
                     <dd className="text-[13px] text-gray-700">STYLAN &amp; GLM-5.3-flash</dd>
-                  </div>
-                  <div className="flex items-start gap-3 px-4 py-2.5">
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0 pt-0.5">
-                      {tr({ zh: '技术栈', en: 'Stack' })}
-                    </dt>
-                    <dd className="text-[13px] text-gray-700 leading-relaxed">
-                      <span className="block">{tr({ zh: '前端：React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6', en: 'Front-end: React 18 · TypeScript · Vite · Tailwind CSS · CodeMirror 6' })}</span>
-                      <span className="block">{tr({ zh: '数据存储：IndexedDB（本地浏览器）', en: 'Data storage: IndexedDB (local browser)' })}</span>
-                      <span className="block">{tr({ zh: 'PDF 导出：浏览器打印；微信等环境自动改为本机生成', en: 'PDF export: browser print; on-device fallback in WeChat and similar browsers' })}</span>
-                    </dd>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-2.5">
-                    <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400 w-16 shrink-0">
-                      {tr({ zh: 'AI 接入', en: 'AI' })}
-                    </dt>
-                    <dd className="text-[13px] text-gray-700">
-                      {tr({
-                        zh: 'OpenAI 兼容协议，支持 DeepSeek / GLM / LongCat / 自定义端点',
-                        en: 'OpenAI-compatible protocol, supporting DeepSeek / GLM / LongCat / custom endpoints',
-                      })}
-                    </dd>
                   </div>
                 </dl>
               </div>

@@ -155,6 +155,16 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.6.0',
+    date: '2026-09-06',
+    title: { zh: 'WebView 提示弹窗化与关于页精简', en: 'WebView Hint Dialog & About Page Cleanup' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '微信等 App 内打开时的「复制链接到浏览器」提示改为屏幕居中弹窗，与全站弹窗风格一致：支持点击遮罩、Esc 或关闭按钮关闭，复制结果在弹窗内反馈', en: 'The "copy link to open in browser" hint shown inside WeChat and other in-app browsers becomes a centered dialog matching the site-wide modal style — dismissible via backdrop click, Esc or the close button, with inline copy feedback' },
+      { zh: '设置窗口「关于」页精简：移除项目名称、技术栈与 AI 接入信息，介绍文案简化', en: 'The About page in Settings is streamlined: project name, tech stack and AI integration details removed, intro text simplified' },
+    ],
+  },
+  {
     version: 'v0.5.0',
     date: '2026-09-05',
     title: { zh: '渲染性能与代码质量优化', en: 'Rendering Performance & Code Quality' },

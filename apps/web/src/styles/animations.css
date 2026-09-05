@@ -29,9 +29,9 @@
   to { opacity: 0; transform: translateY(-10px) scale(0.95); }
 }
 
-/* ---------- WebView 内「复制链接到浏览器」提示条：滑入 / 淡出 ---------- */
-.hint-bar-in { animation: pillIn 0.28s var(--ease-spring) both; }
-.hint-bar-out { animation: pillOut 0.18s ease-in both; }
+/* ---------- WebView 内「复制链接到浏览器」弹窗（复用通用卡片 / 遮罩动画） ---------- */
+.hint-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
+.hint-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
 
 /* ---------- 通用下拉菜单（ThemeConfigPanel / UserModal / ThemeDoc 模型选择等） ---------- */
 @keyframes dropdownIn {
@@ -279,8 +279,8 @@
   .tpl-backdrop-in,
   .tpl-pill-in,
   .tpl-pill-out,
-  .hint-bar-in,
-  .hint-bar-out,
+  .hint-modal-in,
+  .hint-backdrop-in,
   .user-modal-in,
   .user-backdrop-in,
   .avatar-modal-in,
