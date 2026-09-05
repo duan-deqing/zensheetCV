@@ -35,6 +35,9 @@ importers:
       canvas-confetti:
         specifier: ^1.9.4
         version: 1.9.4
+      dompdf.js:
+        specifier: ^2.0.4
+        version: 2.0.4
       github-markdown-css:
         specifier: ^5.5.0
         version: 5.9.0
@@ -1208,6 +1211,10 @@ packages:
 
   dom-accessibility-api@0.6.3:
     resolution: {integrity: sha512-7ZgogeTnjuHbo+ct10G9Ffp0mif17idi0IyWNVA/wcwcm7NPOD/WEHVP3n7n3MhXqxoIYm8d6MuZohYWIZ4T3w==}
+
+  dompdf.js@2.0.4:
+    resolution: {integrity: sha512-sAH68CA9BFJ0xaXIQQ5T0UixHTK5l4xuJ/KhoeVw/y7LXDpEwlCbuLxoeU6AUtu77I3YCTMGd1A3ohpJ19gbGg==}
+    engines: {node: '>=18'}
 
   dompurify@3.4.14:
     resolution: {integrity: sha512-dVoH9z+MY+C9IilgGCk3YfFqjLi3fChm2OiKJMzh6axrJ5qwxqWaZamgmHrpv22CN/KdbZJuGEGgfQoL00LTdg==}
@@ -3736,6 +3743,8 @@ snapshots:
   dom-accessibility-api@0.5.16: {}
 
   dom-accessibility-api@0.6.3: {}
+
+  dompdf.js@2.0.4: {}
 
   dompurify@3.4.14:
     optionalDependencies:
