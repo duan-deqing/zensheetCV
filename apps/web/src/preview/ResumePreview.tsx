@@ -256,13 +256,14 @@ export function ResumePreview() {
     setSelectedPhotoId(null);
   };
 
-  // 初始缩放自适应：纸张（794px = 210mm@96dpi）超出可视宽度时缩小到刚好放下（参考 MujiCV）
+  // 初始缩放自适应：纸张（794px = 210mm@96dpi）超出可视宽度时缩小到刚好放下（参考 MujiCV）；
+  // 48 = 滚动容器 p-6 的左右内边距
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!themeReady) return;
     const el = scrollRef.current;
     if (!el) return;
-    const fit = ((el.clientWidth - 160) / (A4_WIDTH_MM * MM_TO_PX)) * 100;
+    const fit = ((el.clientWidth - 48) / (A4_WIDTH_MM * MM_TO_PX)) * 100;
     if (fit < 100) setScale(Math.max(40, Math.round(fit)));
     // 仅首次就绪时执行一次
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -283,17 +284,27 @@ export function ResumePreview() {
     return () => io.disconnect();
   }, []);
 
+  // 视觉占位层尺寸：transform 缩放不改变布局尺寸，需显式给出缩放后的宽高占位，
+  // 让滚动容器的滚动条按「视觉宽度」生效（窗口更宽 → 无滚动条且居中；更窄 → 出滚动条）
+  const s = scale / 100;
+  const PAGE_W_PX = A4_WIDTH_MM * MM_TO_PX;
+  const PAGE_H_PX = A4_HEIGHT_MM * MM_TO_PX;
+  const pageCount = pages.offsets.length;
+  // 20 = 页与页之间 gap-5 的间距
+  const visualW = PAGE_W_PX * s;
+  const visualH = (pageCount * PAGE_H_PX + Math.max(0, pageCount - 1) * 20) * s;
+
   return (
     <div className="flex flex-col h-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       <PreviewToolbar />
       <div className="relative flex flex-1 min-h-0">
         {themeReady ? (
           <>
-            <div ref={scrollRef} className="flex-1 min-w-0 overflow-auto p-4 px-20 bg-gray-50">
-              <div
-                className="w-fit mx-auto"
-                style={{ transform: `scale(${scale / 100})`, transformOrigin: 'top center' }}
-              >
+            <div ref={scrollRef} className="flex-1 min-w-0 overflow-auto p-6 bg-gray-50">
+              {/* 视觉占位：宽 = 纸宽×缩放。窄于窗口时 mx-auto 水平居中、无水平滚动条；
+                  宽于窗口时出现滚动条，初始/切换可见时由 IntersectionObserver 滚动居中 */}
+              <div className="mx-auto" style={{ width: visualW, height: visualH }}>
+                <div style={{ width: PAGE_W_PX, transform: `scale(${s})`, transformOrigin: 'top left' }}>
                 {/* 隐藏排版源：屏外以真实宽度排版；内含模板/主题样式，
                     导出时整体取 innerHTML（样式 + 内容），保证与预览完全同源 */}
                 <div
@@ -365,6 +376,7 @@ export function ResumePreview() {
                       />
                     </div>
                   ))}
+                </div>
                 </div>
               </div>
             </div>
