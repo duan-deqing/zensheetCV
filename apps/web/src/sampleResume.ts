@@ -1,7 +1,9 @@
 /** 全站共享的示例简历内容（人设：沈亦南 · 后端工程师）
    完整版用于首页 Hero、模板展示区与模板卡片预览，全站内容同源；
    基本信息使用 :::left / :::mid / :::right 三栏语法，展示分栏排版能力
-   英文版 SAMPLE_MARKDOWN_EN 与中文版结构/人设一致，供英文界面按语言选用 */
+   英文版 SAMPLE_MARKDOWN_EN 与中文版结构/人设一致，供英文界面按语言选用
+   ⚠ 同步警示：中英两份为手工对照的完整字符串（未结构化），
+   修改任一版本的章节/条目时，必须同步另一份的对应内容与顺序 */
 
 export const SAMPLE_MARKDOWN = `# ZENSHEET
 
@@ -52,7 +54,7 @@ icon:phone 139-0000-0000 · icon:email zensheet@mail.com
 :::
 `;
 
-/** 英文版示例简历：与 SAMPLE_MARKDOWN 同一人设与结构（公司/项目名意译） */
+/** 英文版示例简历：与 SAMPLE_MARKDOWN 同一人设与结构（公司/项目名意译），改动需与中文版逐条同步 */
 export const SAMPLE_MARKDOWN_EN = `# ZENSHEET
 
 icon:info AI · 2026 icon:github zensheet.dev
