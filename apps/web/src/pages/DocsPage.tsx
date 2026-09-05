@@ -20,7 +20,7 @@ const FEATURES: { title: Bi; desc: Bi }[] = [
   { title: { zh: '主题微调', en: 'Theme Tuning' }, desc: { zh: '主色、字体、字号间距、页边距独立可调，与导出 PDF 严格一致', en: 'Color, font, size/spacing and margins adjust independently, matching the exported PDF exactly' } },
   { title: { zh: 'AI 助手', en: 'AI Assistant' }, desc: { zh: '润色全文、关键词分析、要点成段，支持自定义 OpenAI 兼容模型', en: 'Polish, keyword analysis and bullet expansion with any OpenAI-compatible model' } },
   { title: { zh: '照片与图标', en: 'Photos & Icons' }, desc: { zh: '证件照自由拖放缩放，19 个内置矢量图标随文字变色', en: 'Freely drag & scale ID photos; 19 built-in vector icons follow text color' } },
-  { title: { zh: 'PDF 导出', en: 'PDF Export' }, desc: { zh: '浏览器打印直出，所见即所得，逐页排版与预览完全相同', en: 'Printed straight from your browser — WYSIWYG, page layout identical to the preview' } },
+  { title: { zh: 'PDF 导出', en: 'PDF Export' }, desc: { zh: '支持打印的环境浏览器直出，所见即所得；微信等手机环境自动改为本机生成 PDF', en: 'Printed straight from your browser where supported; on WeChat and other mobile browsers the PDF is generated on-device' } },
 ];
 
 const SUB_DOCS: { to: string; no: string; title: Bi; desc: Bi }[] = [

@@ -41,7 +41,7 @@ const QUICK_STEPS: { no: string; title: Bi; desc: Bi }[] = [
   { no: 'STEP 1', title: { zh: '打开即用', en: 'Open and Use' }, desc: { zh: '免注册登录，打开网站即可使用，默认用户名为 ZENSHEET；简历与配置仅保存在当前浏览器本地。点击导航栏用户名打开设置，可自定义用户名。', en: 'No sign-up required — open the site and start working. Your default username is ZENSHEET; resumes and settings are stored only in your current browser. Click your username in the navbar to open Settings and customize it.' } },
   { no: 'STEP 2', title: { zh: '创建简历', en: 'Create a Resume' }, desc: { zh: '进入「我的简历」页面，点击新建简历，会得到一份示例内容，随后在编辑器中替换为自己的经历。', en: 'Go to "My Resumes" and click New Resume. A sample resume is created for you — replace it with your own experience in the editor.' } },
   { no: 'STEP 3', title: { zh: '编辑内容', en: 'Edit Content' }, desc: { zh: '左侧为 Markdown 编辑器，右侧实时预览。使用标题、列表、分栏等语法组织内容，详见《Markdown 简历教程》。', en: 'Write Markdown on the left and preview live on the right. Organize content with headings, lists, columns and more — see the Markdown Resume Tutorial.' } },
-  { no: 'STEP 4', title: { zh: '调样式并导出', en: 'Style & Export' }, desc: { zh: '通过「主题」面板选择模板与视觉风格；完成后点击右上角「导出 PDF」，在浏览器打印窗口中「另存为 PDF」即可，效果与预览逐页一致。', en: 'Pick a template and visual style in the Theme panel. When done, click "Export PDF" at the top right and choose "Save as PDF" in the browser print dialog — every page matches the preview exactly.' } },
+  { no: 'STEP 4', title: { zh: '调样式并导出', en: 'Style & Export' }, desc: { zh: '通过「主题」面板选择模板与视觉风格；完成后点击「导出 PDF」——桌面与主流手机浏览器在打印窗口中「另存为 PDF」，逐页与预览一致；微信等内置浏览器会自动改用本机生成 PDF 并下载 / 分享。', en: 'Pick a template and visual style in the Theme panel, then click "Export PDF" — on desktop and mainstream mobile browsers, choose "Save as PDF" in the print dialog and every page matches the preview; in in-app browsers like WeChat, a PDF is generated on-device automatically for download or sharing.' } },
 ];
 
 const GUIDE_LINKS: { to: string; no: string; title: Bi; desc: Bi }[] = [
@@ -661,6 +661,18 @@ const CHANGELOG: ChangelogEntry[] = [
 
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 const STATIC_CHANGELOG: ChangelogEntry[] = [
+  {
+    version: 'v0.4.1',
+    date: '2026-09-05',
+    title: { zh: '手机端 PDF 导出', en: 'Mobile PDF Export' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '修复手机端导出无反应：微信 / QQ 等内置浏览器与 iOS 第三方浏览器不再依赖打印窗口，自动改为本机逐页截图生成 PDF', en: 'Fixed mobile export doing nothing: in-app browsers (WeChat / QQ, etc.) and third-party iOS browsers now generate the PDF on-device page by page instead of relying on the print dialog' },
+      { zh: '生成的 PDF 按 A4 逐页组装，2 倍采样保证清晰度，完成后直接下载或唤起系统分享（可存到「文件」）', en: 'The PDF is assembled page by page at A4 size with 2x sampling for clarity, then downloaded or shared via the system sheet (savable to Files)' },
+      { zh: '桌面与支持打印的移动浏览器保持打印导出（矢量文字、体积更小）；截图与 PDF 组件按需加载，不影响首屏', en: 'Desktop and print-capable mobile browsers keep the print export (vector text, smaller files); the capture & PDF libraries load on demand without affecting first paint' },
+      { zh: '新增 README 英文版与免登录版 / 全栈版对比介绍', en: 'Added an English README with a login-free vs full-stack edition comparison' },
+    ],
+  },
   {
     version: 'v0.4.0',
     date: '2026-09-05',

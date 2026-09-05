@@ -140,7 +140,7 @@ const STEPS = [
     no: '03',
     tag: 'EXPORT',
     title: { zh: '一键导出 PDF', en: 'Export PDF in one click' },
-    desc: { zh: '浏览器打印直出，字距与分页与预览一致，直接投递。', en: 'Printed straight from your browser; spacing and pagination match the preview, ready to send.' },
+    desc: { zh: '桌面端浏览器打印直出，字距分页与预览一致；微信等手机环境自动改为本机生成 PDF，随时下载分享。', en: 'Printed straight from your browser on desktop; on WeChat and other mobile browsers the PDF is generated on-device, ready to download or share.' },
   },
 ];
 
