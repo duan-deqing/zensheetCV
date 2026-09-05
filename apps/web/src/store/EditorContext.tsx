@@ -8,6 +8,7 @@ interface EditorState {
 
 type EditorAction =
   | { type: 'SET_MARKDOWN'; payload: string }
+  | { type: 'MARK_DIRTY' }
   | { type: 'MARK_CLEAN' }
   | { type: 'RESET'; payload: string };
 
@@ -27,6 +28,9 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'SET_MARKDOWN':
       return { ...state, markdown: action.payload, isDirty: true };
+    case 'MARK_DIRTY':
+      // 仅置脏标记（模板/主题切换等非内容变更），不触碰 markdown 引用
+      return state.isDirty ? state : { ...state, isDirty: true };
     case 'MARK_CLEAN':
       return { ...state, isDirty: false };
     case 'RESET':

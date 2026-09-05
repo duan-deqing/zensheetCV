@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useRef, useState, ReactNode } from 'react';
 import type { ThemeConfig, Template } from '@stylan/shared-types';
 import { defaultTheme } from '@stylan/shared-types';
 
@@ -30,7 +30,7 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
   /** 进入全屏前的缩放，退出时恢复 */
   const scaleBeforeFullscreenRef = useRef<number | null>(null);
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = useCallback(() => {
     if (isFullscreen) {
       // 退出全屏：恢复之前的缩放
       if (scaleBeforeFullscreenRef.current !== null) {
@@ -44,28 +44,27 @@ export function PreviewProvider({ children }: { children: ReactNode }) {
       setScale(100);
       setIsFullscreen(true);
     }
-  };
+  }, [isFullscreen, scale]);
 
-  return (
-    <PreviewContext.Provider
-      value={{
-        currentTemplate,
-        templates,
-        themeConfig,
-        themeReady,
-        scale,
-        isFullscreen,
-        setCurrentTemplate,
-        setTemplates,
-        setThemeConfig,
-        setThemeReady,
-        setScale,
-        toggleFullscreen,
-      }}
-    >
-      {children}
-    </PreviewContext.Provider>
+  const value = useMemo(
+    () => ({
+      currentTemplate,
+      templates,
+      themeConfig,
+      themeReady,
+      scale,
+      isFullscreen,
+      setCurrentTemplate,
+      setTemplates,
+      setThemeConfig,
+      setThemeReady,
+      setScale,
+      toggleFullscreen,
+    }),
+    [currentTemplate, templates, themeConfig, themeReady, scale, isFullscreen, toggleFullscreen],
   );
+
+  return <PreviewContext.Provider value={value}>{children}</PreviewContext.Provider>;
 }
 
 export function usePreview() {
