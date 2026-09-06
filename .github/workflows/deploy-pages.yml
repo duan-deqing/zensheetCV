@@ -1,10 +1,10 @@
 name: Deploy to GitHub Pages
 
-# 免登录在线版（static 分支，纯前端）部署到 GitHub Pages：
-# https://duan-deqing.github.io/zensheetCV/
+# 免登录在线版部署到 GitHub Pages：https://duan-deqing.github.io/zensheetCV/
+# master 为发布分支（push master 触发部署）；日常开发在 static，合并到 master 即发版
 on:
   push:
-    branches: [static]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
