@@ -157,13 +157,15 @@ export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
     version: 'v0.7.0',
     date: '2026-09-07',
-    title: { zh: '首页改版：一屏工作台与真实渲染模板画廊', en: 'Homepage Revamp: One-Screen Workspace & Live-Rendered Template Gallery' },
+    title: { zh: '首页改版与编辑器体验优化', en: 'Homepage Revamp & Editor UX Polish' },
     tag: { zh: '免登录版', en: 'Login-free' },
     items: [
       { zh: '首页 Hero 改为一屏工作台：编辑器 / 实时预览 / AI 聊天窗三个窗口直接使用编辑器页面真实模块（示例简历内容，可实际操作），随视口高度自适应，底部规格条以白色半透明磨砂条贴底收尾', en: 'The homepage hero becomes a one-screen workspace: editor, live preview and AI chat are the real editor modules (preloaded with a sample resume and fully operable), adapting to the viewport height, with the specs bar anchored at the bottom on a frosted translucent strip' },
       { zh: '背景新增 ShapeGrid 网格动效：方格滚动 + 鼠标悬停高亮拖尾，偏好减弱动效的用户自动降级为静止网格', en: 'A ShapeGrid animated background: scrolling grid squares with hover highlight trails, automatically reduced to a static grid for reduced-motion users' },
       { zh: '「进入编辑器」按钮改为 WebGL 镜面高光胶囊：主色实心 + 深蓝描边，白色光带常驻自动旋转并跟随光标，WebGL 不可用时自动降级为纯 CSS 按钮', en: 'The "Open Editor" button becomes a WebGL specular-highlight pill: solid primary color with a deep-blue edge, a white shine sweeping automatically and following the cursor, falling back to a plain CSS button when WebGL is unavailable' },
       { zh: '「多套模板」展示区重做：8 套模板以与编辑器完全相同的渲染管线真实挂载（非截图），水平铺开一次可见多套，支持滚轮 / 拖拽无限循环浏览，不再依赖截图生成缩略图', en: 'The template showcase is rebuilt: all 8 templates are mounted live through the exact editor rendering pipeline (no screenshots), laid out horizontally so several are visible at once, browsable in an infinite loop via scroll wheel or drag' },
+      { zh: 'Markdown 导入 / 导出的结果提示统一为屏幕顶部中央的深色胶囊样式，与「已添加模板」等操作提示同位置同款式，滑入淡出更轻量，手机折叠菜单内操作同样生效', en: 'Result messages for Markdown import / export now appear as a dark pill at the top center of the screen — same spot and style as other operation hints such as "template added", with a lighter slide-in / fade-out; it also works from the folded mobile menu' },
+      { zh: '「AI 助手」按钮新增三色辉光边框（紫 / 粉 / 天蓝渐变）：光标靠近时亮弧沿按钮边缘点亮并跟随光标，进入页面时扫光一圈，打开 AI 窗口时常亮缓慢旋转；辉光只出现在按钮范围内，减弱动效时跳过旋转', en: 'The "AI Assistant" button gains a tri-color glow border (purple / pink / sky-blue gradient): as the pointer approaches, an arc lights up along the button edge and follows the cursor, a sweep plays once on page load, and with the AI window open it stays lit and slowly rotates — all confined within the button bounds, with rotation skipped for reduced-motion users' },
     ],
   },
   {
