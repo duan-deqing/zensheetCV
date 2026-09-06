@@ -43,8 +43,17 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
 const EditorContext = createContext<EditorState | null>(null);
 const EditorDispatchContext = createContext<Dispatch<EditorAction> | null>(null);
 
-export function EditorProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(editorReducer, initialState);
+export function EditorProvider({
+  children,
+  initialMarkdown,
+}: {
+  children: ReactNode;
+  /** 懒初始化：传入时作为初始 markdown（首页工作台展示示例简历用，避免首帧闪变） */
+  initialMarkdown?: string;
+}) {
+  const [state, dispatch] = useReducer(editorReducer, initialState, (base) =>
+    initialMarkdown !== undefined ? { ...base, markdown: initialMarkdown } : base,
+  );
 
   return (
     <EditorContext.Provider value={state}>

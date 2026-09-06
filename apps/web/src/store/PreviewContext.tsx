@@ -20,11 +20,21 @@ interface PreviewContextType {
 
 const PreviewContext = createContext<PreviewContextType | null>(null);
 
-export function PreviewProvider({ children }: { children: ReactNode }) {
-  const [currentTemplate, setCurrentTemplate] = useState<Template | null>(null);
+export function PreviewProvider({
+  children,
+  initialTemplate,
+  initialThemeReady,
+}: {
+  children: ReactNode;
+  /** 懒初始化：传入时作为初始模板（首页工作台展示用，避免首帧骨架闪变） */
+  initialTemplate?: Template | null;
+  /** 懒初始化：传入 true 时跳过数据加载骨架，直接就绪 */
+  initialThemeReady?: boolean;
+}) {
+  const [currentTemplate, setCurrentTemplate] = useState<Template | null>(initialTemplate ?? null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [themeConfig, setThemeConfig] = useState<ThemeConfig>(defaultTheme);
-  const [themeReady, setThemeReady] = useState(false);
+  const [themeReady, setThemeReady] = useState(!!initialThemeReady);
   const [scale, setScale] = useState(100);
   const [isFullscreen, setIsFullscreen] = useState(false);
   /** 进入全屏前的缩放，退出时恢复 */

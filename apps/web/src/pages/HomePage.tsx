@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import ReactMarkdown, { type Components } from 'react-markdown';
-import type { CSSProperties } from 'react';
+import { lazy, Suspense, type CSSProperties } from 'react';
 import { getTemplateById, getTemplateCss } from '@/templates';
 import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
 import {
@@ -18,6 +18,7 @@ import { sampleMarkdown } from '@/sampleResume';
 import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
 import { DocsFooter } from '@/pages/docs/DocsFooter';
 import { useLang, useTr } from '@/i18n/LangContext';
+import ShapeGrid from '@/pages/home/ShapeGrid';
 import {
   AI_CAPABILITIES,
   AI_CHAT_FEATURES,
@@ -30,6 +31,11 @@ import {
   THEME_FEATURES,
   WORKSPACE_FEATURES,
 } from './home/content';
+
+/* 工作台展示：编辑器页面真实三窗口（编辑器/预览/AI 聊天窗），懒加载避免 CodeMirror 进入首屏 */
+const WorkspaceShowcase = lazy(() =>
+  import('./home/WorkspaceShowcase').then((m) => ({ default: m.WorkspaceShowcase })),
+);
 
 /* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
    （react-markdown + 各模板真实 CSS），非静态截图，内容见 @/sampleResume */
@@ -119,24 +125,37 @@ function ResumePaper({
 export function HomePage() {
   const tr = useTr();
   return (
-    <div className="bg-white text-gray-900">
-      {/* Hero：左文右真实简历预览 */}
-      <section className="max-w-7xl mx-auto px-6 pt-14 pb-16 lg:pt-20 grid lg:grid-cols-2 gap-12 items-center">
-        <div>
+    // -mt-20：抵消 Navbar 的全局 h-20 占位，让 Hero 从视口顶部开始严格占满一屏
+    <div className="bg-white text-gray-900 -mt-20">
+      {/* Hero：严格一屏（h 锁定 100dvh，随视口自动伸缩；极矮视口 560px 兜底改页面滚动），
+          文案区在上 + 全宽可操作三窗口工作台（flex-1 吃掉剩余高度）。
+          背景：ShapeGrid 网格动效（canvas，absolute 铺满，hover 高亮 + 拖尾），
+          置于 DOM 首位，内容自然绘制其上 */}
+      <section className="relative h-[100dvh] min-h-[560px] flex flex-col overflow-hidden">
+        <ShapeGrid
+          className="absolute inset-0"
+          speed={0.3}
+          squareSize={40}
+          direction="diagonal"
+          borderColor="#e5e7eb"
+          hoverFillColor="#dbeafe"
+          shape="square"
+          hoverTrailAmount={5}
+        />
+        <div className="w-full max-w-7xl mx-auto px-6 pt-24 lg:pt-28 text-center">
           <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
             &lt; ZENSHEET{tr({ zh: ' · 简历', en: ' · Resume' })} /&gt;
           </p>
           <h1
-            className="fade-up text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] mb-5"
+            className="fade-up text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15] mb-5"
             style={{ animationDelay: '0.08s' }}
           >
-            {tr({ zh: '专注内容本身，', en: 'Focus on the content,' })}
-            <br />
-            {tr({ zh: '使用', en: 'written in' })}
+            {tr({ zh: '用', en: 'Write a great resume in' })}
             <span className="text-primary-600"> Markdown</span>
+            {tr({ zh: '写一份好简历', en: '' })}
           </h1>
           <p
-            className="fade-up text-lg text-gray-600 leading-relaxed max-w-[32em] mb-8"
+            className="fade-up text-lg text-gray-600 leading-relaxed max-w-[36em] mx-auto"
             style={{ animationDelay: '0.16s' }}
           >
             {tr({
@@ -144,55 +163,50 @@ export function HomePage() {
               en: 'No sign-in required, ready to use; your resume data stays in your own browser. Multiple built-in templates with live preview, free icon and photo layout, AI polishing and keyword optimization, one-click export to high-quality PDF.',
             })}
           </p>
+          {/* 进入编辑器按钮：文案下方、三窗口上方，胶囊造型 */}
           <div
-            className="fade-up flex flex-wrap items-center gap-3"
+            className="fade-up flex justify-center pt-5"
             style={{ animationDelay: '0.24s' }}
           >
-            <Link to="/editor" className="btn-primary text-base px-7 py-3">
+            <Link
+              to="/editor"
+              className="btn-primary rounded-full text-base px-8 py-2.5 shadow-lg shadow-primary-600/25 hover:shadow-primary-600/40 hover:-translate-y-0.5"
+            >
               {tr({ zh: '进入编辑器', en: 'Open Editor' })}
             </Link>
           </div>
         </div>
 
-        {/* 真实渲染的两张模板卡，正面 / 导出 视角（与分栏断点一致：lg 起显示，避免 768-1023 单列时悬挂在文字下方） */}
-        <div className="relative h-[380px] hidden lg:block" aria-hidden="true">
-          <div className="fade-up absolute right-24 top-6 w-[300px] rotate-[3deg] rounded-xl border border-gray-200 shadow-[0_18px_50px_rgba(37,99,235,0.10)]">
-            <ResumePaper templateId="modern" zoom={0.4} className="h-[320px] rounded-xl" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400 px-4 py-2 border-t border-gray-100">
-              MARKDOWN / LIVE PREVIEW
-            </p>
-          </div>
-          <div
-            className="fade-up absolute right-4 top-16 w-[300px] -rotate-[2deg] rounded-xl border border-gray-200 shadow-[0_18px_50px_rgba(17,24,39,0.14)]"
-            style={{ animationDelay: '0.12s' }}
-          >
-            <ResumePaper templateId="classic" zoom={0.4} className="h-[320px] rounded-xl" />
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-400 px-4 py-2 border-t border-gray-100">
-              PDF / PRINT READY
-            </p>
+        {/* 可操作的三窗口工作台（编辑器/预览/AI 聊天窗）：全宽展示，flex-1 吃掉 Hero 剩余
+            高度（父级 h 已锁定，百分比链有效）；<1024px 堆叠由 WorkspaceShowcase 断点接管 */}
+        <div className="flex-1 min-h-0 w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
+          <div className="h-full">
+            <Suspense fallback={<div className="h-full rounded-2xl bg-gray-50 border border-gray-200 animate-pulse" />}>
+              <WorkspaceShowcase />
+            </Suspense>
           </div>
         </div>
-      </section>
 
-      {/* 规格条 */}
-      <section className="border-y border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4">
-          {SPECS.map((s, i) => (
-            <div
-              key={s.unit}
-              className={`py-8 px-4 ${i > 0 ? 'md:border-l md:border-gray-200' : ''} ${
-                i % 2 === 1 ? 'border-l border-gray-200 md:border-l' : ''
-              }`}
-            >
-              <p className="font-mono text-3xl md:text-4xl font-semibold tabular-nums text-gray-900">
-                {s.value}
-              </p>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mt-1">
-                {s.unit}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">{tr(s.label)}</p>
-            </div>
-          ))}
+        {/* 规格条：Hero 底部通栏收尾（shrink-0，数字指标紧凑化） */}
+        <div className="shrink-0 w-full border-y border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4">
+            {SPECS.map((s, i) => (
+              <div
+                key={s.unit}
+                className={`py-4 px-4 text-left ${i > 0 ? 'md:border-l md:border-gray-200' : ''} ${
+                  i % 2 === 1 ? 'border-l border-gray-200 md:border-l' : ''
+                }`}
+              >
+                <p className="font-mono text-2xl md:text-3xl font-semibold tabular-nums text-gray-900">
+                  {s.value}
+                </p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary-600 mt-0.5">
+                  {s.unit}
+                </p>
+                <p className="text-sm text-gray-500 mt-0.5">{tr(s.label)}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -220,94 +234,26 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* 编辑器工作台：左特性 + 右三栏布局示意 */}
+      {/* 编辑器工作台：特性一行 + 三栏工作台示意独占一行 */}
       <section className="max-w-7xl mx-auto px-6 pb-20">
         <p className="font-mono text-xs uppercase tracking-[0.22em] text-gray-400 mb-3">
           {tr({ zh: '▰ 工作台 ▰', en: '▰ Workspace ▰' })}
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-12">
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight mb-10">
           {tr({ zh: '一个页面，完成从写作到投递', en: 'One page, from writing to applying' })}
         </h2>
-        <div className="grid lg:grid-cols-5 gap-10 items-center">
-          {/* 特性列表 */}
-          <div className="lg:col-span-2 divide-y divide-gray-100">
-            {WORKSPACE_FEATURES.map((f) => (
-              <div key={f.title.zh} className="py-4 first:pt-0 last:pb-0">
-                <h3 className="font-semibold flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0" />
-                  {tr(f.title)}
-                </h3>
-                <p className="text-sm text-gray-600 leading-relaxed mt-1 pl-3.5">{tr(f.desc)}</p>
-              </div>
-            ))}
-          </div>
 
-          {/* 三栏布局示意（CSS mockup）：桌面横向三栏；<640px 纵向堆叠避免每栏仅 ~85px 过窄 */}
-          <div className="lg:col-span-3 rounded-2xl border border-gray-200 bg-gray-100/70 p-4" aria-hidden="true">
-            <div className="flex gap-2.5 max-sm:flex-col">
-              {/* 编辑器栏 */}
-              <div className="w-[30%] max-sm:w-full rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 max-sm:shrink">
-                <div className="h-7 border-b border-gray-100 px-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-gray-300" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gray-400">
-                    EDITOR
-                  </span>
-                </div>
-                <div className="p-3 flex flex-col gap-2">
-                  {['w-3/4 h-2 bg-primary-300 rounded', 'w-full h-1.5 bg-gray-200 rounded', 'w-5/6 h-1.5 bg-gray-200 rounded', 'w-2/3 h-1.5 bg-gray-200 rounded', 'w-1/2 h-2 bg-gray-300 rounded', 'w-full h-1.5 bg-gray-200 rounded', 'w-4/5 h-1.5 bg-gray-200 rounded'].map(
-                    (c, i) => (
-                      <div key={i} className={c} />
-                    ),
-                  )}
-                </div>
-              </div>
-
-              {/* 拖拽手柄 */}
-              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0 max-sm:hidden" />
-
-              {/* 预览栏：真实渲染 */}
-              <div className="flex-1 rounded-xl border border-gray-200 bg-white overflow-hidden min-w-0">
-                <div className="h-7 border-b border-gray-100 px-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-gray-300" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gray-400">
-                    LIVE PREVIEW
-                  </span>
-                </div>
-                <ResumePaper templateId="carbon" zoom={0.34} className="h-[250px]" />
-              </div>
-
-              {/* 拖拽手柄 */}
-              <div className="w-1 self-stretch my-4 rounded-full bg-gray-300/70 shrink-0 max-sm:hidden" />
-
-              {/* AI 聊天窗示意 */}
-              <div className="w-[27%] max-sm:w-full rounded-xl border border-gray-200 bg-white overflow-hidden shrink-0 max-sm:shrink flex flex-col">
-                <div className="h-7 border-b border-gray-100 px-3 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-gray-300" />
-                  <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-gray-400">
-                    AI CHAT
-                  </span>
-                </div>
-                <div className="flex-1 p-2.5 flex flex-col gap-2 text-[9px] leading-snug">
-                  <p className="self-end max-w-[85%] bg-primary-50 text-gray-700 rounded-2xl rounded-br-sm px-2.5 py-1.5">
-                    {tr({ zh: '帮我润色这段项目经历', en: 'Help me polish this project experience' })}
-                  </p>
-                  <p className="self-start max-w-[90%] text-gray-600">
-                    {tr({ zh: '好的，建议把成果量化到数字…', en: 'Sure — try quantifying the results with numbers…' })}
-                  </p>
-                  <div className="flex gap-1 mt-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-pulse [animation-delay:0.4s]" />
-                  </div>
-                </div>
-                <div className="border-t border-gray-100 p-2">
-                  <div className="rounded-full border border-gray-200 px-2.5 py-1 text-[9px] text-gray-400">
-                    {tr({ zh: '输入消息…', en: 'Type a message…' })}
-                  </div>
-                </div>
-              </div>
+        {/* 特性列表：一行四项（三窗口实景演示见首屏 Hero） */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-10 gap-y-6">
+          {WORKSPACE_FEATURES.map((f) => (
+            <div key={f.title.zh}>
+              <h3 className="font-semibold flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0" />
+                {tr(f.title)}
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed mt-1 pl-3.5">{tr(f.desc)}</p>
             </div>
-          </div>
+          ))}
         </div>
       </section>
 

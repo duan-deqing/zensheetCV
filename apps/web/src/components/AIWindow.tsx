@@ -11,7 +11,7 @@ import { useTr, type Bi } from '@/i18n/LangContext';
 import { loadAISettings, resolveAISettings } from '@/settings/aiSettings';
 
 /** AI 请求执行元信息：用于消息上方的可展开执行状态 */
-interface AIMeta {
+export interface AIMeta {
   model?: string;
   baseUrl?: string;
   /** 是否携带了当前简历作为上下文 */
@@ -23,7 +23,7 @@ interface AIMeta {
   error?: string;
 }
 
-interface ChatMessage {
+export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   /** 泡内时间戳（HH:MM），创建消息时记录 */
@@ -259,20 +259,32 @@ function AIStatus({ meta }: { meta: AIMeta }) {
  * 外观与编辑器/预览同为圆角卡片。多轮流式对话，BYOK 配置随请求携带；
  * Esc / 关闭按钮 / 再次点击 AI 按钮均可关闭。
  */
-export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeId?: string; onClose?: () => void }) {
+export function AIWindow({
+  width,
+  resumeId,
+  onClose,
+  demo,
+}: {
+  width?: number;
+  resumeId?: string;
+  onClose?: () => void;
+  /** 演示模式（首页工作台）：预填示例对话，可继续真实对话（BYOK），但不读写历史、不可关闭 */
+  demo?: ChatMessage[];
+}) {
   const { aiWindowOpen, toggleAIWindow } = useUI();
   // 统一关闭入口：由 EditorPage 的关闭流程驱动（滑出动画结束后卸载）
   const close = onClose ?? toggleAIWindow;
   const { markdown } = useEditor();
   const { user } = useAuth();
   const tr = useTr();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(demo ?? []);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   // 对话记录持久化（IndexedDB）：按简历隔离，打开窗口时从本地载入；
   // 流式期间与载入完成前不回写，避免覆盖
   const [historyReady, setHistoryReady] = useState(false);
   useEffect(() => {
+    if (demo) return; // 演示模式：静态对话，不读写历史
     if (!resumeId) {
       setMessages([]);
       setHistoryReady(false);
@@ -293,7 +305,7 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
     return () => {
       cancelled = true;
     };
-  }, [resumeId]);
+  }, [resumeId, demo]);
   useEffect(() => {
     if (!historyReady || isStreaming || !resumeId) return;
     const t = setTimeout(() => {
@@ -436,7 +448,7 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
     setIsStreaming(false);
   };
 
-  if (!aiWindowOpen) return null;
+  if (!aiWindowOpen && !demo) return null;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Enter 发送，Shift+Enter 换行
@@ -448,7 +460,7 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
 
   return (
     <aside
-      className="relative shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col w-full"
+      className="relative h-full shrink-0 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col w-full"
       style={width ? { width } : undefined}
       aria-label={tr({ zh: 'AI 助手', en: 'AI Assistant' })}
     >
@@ -460,15 +472,18 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
         >
           {'< AI ASSISTANT />'}
         </p>
-        <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
-          <button
-            onClick={close}
-            className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
-            aria-label={tr({ zh: '关闭 AI 助手', en: 'Close AI assistant' })}
-          >
-            ✕
-          </button>
-        </HoverTip>
+        {/* 演示模式无关闭流程，隐藏关闭按钮避免点击无响应 */}
+        {!demo && (
+          <HoverTip text={tr({ zh: '关闭', en: 'Close' })}>
+            <button
+              onClick={close}
+              className="ml-auto w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors text-sm"
+              aria-label={tr({ zh: '关闭 AI 助手', en: 'Close AI assistant' })}
+            >
+              ✕
+            </button>
+          </HoverTip>
+        )}
       </div>
 
       {/* 对话消息区：占满整个窗口，底部留出输入框悬浮的空间 */}
@@ -575,4 +590,30 @@ export function AIWindow({ width, resumeId, onClose }: { width?: number; resumeI
       </div>
     </aside>
   );
+}
+
+/** 首页工作台演示对话：与示例简历内容呼应（demo 模式使用，不读写历史） */
+export function buildDemoMessages(tr: (b: Bi) => string): ChatMessage[] {
+  const t = Date.now();
+  return [
+    {
+      role: 'user',
+      content: tr({
+        zh: '帮我把这条经历改得更有说服力：从 0 搭建物联网数据接入平台',
+        en: 'Make this bullet more compelling: built an IoT data ingestion platform from scratch',
+      }),
+      time: '10:24',
+      name: tr({ zh: '我', en: 'Me' }),
+    },
+    {
+      role: 'assistant',
+      content: tr({
+        zh: '补上规模与结果数字会更有说服力：\n\n- 从 0 搭建物联网数据接入平台，日均处理 **2 亿条**设备消息\n- 沉淀统一接入协议，新设备接入周期从 2 周缩短到 **3 天**',
+        en: 'Adding scale and concrete outcomes makes it stronger:\n\n- Built an IoT ingestion platform from scratch, processing **200M** device messages daily\n- Standardized the ingestion protocol, cutting new-device onboarding from 2 weeks to **3 days**',
+      }),
+      time: '10:24',
+      name: tr({ zh: 'AI 助手', en: 'AI Assistant' }),
+      meta: { context: true, start: t, end: t + 1200, status: 'done' },
+    },
+  ];
 }

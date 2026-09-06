@@ -30,7 +30,7 @@ import { PreviewToolbar } from './PreviewToolbar';
 /** mm → px 换算（CSS 标准 96dpi） */
 const MM_TO_PX = 96 / 25.4;
 
-export function ResumePreview() {
+export function ResumePreview({ fitHeight = false }: { fitHeight?: boolean } = {}) {
   const { markdown } = useEditor();
   const { currentTemplate, themeConfig, themeReady, scale, setScale } = usePreview();
   const { photos, setPhotos } = usePhotoSync();
@@ -160,7 +160,7 @@ export function ResumePreview() {
   // 48 = 滚动容器 p-6 的左右内边距
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!themeReady) return;
+    if (!themeReady || fitHeight) return;
     const el = scrollRef.current;
     if (!el) return;
     const fit = ((el.clientWidth - 48) / (A4_WIDTH_MM * MM_TO_PX)) * 100;
@@ -168,6 +168,35 @@ export function ResumePreview() {
     // 仅首次就绪时执行一次
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeReady]);
+
+  // fitHeight（首页工作台展示）：宽高同时 contain 适配，单页纸完整显示、窗口高度贴合内容。
+  // 持续监听：flex 布局稳定前后可视区尺寸会变化，只算一次会留裁切。
+  // 带阈值防抖：手动缩放引起滚动条出现/消失会让可视区尺寸抖动约 15px，小于阈值时
+  // 不重算（尊重用户手动缩放）；真正的窗口/布局变化（≥24px）才重新适配
+  const lastFitSize = useRef<{ w: number; h: number } | null>(null);
+  useEffect(() => {
+    if (!themeReady || !fitHeight) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      const prev = lastFitSize.current;
+      if (prev && Math.abs(prev.w - w) < 24 && Math.abs(prev.h - h) < 24) return;
+      lastFitSize.current = { w, h };
+      const fitW = (w - 48) / (A4_WIDTH_MM * MM_TO_PX);
+      const fitH = (h - 48) / (A4_HEIGHT_MM * MM_TO_PX);
+      const fit = Math.min(fitW, fitH) * 100;
+      // 展示区下限 20 优先保证单页纸完整显示；上限 100（contain 语义：显示完整即可不放大）
+      setScale(Math.round(Math.min(100, Math.max(20, fit))));
+    };
+    update();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeReady, fitHeight]);
 
   // 水平滚动居中：纸张加两侧留白超出可视宽度时（手机端常见），
   // 每次滚动容器从隐藏变为可见（手机切到「预览」页）都把水平滚动位置设到中间，
