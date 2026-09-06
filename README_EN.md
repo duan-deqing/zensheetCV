@@ -77,6 +77,10 @@ ZENSHEET Resume is a Markdown-based online resume builder: write Markdown on the
 #### AI Writing Assistance (BYOK)
 
 - **Experience polishing / keyword matching / bullet expansion**: dedicated chat window with SSE streaming replies rendered as Markdown
+- **Deep workflows**: one-click serial pipelines — "Polish All" (diagnose → draft → local self-check → revise) and "JD Match" (keyword extraction → coverage calc → gap rewrite) with live per-step status; JD Match ships with a built-in honesty constraint that rephrases without fabricating experience
+- **Structured edit suggestions**: AI-proposed changes appear as diff confirmation cards (original vs replacement), applied individually or all at once with one-click undo of the round; applying auto-saves — the AI never edits your document directly
+- **Agent mode (experimental)**: once enabled, the AI calls tools (read full resume / read a section / query page count & template) to explore autonomously over multiple rounds and proposes edits one by one (still confirmed on cards); providers without tool-calling support automatically fall back to suggestion-block mode
+- **AI Trace panel**: the "AI RUN" row above each reply expands repeatedly, revealing step-by-step execution details (tool call arguments & result previews, workflow intermediate output) and error details, with multiple steps expandable at once
 - **Bring your own key**: the browser connects directly to OpenAI-compatible providers — OpenAI / DeepSeek / GLM / Qwen / LongCat / custom endpoints; keys are stored only in your local browser
 - **Chat history**: conversations persist in browser IndexedDB so you can continue past topics
 
