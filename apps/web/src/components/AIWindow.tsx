@@ -179,11 +179,24 @@ function StopIcon() {
   );
 }
 
-/** AI 消息上方的执行状态行：收起时显示摘要，点击展开查看具体步骤 */
+/** AI 消息上方的执行状态行：点击展开执行面板，可反复展开 / 收起；
+ *  面板内每个步骤可独立展开查看完整输出（长详情折叠展示，多个步骤可同时展开），
+ *  展开状态为组件本地 state，不随流式更新与面板重开丢失。 */
 function AIStatus({ meta }: { meta: AIMeta }) {
   const [open, setOpen] = useState(false);
+  // 用户的步骤展开集合（i → 展开）；空集合时不影响默认展示
+  const [openSteps, setOpenSteps] = useState<ReadonlySet<number>>(() => new Set());
   const tr = useTr();
   const dur = (((meta.end ?? Date.now()) - meta.start) / 1000).toFixed(1);
+  const toggleStep = (i: number) => {
+    setOpenSteps((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
+  };
+
   const statusText =
     meta.status === 'running'
       ? tr({ zh: '生成中', en: 'Generating' })
@@ -236,19 +249,27 @@ function AIStatus({ meta }: { meta: AIMeta }) {
     failed: { zh: '失败', en: 'Failed' },
     skipped: { zh: '已跳过', en: 'Skipped' },
   };
-  const rows: { key: string; label: string; detail: string; failed?: boolean }[] = meta.steps
-    ? meta.steps.map((s, i) => ({
-        key: `${i}-${s.label.zh}`,
-        label: tr(s.label),
-        failed: s.status === 'failed',
-        detail:
-          s.status === 'done'
-            ? `${tr(stepStatusText.done)}${s.ms ? ` · ${(s.ms / 1000).toFixed(1)}s` : ''}${s.detail ? ` · ${s.detail}` : ''}`
-            : s.status === 'failed'
-              ? s.detail || tr(stepStatusText.failed)
-              : tr(stepStatusText[s.status]),
-      }))
-    : staticSteps.map((s, i) => ({ key: `${i}-${s.label.zh}`, label: tr(s.label), detail: s.detail, failed: s.failed }));
+  const stepDotColor: Record<WorkflowStepState['status'], string> = {
+    pending: 'bg-gray-300',
+    running: 'bg-primary-500 animate-pulse',
+    done: 'bg-emerald-500',
+    failed: 'bg-red-500',
+    skipped: 'bg-amber-400',
+  };
+  const chevron = (expanded: boolean) => (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`w-2.5 h-2.5 shrink-0 text-gray-300 transition-transform duration-150 ${expanded ? 'rotate-90' : ''}`}
+      aria-hidden="true"
+    >
+      <path d="m9 18 6-6-6-6" />
+    </svg>
+  );
 
   return (
     <div className="mb-1.5">
@@ -275,18 +296,72 @@ function AIStatus({ meta }: { meta: AIMeta }) {
         <span className="tabular-nums">· {dur}s</span>
       </button>
       {open && (
-        <div className="mt-1.5 rounded-lg bg-gray-50 border border-gray-200/80 px-2.5 py-2 flex flex-col gap-1.5">
-          {rows.map((s, i) => (
-            <div key={s.key} className="flex items-baseline gap-2 text-[11px] leading-snug">
-              <span className="font-mono text-gray-300 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</span>
-              <span className={s.failed ? 'text-red-500 shrink-0' : 'text-gray-600 shrink-0'}>{s.label}</span>
-              <span className={`truncate ${s.failed ? 'text-red-400' : 'text-gray-400'}`} title={s.detail}>
-                {s.detail}
-              </span>
-            </div>
-          ))}
+        <div className="ai-status-panel-in mt-1.5 rounded-lg border border-gray-200/80 bg-gray-50 px-1.5 py-2 flex flex-col origin-top">
+          {/* 面板眉标：步骤总数一目了然 */}
+          <p className="px-1 pb-1 font-mono text-[9px] uppercase tracking-[0.2em] text-gray-300 select-none">
+            {meta.steps
+              ? tr({ zh: `执行流程 · ${meta.steps.length} 步`, en: `Execution · ${meta.steps.length} steps` })
+              : tr({ zh: '执行流程', en: 'Execution flow' })}
+          </p>
+          {meta.steps
+            ? meta.steps.map((s, i) => {
+                const expandable = !!s.detail;
+                const expanded = openSteps.has(i);
+                const right =
+                  s.status === 'done'
+                    ? `${tr(stepStatusText.done)}${s.ms ? ` · ${(s.ms / 1000).toFixed(1)}s` : ''}`
+                    : tr(stepStatusText[s.status]);
+                return (
+                  <div key={`${i}-${s.label.zh}`} className="flex flex-col">
+                    <button
+                      type="button"
+                      onClick={() => expandable && toggleStep(i)}
+                      disabled={!expandable}
+                      aria-expanded={expandable ? expanded : undefined}
+                      title={expandable ? tr({ zh: '点击展开 / 收起该步详情', en: 'Click to expand / collapse details' }) : undefined}
+                      className={`flex items-center gap-2 rounded px-1 py-0.5 text-left text-[11px] leading-snug transition-colors ${
+                        expandable ? 'cursor-pointer hover:bg-gray-100' : 'cursor-default'
+                      }`}
+                    >
+                      {expandable ? chevron(expanded) : <span className="w-2.5 shrink-0" aria-hidden="true" />}
+                      <span className="font-mono text-gray-300 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${stepDotColor[s.status]}`} aria-hidden="true" />
+                      <span className={`shrink-0 ${s.status === 'failed' ? 'text-red-500' : 'text-gray-600'}`}>{tr(s.label)}</span>
+                      <span
+                        className={`ml-auto shrink-0 tabular-nums ${
+                          s.status === 'failed' ? 'text-red-400' : 'text-gray-400'
+                        }`}
+                      >
+                        {right}
+                      </span>
+                    </button>
+                    {expandable && expanded && (
+                      <pre className="ai-step-detail-in mb-0.5 mr-1 ml-[52px] max-h-44 overflow-y-auto whitespace-pre-wrap break-all rounded border border-gray-200 bg-white px-2 py-1.5 font-mono text-[10px] leading-relaxed text-gray-500">
+                        {s.detail}
+                      </pre>
+                    )}
+                  </div>
+                );
+              })
+            : staticSteps.map((s, i) => (
+                <div key={`${i}-${s.label.zh}`} className="flex items-center gap-2 rounded px-1 py-0.5 text-[11px] leading-snug">
+                  <span className="w-2.5 shrink-0" aria-hidden="true" />
+                  <span className="font-mono text-gray-300 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${s.failed ? 'bg-red-500' : 'bg-emerald-500'}`}
+                    aria-hidden="true"
+                  />
+                  <span className={`shrink-0 ${s.failed ? 'text-red-500' : 'text-gray-600'}`}>{tr(s.label)}</span>
+                  <span
+                    className={`ml-auto truncate pl-2 text-right ${s.failed ? 'text-red-400' : 'text-gray-400'}`}
+                    title={s.detail}
+                  >
+                    {s.detail}
+                  </span>
+                </div>
+              ))}
           {meta.error && (
-            <div className="flex items-baseline gap-2 text-[11px] leading-snug pt-1 border-t border-gray-200/80">
+            <div className="mt-1 flex items-baseline gap-2 rounded bg-red-50/70 px-1.5 py-1 text-[11px] leading-snug">
               <span className="font-mono text-red-400 shrink-0">!</span>
               <span className="text-red-500 shrink-0">{tr({ zh: '错误详情', en: 'Error details' })}</span>
               <span className="text-red-400 break-all" title={meta.error}>{meta.error}</span>

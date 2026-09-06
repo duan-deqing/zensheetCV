@@ -651,9 +651,40 @@
   animation: hoverTipIn 0.12s ease-out both;
 }
 
+/* ---------- AI 执行状态面板展开 ---------- */
+@keyframes aiStatusPanelIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ai-status-panel-in {
+  animation: aiStatusPanelIn 0.16s ease-out both;
+}
+/* 步骤详情块展开 */
+@keyframes aiStepDetailIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.ai-step-detail-in {
+  animation: aiStepDetailIn 0.14s ease-out both;
+}
+
 /* ---------- 减少动态效果：全部动画停用 ---------- */
 @media (prefers-reduced-motion: reduce) {
   .dropdown-pop,
+  .ai-status-panel-in,
+  .ai-step-detail-in,
   .dropdown-pop.dropdown-down,
   .dropdown-pop.dropdown-up,
   .nav-menu-pop,

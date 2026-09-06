@@ -92,7 +92,8 @@ export function runWorkflow(
         io.onStep(i, {
           status: 'done',
           ms: Date.now() - start,
-          detail: output.replace(/\s+/g, ' ').trim().slice(0, 80),
+          // 详情放宽到 400 字符：状态面板步骤行可展开查看具体执行流程
+          detail: output.replace(/\s+/g, ' ').trim().slice(0, 400),
         });
       } catch (err: unknown) {
         if ((err as { name?: string })?.name === 'AbortError') {
@@ -102,7 +103,7 @@ export function runWorkflow(
         }
         const msg = (err as Error)?.message || String(err);
         ctx.intermediate.push('');
-        io.onStep(i, { status: 'failed', ms: Date.now() - start, detail: msg.slice(0, 80) });
+        io.onStep(i, { status: 'failed', ms: Date.now() - start, detail: msg.slice(0, 400) });
         return { outputs: ctx.intermediate, aborted: false, failed: true, error: msg };
       }
     }

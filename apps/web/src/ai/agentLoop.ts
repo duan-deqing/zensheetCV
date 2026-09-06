@@ -138,10 +138,13 @@ export async function runAgentLoop(
         } catch (err: unknown) {
           result = { ok: false, content: JSON.stringify({ error: (err as Error)?.message || 'tool crashed' }) };
         }
+        // 步骤摘要：参数预览 + 结果预览（状态面板可展开查看完整执行流程，上限放宽到 300 字符）
+        const argsPreview = call.argsJson.replace(/\s+/g, ' ').trim().slice(0, 120);
+        const resultPreview = result.content.replace(/\s+/g, ' ').trim().slice(0, 300);
         cb.onStepEnd({
           status: result.ok ? 'done' : 'failed',
           ms: Date.now() - t0,
-          detail: result.content.slice(0, 60),
+          detail: argsPreview ? `${argsPreview} → ${resultPreview}` : resultPreview,
         });
         toolWire.push({ role: 'tool', tool_call_id: call.id, content: result.content });
       }
