@@ -34,7 +34,7 @@ export const azureTemplate: TemplateDefinition = {
     }
     .resume-preview h1 + p { color: #747474; }
     .resume-preview h2 {
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 700;
       color: var(--resume-primary, #5974D4);
       border-bottom: 1px solid var(--resume-primary, #5974D4);
@@ -64,6 +64,11 @@ export const azureTemplate: TemplateDefinition = {
     .resume-preview ul li::marker { color: var(--resume-primary, #5974D4); }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #747474; }
     .resume-preview a { color: #747474; text-decoration: none; }
+    .resume-preview hr {
+      border: none;
+      border-top: 1px solid #C9D4F0;
+      margin: calc(1.25rem * var(--resume-sp, 1)) 0;
+    }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -87,6 +92,6 @@ export const azureTemplate: TemplateDefinition = {
     primaryColor: '#5974D4',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

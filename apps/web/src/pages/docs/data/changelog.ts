@@ -157,7 +157,7 @@ export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
     version: 'v0.7.0',
     date: '2026-09-07',
-    title: { zh: '首页改版与编辑器体验优化', en: 'Homepage Revamp & Editor UX Polish' },
+    title: { zh: '首页改版、模板升级与编辑器体验优化', en: 'Homepage Revamp, Template Upgrades & Editor UX Polish' },
     tag: { zh: '免登录版', en: 'Login-free' },
     items: [
       { zh: '首页 Hero 改为一屏工作台：编辑器 / 实时预览 / AI 聊天窗三个窗口直接使用编辑器页面真实模块（示例简历内容，可实际操作），随视口高度自适应，底部规格条以白色半透明磨砂条贴底收尾', en: 'The homepage hero becomes a one-screen workspace: editor, live preview and AI chat are the real editor modules (preloaded with a sample resume and fully operable), adapting to the viewport height, with the specs bar anchored at the bottom on a frosted translucent strip' },
@@ -166,6 +166,10 @@ export const STATIC_CHANGELOG: ChangelogEntry[] = [
       { zh: '「多套模板」展示区重做：8 套模板以与编辑器完全相同的渲染管线真实挂载（非截图），水平铺开一次可见多套，支持滚轮 / 拖拽无限循环浏览，不再依赖截图生成缩略图', en: 'The template showcase is rebuilt: all 8 templates are mounted live through the exact editor rendering pipeline (no screenshots), laid out horizontally so several are visible at once, browsable in an infinite loop via scroll wheel or drag' },
       { zh: 'Markdown 导入 / 导出的结果提示统一为屏幕顶部中央的深色胶囊样式，与「已添加模板」等操作提示同位置同款式，滑入淡出更轻量，手机折叠菜单内操作同样生效', en: 'Result messages for Markdown import / export now appear as a dark pill at the top center of the screen — same spot and style as other operation hints such as "template added", with a lighter slide-in / fade-out; it also works from the folded mobile menu' },
       { zh: '「AI 助手」按钮新增三色辉光边框（紫 / 粉 / 天蓝渐变）：光标靠近时亮弧沿按钮边缘点亮并跟随光标，进入页面时扫光一圈，打开 AI 窗口时常亮缓慢旋转；辉光只出现在按钮范围内，减弱动效时跳过旋转', en: 'The "AI Assistant" button gains a tri-color glow border (purple / pink / sky-blue gradient): as the pointer approaches, an arc lights up along the button edge and follows the cursor, a sweep plays once on page load, and with the AI window open it stays lit and slowly rotates — all confined within the button bounds, with rotation skipped for reduced-motion users' },
+      { zh: '「---」水平分割线全面支持：8 套模板各自定制样式（现代蓝调主色渐隐线、优雅复古居中双细线、技术极简虚线、墨纸极简短墨杠等），随主题主色与行距联动，预览与导出一致', en: 'Full support for "---" horizontal rules: each of the 8 templates ships its own divider style (a primary-color fading line for Modern Blue, a centered double hairline for Elegant Wine, a dashed line for Tech Green, a short ink bar for Muji Minimal and more), synced with the theme primary color and line spacing in both preview and export' },
+      { zh: '四套模板按特点精修：优雅复古加宽衬线字距并以暖酒金点缀列表符号 / 强调 / 链接；技术极简章节标题带「#」前缀、代码块改为终端输出窗样式、链接用虚线下划线；墨纸极简胶囊标题加宽字距、条目标题前加小方块、列表符号加深；朝阳暖橙章节两侧线改为向外渐隐的光线', en: 'Four templates are refined to their characters: Elegant Wine widens serif letter spacing and warms list markers / emphasis / links in wine-gold; Tech Green adds a "#" prefix to section titles, a terminal-window code block style and dashed link underlines; Muji Minimal widens capsule title spacing, adds a small square before item titles and deepens list markers; Sunrise Orange turns the lines around section titles into outward-fading rays' },
+      { zh: '优雅复古与技术极简页面背景改为纯白：技术极简整体配色由深底浅字翻转为白底深字，与其他模板观感一致，导出 PDF 更省墨', en: 'The page background of Elegant Wine and Tech Green becomes pure white: Tech Green\'s palette flips from light-on-dark to dark-on-light, matching the other templates and saving ink in exported PDFs' },
+      { zh: '排版默认值调整：H2 字号默认 18px、行距默认 1.6 倍，主题面板「字号」与「行距」下拉的默认选项均带「默认」徽章标识，未自定义的简历自动应用新默认值', en: 'Typography defaults updated: H2 now defaults to 18px and line spacing to 1.6x, the default options in the font-size and line-spacing dropdowns are marked with a "Default" badge, and resumes without custom values pick these up automatically' },
     ],
   },
   {

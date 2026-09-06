@@ -32,7 +32,7 @@ export interface ElementFontSizes {
 /** 分类字号默认值：未单独设置时按此渲染（下拉中带「默认」标识） */
 export const defaultElementFontSizes: ElementFontSizes = {
   h1: 30,
-  h2: 20,
+  h2: 18,
   h3: 14,
   h4: 14,
   h5: 14,
@@ -65,7 +65,7 @@ export const defaultTheme: ThemeConfig = {
   primaryColor: '#2563EB',
   fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
   fontSize: 14,
-  lineHeight: 1.4,
+  lineHeight: 1.6,
   marginX: 'none',
   marginY: 'none',
   contentPadding: 'normal',

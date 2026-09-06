@@ -29,6 +29,7 @@ export const sunriseTemplate: TemplateDefinition = {
     .resume-preview h1 {
       font-size: var(--resume-fs-h1, 30px);
       font-weight: 800;
+      letter-spacing: 0.05em;
       color: #FFFFFF;
       text-shadow: 0 1px 2px rgba(180, 90, 20, 0.35);
       background: linear-gradient(180deg, #F9855D 0%, #FDD288 78%, #FFFFFF 100%);
@@ -41,18 +42,25 @@ export const sunriseTemplate: TemplateDefinition = {
       display: flex;
       align-items: center;
       gap: 0.875rem;
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 700;
+      letter-spacing: 0.05em;
       color: var(--resume-primary, #F9855D);
       margin-top: calc(1.75rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
     }
-    .resume-preview h2::before,
+    /* 两侧线改为向外渐隐的光线，呼应朝阳主题 */
+    .resume-preview h2::before {
+      content: '';
+      flex: 1 1 0;
+      height: 2px;
+      background: linear-gradient(to left, #FDD288, rgba(253, 210, 136, 0));
+    }
     .resume-preview h2::after {
       content: '';
       flex: 1 1 0;
       height: 2px;
-      background: #FDD288;
+      background: linear-gradient(to right, #FDD288, rgba(253, 210, 136, 0));
     }
     .resume-preview h3 {
       font-size: var(--resume-fs-h3, 14px);
@@ -74,6 +82,11 @@ export const sunriseTemplate: TemplateDefinition = {
     }
     .resume-preview ul li::marker { color: var(--resume-primary, #F9855D); }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #5C4F42; }
+    .resume-preview hr {
+      border: none;
+      border-top: 1px solid #FAD3C0;
+      margin: calc(1.25rem * var(--resume-sp, 1)) 0;
+    }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -99,6 +112,6 @@ export const sunriseTemplate: TemplateDefinition = {
     primaryColor: '#F9855D',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

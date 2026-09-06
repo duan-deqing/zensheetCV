@@ -33,7 +33,7 @@ export const modernTemplate: TemplateDefinition = {
     /* 章节标题：蓝色双斜线装饰 + 黑色标题 */
     .resume-preview h2 {
       position: relative;
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 700;
       margin-top: calc(1.75rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
@@ -80,6 +80,13 @@ export const modernTemplate: TemplateDefinition = {
     /* 加粗词条：近黑强调 */
     .resume-preview strong { color: #111827; font-weight: 700; }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #4B5563; }
+    /* 分割线：主色渐隐，向右淡出 */
+    .resume-preview hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(to right, var(--resume-primary, #2563EB), transparent);
+      margin: calc(1.5rem * var(--resume-sp, 1)) 0;
+    }
     /* 行内代码：技术栈标签，灰边胶囊 */
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
@@ -104,6 +111,6 @@ export const modernTemplate: TemplateDefinition = {
     primaryColor: '#2563EB',
     fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

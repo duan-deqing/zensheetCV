@@ -45,7 +45,7 @@ export const carbonTemplate: TemplateDefinition = {
       background: color-mix(in srgb, var(--resume-primary, #1A1A1A) 8%, #ffffff);
       border-left: 5px solid var(--resume-primary, #1A1A1A);
       padding: 0.4rem 0.9rem;
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 800;
       color: var(--resume-primary, #1A1A1A);
       margin-top: calc(2rem * var(--resume-sp, 1));
@@ -72,6 +72,11 @@ export const carbonTemplate: TemplateDefinition = {
     }
     .resume-preview ul li::marker { color: #1A1A1A; }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #333333; }
+    .resume-preview hr {
+      border: none;
+      border-top: 2px solid #D4D4D4;
+      margin: calc(1.5rem * var(--resume-sp, 1)) 0;
+    }
     .resume-preview code {
       font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
       font-size: 0.85em;
@@ -98,6 +103,6 @@ export const carbonTemplate: TemplateDefinition = {
     primaryColor: '#1A1A1A',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

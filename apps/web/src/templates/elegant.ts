@@ -13,13 +13,13 @@ export const elegantTemplate: TemplateDefinition = {
     p: 'description',
     hr: 'divider',
   },
-  pageBackground: '#FDFBF7',
+  pageBackground: '#FFFFFF',
   css: `
     .resume-preview {
       font-family: 'Georgia', 'Noto Serif SC', serif;
       color: #2C2C2C;
       line-height: calc(1.7 * var(--resume-sp, 1));
-      background: #FDFBF7;
+      background: #FFFFFF;
       text-align: justify;
     }
     .resume-preview h1 {
@@ -27,11 +27,12 @@ export const elegantTemplate: TemplateDefinition = {
       font-weight: 400;
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
       color: var(--resume-primary, #78350F);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.06em;
     }
     .resume-preview h2 {
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 600;
+      letter-spacing: 0.08em;
       margin-top: calc(2rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
       color: var(--resume-primary, #78350F);
@@ -51,6 +52,23 @@ export const elegantTemplate: TemplateDefinition = {
     .resume-preview ol { padding-left: 1.5rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview li { margin-bottom: calc(0.375rem * var(--resume-sp, 1)); }
     .resume-preview p { margin-bottom: calc(0.625rem * var(--resume-sp, 1)); }
+    /* 复古暖调点缀：列表符号与强调/链接统一暖酒金色系 */
+    .resume-preview ul li::marker {
+      color: #B45309;
+      color: color-mix(in srgb, var(--resume-primary, #78350F) 72%, #FFFFFF);
+    }
+    .resume-preview strong { color: var(--resume-primary, #78350F); }
+    .resume-preview a {
+      color: #92400E;
+      color: color-mix(in srgb, var(--resume-primary, #78350F) 70%, #FFFFFF);
+      text-decoration: none;
+    }
+    .resume-preview hr {
+      border: none;
+      border-top: 3px double #DCC9A8;
+      width: 60%;
+      margin: calc(1.5rem * var(--resume-sp, 1)) auto;
+    }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -74,6 +92,6 @@ export const elegantTemplate: TemplateDefinition = {
     primaryColor: '#78350F',
     fontFamily: "'Times New Roman', 'Noto Serif SC', serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

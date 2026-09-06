@@ -56,7 +56,7 @@ export const mujiTemplate: TemplateDefinition = {
       display: flex;
       align-items: center;
       gap: 0.875rem;
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 700;
       color: #333333;
       margin-top: calc(1.75rem * var(--resume-sp, 1));
@@ -77,6 +77,8 @@ export const mujiTemplate: TemplateDefinition = {
       border-radius: 999px;
       padding: 0.3rem 1.5rem;
       line-height: 1.5;
+      /* 加宽字距：留白呼吸感，极简水墨气质 */
+      letter-spacing: 0.14em;
     }
     .resume-preview h3 {
       font-size: var(--resume-fs-h3, 14px);
@@ -84,6 +86,16 @@ export const mujiTemplate: TemplateDefinition = {
       margin-top: calc(1rem * var(--resume-sp, 1));
       margin-bottom: calc(0.25rem * var(--resume-sp, 1));
       color: #1A1A1A;
+    }
+    /* 方块题标前缀：呼应方形列表符号的极简几何感 */
+    .resume-preview h3::before {
+      content: '';
+      display: inline-block;
+      width: 0.4em;
+      height: 0.4em;
+      background: currentColor;
+      margin-right: 0.5em;
+      vertical-align: 0.08em;
     }
     .resume-preview ul { padding-left: 1.1rem; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
     .resume-preview ol { padding-left: 1.4rem; list-style: decimal; margin-bottom: calc(0.5rem * var(--resume-sp, 1)); }
@@ -97,8 +109,14 @@ export const mujiTemplate: TemplateDefinition = {
       margin-bottom: calc(0.375rem * var(--resume-sp, 1));
       color: #444444;
     }
-    .resume-preview ul li::marker { color: #444444; }
+    .resume-preview ul li::marker { color: #1A1A1A; }
     .resume-preview p { margin-bottom: calc(0.5rem * var(--resume-sp, 1)); color: #4A4A4A; }
+    .resume-preview hr {
+      border: none;
+      border-top: 2px solid var(--resume-primary, #39393A);
+      width: 2rem;
+      margin: calc(1.5rem * var(--resume-sp, 1)) auto;
+    }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -122,6 +140,6 @@ export const mujiTemplate: TemplateDefinition = {
     primaryColor: '#39393A',
     fontFamily: "'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

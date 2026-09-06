@@ -28,7 +28,7 @@ export const classicTemplate: TemplateDefinition = {
       color: var(--resume-primary, #111827);
     }
     .resume-preview h2 {
-      font-size: var(--resume-fs-h2, 20px);
+      font-size: var(--resume-fs-h2, 18px);
       font-weight: 600;
       margin-top: calc(1.5rem * var(--resume-sp, 1));
       margin-bottom: calc(0.75rem * var(--resume-sp, 1));
@@ -58,6 +58,11 @@ export const classicTemplate: TemplateDefinition = {
     .resume-preview p {
       margin-bottom: calc(0.5rem * var(--resume-sp, 1));
     }
+    .resume-preview hr {
+      border: none;
+      border-top: 1px solid #E5E7EB;
+      margin: calc(1.25rem * var(--resume-sp, 1)) 0;
+    }
     .resume-preview code {
       font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
       font-size: 0.8125em;
@@ -81,6 +86,6 @@ export const classicTemplate: TemplateDefinition = {
     primaryColor: '#111827',
     fontFamily: "'Inter', 'Noto Sans SC', sans-serif",
     fontSize: 14,
-    lineHeight: 1.4,
+    lineHeight: 1.6,
   },
 };

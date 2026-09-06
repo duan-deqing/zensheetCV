@@ -9,8 +9,8 @@ import { defaultElementFontSizes } from '@stylan/shared-types';
 export const BASE_FONT_SIZE = 14;
 export const BASE_LINE_HEIGHT = 1.6;
 
-/** 行距默认值：未设置时按 1.4 倍渲染（BASE_LINE_HEIGHT 仅作缩放基准，保证旧数据渲染不变） */
-export const DEFAULT_LINE_HEIGHT = 1.4;
+/** 行距默认值：未设置时按 1.6 倍渲染（与缩放基准 BASE_LINE_HEIGHT 一致，--resume-sp 默认为 1） */
+export const DEFAULT_LINE_HEIGHT = 1.6;
 
 const clampNum = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 

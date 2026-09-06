@@ -97,7 +97,7 @@ const elementSizeOptions = (def: number): DropdownOption<string>[] => {
   });
 };
 
-/** 各分类字号选项：默认值 H1 30 / H2 20 / 其余 14（与 defaultElementFontSizes 一致） */
+/** 各分类字号选项：默认值 H1 30 / H2 18 / 其余 14（与 defaultElementFontSizes 一致） */
 const elementSizeOptionsMap = {
   h1: elementSizeOptions(defaultElementFontSizes.h1),
   h2: elementSizeOptions(defaultElementFontSizes.h2),
@@ -119,7 +119,7 @@ const fontSizeCategories: Array<[keyof ElementFontSizes, Bi]> = [
   ['list', { zh: '列表', en: 'List' }],
 ];
 
-/** 行距下拉：12 ~ 25 → 1.2 ~ 2.5 倍，默认值 1.4 选项以「默认」徽章标识 */
+/** 行距下拉：12 ~ 25 → 1.2 ~ 2.5 倍，默认值选项在渲染处加「默认」徽章标识 */
 const lineHeightOptions: { value: string; label: Bi }[] = Array.from({ length: 14 }, (_, i) => {
   const lh = ((12 + i) / 10).toFixed(1);
   return {
@@ -491,7 +491,19 @@ export function ThemeConfigPanel() {
                 {tr({ zh: '行距', en: 'Line height' })}
               </label>
               <Dropdown
-                options={lineHeightOptions.map((o) => ({ value: o.value, label: tr(o.label) }))}
+                options={lineHeightOptions.map((o) =>
+                  Number(o.value) === DEFAULT_LINE_HEIGHT
+                    ? {
+                        value: o.value,
+                        label: (
+                          <span className="inline-flex items-center gap-1.5">
+                            {tr(o.label)}
+                            <DefaultBadge />
+                          </span>
+                        ),
+                      }
+                    : { value: o.value, label: tr(o.label) },
+                )}
                 value={normalizeLineHeight(
                   themeConfig.lineHeight ?? (themeConfig as { spacing?: unknown }).spacing,
                 ).toFixed(1)}
