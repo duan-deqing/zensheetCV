@@ -1,13 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useEditor } from '@/store/EditorContext';
+import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { useUI } from '@/store/UIContext';
 import { useAuth } from '@/store/AuthContext';
-import { streamChat } from '@/api/chatClient';
+import { usePreview } from '@/store/PreviewContext';
+import { streamChat, streamChatEvents } from '@/api/chatClient';
+import { agentSummarySystem, agentSystemPrompt, chatSystemPrompt } from '@/ai/prompts';
+import { getPageCount } from '@/ai/pageCountStore';
+import { runAgentLoop } from '@/ai/agentLoop';
+import { AGENT_TOOL_SCHEMAS, executeTool, type AgentToolContext } from '@/ai/agentTools';
+import { buildJdWorkflow, buildPolishWorkflow, runWorkflow } from '@/ai/workflows';
+import { parseResumeEdits, stripEditBlocks } from '@/ai/patchParser';
+import type { PatchState, StepStatus, WorkflowStepState } from '@/ai/types';
+import { PatchCards } from '@/components/ai/PatchCards';
 import { getAiHistory, putAiHistory } from '@/storage/aiHistoryStore';
 import { HoverTip } from '@/components/HoverTip';
-import { useTr, type Bi } from '@/i18n/LangContext';
+import { useTr, getLang, type Bi } from '@/i18n/LangContext';
 import { loadAISettings, resolveAISettings } from '@/settings/aiSettings';
 
 /** AI 请求执行元信息：用于消息上方的可展开执行状态 */
@@ -21,6 +30,8 @@ export interface AIMeta {
   status: 'running' | 'done' | 'error' | 'aborted';
   /** 技术性报错详情，仅在状态面板中展示 */
   error?: string;
+  /** 动态步骤（工作流 / Agent）：存在时替代静态 4 步渲染 */
+  steps?: WorkflowStepState[];
 }
 
 export interface ChatMessage {
@@ -32,20 +43,33 @@ export interface ChatMessage {
   name?: string;
   /** AI 消息的执行状态（用户消息无） */
   meta?: AIMeta;
+  /** 结构化编辑建议（resume-edits 协议）：流结束后从正文解析，卡片确认应用 */
+  patches?: PatchState[];
 }
 
 function nowTime(): string {
   return new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-/** 规范化从本地载入的历史：中断的流式消息标记为「已停止」 */
+/** 规范化从本地载入的历史：中断的流式消息标记为「已停止」；
+ *  旧记录惰性补解析 assistant 消息中的 resume-edits 建议块 */
 function normalizeHistory(msgs: ChatMessage[]): ChatMessage[] {
   if (!Array.isArray(msgs)) return [];
-  return msgs.map((m) =>
-    m.meta?.status === 'running'
-      ? { ...m, meta: { ...m.meta, status: 'aborted' as const, end: m.meta.end ?? Date.now() } }
-      : m,
-  );
+  return msgs.map((m) => {
+    const normalized =
+      m.meta?.status === 'running'
+        ? { ...m, meta: { ...m.meta, status: 'aborted' as const, end: m.meta.end ?? Date.now() } }
+        : m;
+    if (
+      normalized.role === 'assistant' &&
+      !normalized.patches &&
+      normalized.content.includes('resume-edits')
+    ) {
+      const found = parseResumeEdits(normalized.content);
+      if (found.length) return { ...normalized, patches: found };
+    }
+    return normalized;
+  });
 }
 
 /** AI 回复的 Markdown 渲染样式：紧凑聊天排版（GFM 支持表格/任务列表/删除线） */
@@ -177,8 +201,8 @@ function AIStatus({ meta }: { meta: AIMeta }) {
           ? 'bg-amber-500'
           : 'bg-red-500';
 
-  // 从实际请求过程还原的执行步骤
-  const steps: { label: Bi; detail: string; failed?: boolean }[] = [
+  // 面板行：动态步骤（工作流/Agent）存在时优先；否则从实际请求过程还原静态 4 步
+  const staticSteps: { label: Bi; detail: string; failed?: boolean }[] = [
     {
       label: { zh: '读取模型配置', en: 'Read model config' },
       detail: meta.model ?? tr({ zh: '未配置 AI 模型', en: 'No AI model configured' }),
@@ -205,6 +229,26 @@ function AIStatus({ meta }: { meta: AIMeta }) {
       failed: meta.status === 'error',
     },
   ];
+  const stepStatusText: Record<WorkflowStepState['status'], Bi> = {
+    pending: { zh: '待执行', en: 'Pending' },
+    running: { zh: '执行中…', en: 'Running…' },
+    done: { zh: '完成', en: 'Done' },
+    failed: { zh: '失败', en: 'Failed' },
+    skipped: { zh: '已跳过', en: 'Skipped' },
+  };
+  const rows: { key: string; label: string; detail: string; failed?: boolean }[] = meta.steps
+    ? meta.steps.map((s, i) => ({
+        key: `${i}-${s.label.zh}`,
+        label: tr(s.label),
+        failed: s.status === 'failed',
+        detail:
+          s.status === 'done'
+            ? `${tr(stepStatusText.done)}${s.ms ? ` · ${(s.ms / 1000).toFixed(1)}s` : ''}${s.detail ? ` · ${s.detail}` : ''}`
+            : s.status === 'failed'
+              ? s.detail || tr(stepStatusText.failed)
+              : tr(stepStatusText[s.status]),
+      }))
+    : staticSteps.map((s, i) => ({ key: `${i}-${s.label.zh}`, label: tr(s.label), detail: s.detail, failed: s.failed }));
 
   return (
     <div className="mb-1.5">
@@ -232,10 +276,10 @@ function AIStatus({ meta }: { meta: AIMeta }) {
       </button>
       {open && (
         <div className="mt-1.5 rounded-lg bg-gray-50 border border-gray-200/80 px-2.5 py-2 flex flex-col gap-1.5">
-          {steps.map((s, i) => (
-            <div key={s.label.zh} className="flex items-baseline gap-2 text-[11px] leading-snug">
+          {rows.map((s, i) => (
+            <div key={s.key} className="flex items-baseline gap-2 text-[11px] leading-snug">
               <span className="font-mono text-gray-300 tabular-nums shrink-0">{String(i + 1).padStart(2, '0')}</span>
-              <span className={s.failed ? 'text-red-500 shrink-0' : 'text-gray-600 shrink-0'}>{tr(s.label)}</span>
+              <span className={s.failed ? 'text-red-500 shrink-0' : 'text-gray-600 shrink-0'}>{s.label}</span>
               <span className={`truncate ${s.failed ? 'text-red-400' : 'text-gray-400'}`} title={s.detail}>
                 {s.detail}
               </span>
@@ -271,15 +315,19 @@ export function AIWindow({
   /** 演示模式（首页工作台）：预填示例对话，可继续真实对话（BYOK），但不读写历史、不可关闭 */
   demo?: ChatMessage[];
 }) {
-  const { aiWindowOpen, toggleAIWindow } = useUI();
+  const { aiWindowOpen, toggleAIWindow, addToast } = useUI();
   // 统一关闭入口：由 EditorPage 的关闭流程驱动（滑出动画结束后卸载）
   const close = onClose ?? toggleAIWindow;
   const { markdown } = useEditor();
+  const editorDispatch = useEditorDispatch();
   const { user } = useAuth();
+  const { currentTemplate, themeConfig } = usePreview();
   const tr = useTr();
   const [messages, setMessages] = useState<ChatMessage[]>(demo ?? []);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
+  // Agent 模式（方案 B）：开启后发送走 function calling 循环，模型可用工具读取简历并提议修改
+  const [agentOn, setAgentOn] = useState(false);
   // 对话记录持久化（IndexedDB）：按简历隔离，打开窗口时从本地载入；
   // 流式期间与载入完成前不回写，避免覆盖
   const [historyReady, setHistoryReady] = useState(false);
@@ -317,6 +365,14 @@ export function AIWindow({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // 最新简历快照：编辑建议卡片应用/撤销时读取，避免事件闭包拿到旧值
+  const markdownRef = useRef(markdown);
+  markdownRef.current = markdown;
+  // 模板/主题快照：Agent 工具 get_template_info 读取（循环运行期间保持最新值）
+  const templateRef = useRef({ currentTemplate, themeConfig });
+  templateRef.current = { currentTemplate, themeConfig };
+  /** 最近一次建议应用的撤销快照（单级）：消息下标 + 应用前 markdown */
+  const [undoState, setUndoState] = useState<{ msgIndex: number; snapshot: string } | null>(null);
 
   // Esc 关闭由 useModalClose 内置监听
 
@@ -336,6 +392,95 @@ export function AIWindow({
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
   }, [input]);
+
+  /** 追加最后一条 AI 消息正文（流式增量） */
+  const patchLast = (patch: (prev: string) => string) => {
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      next[next.length - 1] = { ...next[next.length - 1], content: patch(next[next.length - 1].content) };
+      return next;
+    });
+  };
+  /** 将技术性报错写入执行状态，正文只保留友好提示 */
+  const setLastError = (error: string) => {
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (last.role === 'assistant' && last.meta) {
+        next[next.length - 1] = { ...last, meta: { ...last.meta, error } };
+      }
+      return next;
+    });
+  };
+  const FAIL_HINT = tr({
+    zh: '生成失败：请检查网络连接与 API 配置，可展开上方「AI 执行」查看详情。',
+    en: 'Generation failed: check your network connection and API configuration. Expand "AI RUN" above for details.',
+  });
+  /** 流结束收尾：写回执行元信息 + 从正文提取 resume-edits 建议（send 与工作流共用） */
+  const finishAssistantMessage = (outcome: AIMeta['status']) => {
+    setIsStreaming(false);
+    abortRef.current = null;
+    const end = Date.now();
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (last.role === 'assistant' && last.meta) {
+        next[next.length - 1] = { ...last, meta: { ...last.meta, status: outcome, end } };
+      }
+      if (last.role === 'assistant' && !last.patches) {
+        const found = parseResumeEdits(last.content);
+        if (found.length) next[next.length - 1] = { ...last, patches: found };
+      }
+      return next;
+    });
+  };
+
+  /** Agent propose_edit 入队：追加为当前（最后一条 assistant）消息的建议卡片，
+   *  运行中即可提前审阅，复用方案 A 管线确认应用 */
+  const appendAgentPatch = (p: { search: string; replace: string; note?: string }) => {
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (last.role !== 'assistant') return prev;
+      const id = `patch-${Date.now().toString(36)}-${last.patches?.length ?? 0}`;
+      next[next.length - 1] = {
+        ...last,
+        patches: [...(last.patches ?? []), { ...p, id, status: 'pending' as const }],
+      };
+      return next;
+    });
+  };
+  /** Agent 步进（AIStatus 动态步骤）：工具调用开始时追加一行 */
+  const appendAgentStep = (label: Bi) => {
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (!last.meta) return prev;
+      next[next.length - 1] = {
+        ...last,
+        meta: { ...last.meta, steps: [...(last.meta.steps ?? []), { label, status: 'running' as const }] },
+      };
+      return next;
+    });
+  };
+  /** Agent 步进：最后一个步骤收尾（done/failed + 耗时摘要） */
+  const patchLastAgentStep = (patch: { status: StepStatus; detail?: string; ms?: number }) => {
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      const next = [...prev];
+      const last = next[next.length - 1];
+      if (!last.meta?.steps?.length) return prev;
+      const steps = last.meta.steps.slice();
+      steps[steps.length - 1] = { ...steps[steps.length - 1], ...patch };
+      next[next.length - 1] = { ...last, meta: { ...last.meta, steps } };
+      return next;
+    });
+  };
 
   const send = async () => {
     const text = input.trim();
@@ -364,31 +509,6 @@ export function AIWindow({
 
     const controller = new AbortController();
     abortRef.current = controller;
-    const patchLast = (patch: (prev: string) => string) => {
-      setMessages((prev) => {
-        if (prev.length === 0) return prev;
-        const next = [...prev];
-        next[next.length - 1] = { ...next[next.length - 1], content: patch(next[next.length - 1].content) };
-        return next;
-      });
-    };
-    /** 将技术性报错写入执行状态，正文只保留友好提示 */
-    const FAIL_HINT = tr({
-      zh: '生成失败：请检查网络连接与 API 配置，可展开上方「AI 执行」查看详情。',
-      en: 'Generation failed: check your network connection and API configuration. Expand "AI RUN" above for details.',
-    });
-    const setLastError = (error: string) => {
-      setMessages((prev) => {
-        if (prev.length === 0) return prev;
-        const next = [...prev];
-        const last = next[next.length - 1];
-        if (last.role === 'assistant' && last.meta) {
-          next[next.length - 1] = { ...last, meta: { ...last.meta, error } };
-        }
-        return next;
-      });
-    };
-
     // 记录执行结果，供结束时写入状态元信息
     let outcome: AIMeta['status'] = 'done';
 
@@ -405,15 +525,94 @@ export function AIWindow({
         );
         return;
       }
-      // 浏览器直连供应商（OpenAI 兼容协议，SSE 流式）
+      // 浏览器直连供应商（OpenAI 兼容协议，SSE 流式）；
+      // system prompt 每次请求携带（不写入历史），确立身份与 resume-edits 输出协议
+      if (agentOn) {
+        // Agent 模式（方案 B）：function calling 循环，工具结果与步骤实时更新
+        const lang = getLang();
+        const agentCtx: AgentToolContext = {
+          getMarkdown: () => markdownRef.current,
+          getPageCount,
+          getTemplateInfo: () => {
+            const t = templateRef.current.currentTemplate;
+            const th = templateRef.current.themeConfig;
+            return t
+              ? { id: t.id, name: t.name, primaryColor: th.primaryColor, fontSize: th.fontSize, lineHeight: th.lineHeight }
+              : null;
+          },
+          onPatch: appendAgentPatch,
+        };
+        const result = await runAgentLoop(
+          {
+            baseUrl: cfg.baseUrl,
+            apiKey: cfg.apiKey,
+            model: cfg.model,
+            messages: [
+              {
+                role: 'system',
+                content: agentSystemPrompt(lang, {
+                  templateName: templateRef.current.currentTemplate?.name,
+                  pages: getPageCount(),
+                }),
+              },
+              ...history.map((m, i) => ({
+                role: m.role,
+                content: i === 0 ? contextPrefix : m.content,
+              })),
+            ],
+            tools: AGENT_TOOL_SCHEMAS,
+            summarySystem: agentSummarySystem(lang),
+            fallbackSystem: chatSystemPrompt(lang),
+            signal: controller.signal,
+          },
+          {
+            onRoundStart: () => patchLast(() => ''),
+            onText: (delta) => patchLast((prev) => prev + delta),
+            onStepStart: appendAgentStep,
+            onStepEnd: patchLastAgentStep,
+          },
+          (o) => streamChatEvents(o),
+          (name, argsJson) => executeTool(name, argsJson, agentCtx),
+        );
+        if (result.failed) {
+          outcome = 'error';
+          setLastError(result.error || tr({ zh: 'Agent 执行失败', en: 'Agent run failed' }));
+          patchLast((prev) => prev || FAIL_HINT);
+        } else if (result.aborted) {
+          outcome = 'aborted';
+        } else {
+          if (result.degraded && !result.truncated) {
+            addToast(
+              tr({
+                zh: '当前供应商不支持工具调用，已自动降级为建议块模式',
+                en: 'Provider does not support tool calling — fell back to suggestion-block mode',
+              }),
+              'info',
+            );
+          }
+          if (result.truncated) {
+            addToast(
+              tr({
+                zh: '工具调用轮次已达上限，已自动总结收尾',
+                en: 'Tool round limit reached — wrapped up with a summary',
+              }),
+              'info',
+            );
+          }
+        }
+        return;
+      }
       for await (const delta of streamChat({
         baseUrl: cfg.baseUrl,
         apiKey: cfg.apiKey,
         model: cfg.model,
-        messages: history.map((m, i) => ({
-          role: m.role,
-          content: i === 0 ? contextPrefix : m.content,
-        })),
+        messages: [
+          { role: 'system', content: chatSystemPrompt(getLang()) },
+          ...history.map((m, i) => ({
+            role: m.role,
+            content: i === 0 ? contextPrefix : m.content,
+          })),
+        ],
         signal: controller.signal,
       })) {
         patchLast((prev) => prev + delta);
@@ -427,25 +626,168 @@ export function AIWindow({
         patchLast((prev) => prev || FAIL_HINT);
       }
     } finally {
-      setIsStreaming(false);
-      abortRef.current = null;
-      // 将最终状态与耗时写回该条 AI 消息的执行元信息
-      const end = Date.now();
-      setMessages((prev) => {
-        if (prev.length === 0) return prev;
-        const next = [...prev];
-        const last = next[next.length - 1];
-        if (last.role === 'assistant' && last.meta) {
-          next[next.length - 1] = { ...last, meta: { ...last.meta, status: outcome, end } };
-        }
-        return next;
-      });
+      finishAssistantMessage(outcome);
     }
   };
 
   const stop = () => {
     abortRef.current?.abort();
     setIsStreaming(false);
+  };
+
+  /** 深度工作流入口（方案 C）：全文润色 / JD 对齐。
+   *  串行多步流水线；最终内容步的输出流入气泡，与方案 A 同管线解析确认卡片 */
+  const startWorkflow = async (kind: 'polish' | 'jd') => {
+    if (isStreaming || demo) return;
+    const jd = input.trim();
+    if (kind === 'jd' && !jd) {
+      inputRef.current?.focus();
+      addToast(tr({ zh: '请先在输入框粘贴职位描述（JD）', en: 'Paste the job description into the input first' }), 'info');
+      return;
+    }
+    // BYOK：未配置供应商时直接提示，不发请求
+    const cfg = resolveAISettings(loadAISettings());
+    if (!cfg) {
+      addToast(
+        tr({
+          zh: '尚未配置 AI 模型：点击右上角用户名，在「设置 → AI」中配置后重试',
+          en: 'No AI model configured yet: set up a provider under "Settings → AI" first',
+        }),
+        'error',
+      );
+      return;
+    }
+    setInput('');
+    const lang = getLang();
+    const defs = kind === 'polish' ? buildPolishWorkflow(lang) : buildJdWorkflow(lang);
+    const userMsg: ChatMessage = {
+      role: 'user',
+      time: nowTime(),
+      name: user?.name || tr({ zh: '我', en: 'Me' }),
+      content:
+        kind === 'polish'
+          ? lang === 'en'
+            ? '[Deep workflow] Polish the whole resume.'
+            : '【深度工作流】全文润色'
+          : lang === 'en'
+            ? `[Deep workflow] Align resume to this JD:\n${jd}`
+            : `【深度工作流】对齐以下职位描述：\n${jd}`,
+    };
+    setMessages([
+      ...messages,
+      userMsg,
+      {
+        role: 'assistant',
+        content: '',
+        time: nowTime(),
+        name: tr({ zh: 'AI 助手', en: 'AI Assistant' }),
+        meta: {
+          model: cfg.model,
+          baseUrl: cfg.baseUrl,
+          context: !!markdown.trim(),
+          start: Date.now(),
+          status: 'running',
+          steps: defs.map((d) => ({ label: d.label, status: 'pending' as const })),
+        },
+      },
+    ]);
+    setIsStreaming(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    let outcome: AIMeta['status'] = 'done';
+
+    try {
+      const request = async function* (req: { system: string; user: string; signal: AbortSignal }) {
+        yield* streamChat({
+          baseUrl: cfg.baseUrl,
+          apiKey: cfg.apiKey,
+          model: cfg.model,
+          messages: [
+            { role: 'system', content: req.system },
+            { role: 'user', content: req.user },
+          ],
+          signal: req.signal,
+        });
+      };
+      const result = await runWorkflow(
+        defs,
+        {
+          request,
+          onStep: (i, patch) => {
+            setMessages((prev) => {
+              if (prev.length === 0) return prev;
+              const next = [...prev];
+              const last = next[next.length - 1];
+              if (!last.meta?.steps) return prev;
+              const steps = last.meta.steps.map((s, k) => (k === i ? { ...s, ...patch } : s));
+              next[next.length - 1] = { ...last, meta: { ...last.meta, steps } };
+              return next;
+            });
+            // 请求步开始时清空气泡（最终气泡只保留最后一个请求步的输出）
+            if (patch.status === 'running' && defs[i].kind === 'request') {
+              patchLast(() => '');
+            }
+          },
+          onStreamText: (delta) => patchLast((prev) => prev + delta),
+          signal: controller.signal,
+        },
+        { markdown, jd, lang },
+      );
+      if (result.failed) {
+        outcome = 'error';
+        setLastError(result.error || tr({ zh: '工作流执行失败', en: 'Workflow failed' }));
+        patchLast((prev) => prev || FAIL_HINT);
+      } else if (result.aborted) {
+        outcome = 'aborted';
+      }
+    } catch (err: unknown) {
+      if ((err as { name?: string }).name === 'AbortError') {
+        outcome = 'aborted';
+      } else {
+        outcome = 'error';
+        setLastError((err as Error)?.message || tr({ zh: '网络请求异常', en: 'Network request error' }));
+        patchLast((prev) => prev || FAIL_HINT);
+      }
+    } finally {
+      finishAssistantMessage(outcome);
+    }
+  };
+
+  /** 建议卡片应用成功：写回编辑器（SET_MARKDOWN，自动保存链路接管持久化）并记录撤销快照 */
+  const handlePatchCommit = (
+    msgIndex: number,
+    nextMarkdown: string,
+    updated: PatchState[],
+    appliedCount: number,
+  ) => {
+    setUndoState({ msgIndex, snapshot: markdownRef.current });
+    editorDispatch({ type: 'SET_MARKDOWN', payload: nextMarkdown });
+    setMessages((prev) => prev.map((m, k) => (k === msgIndex ? { ...m, patches: updated } : m)));
+    addToast(
+      tr({ zh: `已应用 ${appliedCount} 处修改`, en: `Applied ${appliedCount} edit${appliedCount > 1 ? 's' : ''}` }),
+      'success',
+    );
+  };
+
+  /** 建议卡片仅状态变化（忽略 / 恢复 / 全部失败标记） */
+  const handlePatchStatuses = (msgIndex: number, updated: PatchState[]) => {
+    setMessages((prev) => prev.map((m, k) => (k === msgIndex ? { ...m, patches: updated } : m)));
+  };
+
+  /** 撤销本轮 AI 修改：恢复应用前快照，已应用卡片回到待确认 */
+  const handlePatchUndo = () => {
+    if (!undoState) return;
+    editorDispatch({ type: 'SET_MARKDOWN', payload: undoState.snapshot });
+    const { msgIndex } = undoState;
+    setUndoState(null);
+    setMessages((prev) =>
+      prev.map((m, k) =>
+        k === msgIndex && m.patches
+          ? { ...m, patches: m.patches.map((p) => (p.status === 'applied' ? { ...p, status: 'pending' as const } : p)) }
+          : m,
+      ),
+    );
+    addToast(tr({ zh: '已撤销本轮 AI 修改', en: 'AI edits reverted' }), 'info');
   };
 
   if (!aiWindowOpen && !demo) return null;
@@ -518,7 +860,7 @@ export function AIWindow({
           messages.map((m, i) => (
             <div
               key={i}
-              className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
             >
               {/* 用户消息：Telegram 风格气泡（大圆角 + 收尾角收紧 + 泡内署名时间戳）；
                   AI 消息：无气泡 Markdown 渲染，仅保留 AI 标识与时间戳 */}
@@ -531,7 +873,12 @@ export function AIWindow({
               >
                 {m.role === 'assistant' && m.meta && <AIStatus meta={m.meta} />}
                 {m.role === 'assistant' ? (
-                  <AIMarkdown content={m.content || (isStreaming && i === messages.length - 1 ? '…' : '')} />
+                  <AIMarkdown
+                    content={
+                      stripEditBlocks(m.content, isStreaming && i === messages.length - 1) ||
+                      (isStreaming && i === messages.length - 1 ? '…' : '')
+                    }
+                  />
                 ) : (
                   m.content
                 )}
@@ -546,6 +893,19 @@ export function AIWindow({
                   </span>
                 )}
               </div>
+              {/* 结构化编辑建议：卡片确认应用（方案 A 管线，与工作流/Agent 共用） */}
+              {m.role === 'assistant' && m.patches && m.patches.length > 0 && (
+                <div className="w-[92%] max-w-[420px]">
+                  <PatchCards
+                    patches={m.patches}
+                    getMarkdown={() => markdownRef.current}
+                    onCommit={(next, updated, count) => handlePatchCommit(i, next, updated, count)}
+                    onStatuses={(updated) => handlePatchStatuses(i, updated)}
+                    canUndo={undoState?.msgIndex === i}
+                    onUndo={handlePatchUndo}
+                  />
+                </div>
+              )}
             </div>
           ))
         )}
@@ -553,6 +913,51 @@ export function AIWindow({
 
       {/* 底部输入区：悬浮于对话区上方，白色渐变过渡避免遮挡内容 */}
       <div className="absolute inset-x-0 bottom-0 px-3 pb-3 pt-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
+        {/* 深度工作流 + Agent 模式入口（方案 C / B）：演示模式不展示，流式期间禁用 */}
+        {!demo && (
+          <div className="pointer-events-auto flex items-center gap-1.5 mb-1.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-300 select-none">
+              {tr({ zh: '增强', en: 'MODES' })}
+            </span>
+            <button
+              type="button"
+              onClick={() => startWorkflow('polish')}
+              disabled={isStreaming}
+              className="px-2 py-0.5 rounded-full text-[11px] border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {tr({ zh: '全文润色', en: 'Polish resume' })}
+            </button>
+            <button
+              type="button"
+              onClick={() => startWorkflow('jd')}
+              disabled={isStreaming}
+              className="px-2 py-0.5 rounded-full text-[11px] border border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {tr({ zh: 'JD 对齐', en: 'JD match' })}
+            </button>
+            {/* Agent 模式（方案 B）：开启后发送消息走 function calling 循环 */}
+            <HoverTip
+              text={tr({
+                zh: 'Agent 模式：AI 可调用工具读取简历、按页数与模板约束提议修改，改动仍需你在卡片上确认',
+                en: 'Agent mode: AI can call tools to read the resume and propose edits (page/template aware); changes still require your confirmation',
+              })}
+            >
+              <button
+                type="button"
+                onClick={() => setAgentOn((v) => !v)}
+                aria-pressed={agentOn}
+                disabled={isStreaming}
+                className={`px-2 py-0.5 rounded-full text-[11px] border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                  agentOn
+                    ? 'border-primary-300 bg-primary-50 text-primary-700 font-medium'
+                    : 'border-gray-200 text-gray-500 hover:text-primary-600 hover:border-primary-300 hover:bg-primary-50'
+                }`}
+              >
+                {tr({ zh: 'Agent 模式', en: 'Agent' })}
+              </button>
+            </HoverTip>
+          </div>
+        )}
         <div className="pointer-events-auto flex flex-col bg-gray-50 border border-gray-200 rounded-2xl px-2.5 py-2 transition-all duration-150 hover:border-gray-300 focus-within:bg-white focus-within:border-primary-300 focus-within:ring-2 focus-within:ring-primary-100">
           <textarea
             ref={inputRef}
