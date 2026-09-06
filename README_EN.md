@@ -110,8 +110,8 @@ git checkout static
 # Install dependencies (from the monorepo root)
 pnpm install
 
-# Start the dev server
-pnpm run dev:web        # http://localhost:5173
+# Start the login-free edition
+pnpm run dev            # http://localhost:5173
 
 # Run tests / lint
 pnpm run test:web       # Vitest

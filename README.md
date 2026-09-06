@@ -110,8 +110,8 @@ git checkout static
 # 安装依赖（monorepo 根目录）
 pnpm install
 
-# 启动开发服务器
-pnpm run dev:web        # http://localhost:5173
+# 启动免登录版
+pnpm run dev            # http://localhost:5173
 
 # 运行测试 / 代码检查
 pnpm run test:web       # Vitest
