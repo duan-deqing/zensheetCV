@@ -1,24 +1,12 @@
-import { Link } from 'react-router-dom';
-import ReactMarkdown, { type Components } from 'react-markdown';
-import { lazy, Suspense, type CSSProperties } from 'react';
-import { getTemplateById, getTemplateCss } from '@/templates';
-import { RESUME_ICON_TAG, getIconMap, remarkResumeIcons } from '@/preview/resumeIcons';
-import {
-  CONTENT_PADDING_MM,
-  fontScale,
-  MARGIN_MM,
-  rehypeWrapH2Text,
-  spacingScale,
-  resumeColsCss,
-  resumeFontSizeCss,
-  resumeIconsCss,
-} from '@/preview/previewShared';
-import { defaultTheme } from '@stylan/shared-types';
-import { sampleMarkdown } from '@/sampleResume';
-import { normalizeColMarkers, remarkResumeCols } from '@/preview/remarkResumeCols';
+import { lazy, Suspense } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { getIconMap } from '@/preview/resumeIcons';
+import { resumeIconsCss } from '@/preview/previewShared';
 import { DocsFooter } from '@/pages/docs/DocsFooter';
-import { useLang, useTr } from '@/i18n/LangContext';
+import { useTr } from '@/i18n/LangContext';
 import ShapeGrid from '@/pages/home/ShapeGrid';
+import SpecularButton from '@/pages/home/SpecularButton';
+import TemplateGallery from '@/pages/home/TemplateGallery';
 import {
   AI_CAPABILITIES,
   AI_CHAT_FEATURES,
@@ -27,7 +15,6 @@ import {
   HOME_ICONS,
   SPECS,
   STEPS,
-  TEMPLATE_SHOWCASE,
   THEME_FEATURES,
   WORKSPACE_FEATURES,
 } from './home/content';
@@ -37,93 +24,11 @@ const WorkspaceShowcase = lazy(() =>
   import('./home/WorkspaceShowcase').then((m) => ({ default: m.WorkspaceShowcase })),
 );
 
-/* Hero 右侧与模板展示区渲染的是项目真实的 Markdown 渲染管线
-   （react-markdown + 各模板真实 CSS），非静态截图，内容见 @/sampleResume */
-
-function MiniResume({
-  templateId,
-  className = '',
-}: {
-  templateId: string;
-  className?: string;
-}) {
-  // 各模板 CSS 均以 .resume-preview 为作用域，替换前缀实现同页多模板互不干扰
-  const scoped = getTemplateCss(templateId).replace(
-    /\.resume-preview/g,
-    `.rp-${templateId}`,
-  );
-  // 与编辑页/我的简历页一致：使用模板自带默认主题（主色/字体/字号/间距）
-  const theme = getTemplateById(templateId).defaultTheme;
-  // 按界面语言选择示例简历内容（中/英文版同人设同结构）
-  const { lang } = useLang();
-  // 每页四周总留白 = 页边距 + 内容边距，与分页预览/导出同一套默认值
-  const padXMM =
-    (MARGIN_MM[defaultTheme.marginX] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
-  const padYMM =
-    (MARGIN_MM[defaultTheme.marginY] ?? 0) + (CONTENT_PADDING_MM[defaultTheme.contentPadding] ?? 0);
-  const iconMap = getIconMap();
-  const components = {
-    [RESUME_ICON_TAG]: ({ name }: { name?: string }) => {
-      const svg = name ? iconMap[name] : undefined;
-      if (!svg) return null;
-      return <span className="resume-icon" dangerouslySetInnerHTML={{ __html: svg }} />;
-    },
-  } as Components; // 自定义元素名不在 JSX.IntrinsicElements 中，需断言
-  return (
-    <div className={className}>
-      <style>{scoped}</style>
-      <style>{resumeIconsCss(`.rp-${templateId}`)}</style>
-      <style>{resumeColsCss(`.rp-${templateId}`)}</style>
-      <style>{resumeFontSizeCss(`.rp-${templateId}`)}</style>
-      <div
-        className={`rp-${templateId}`}
-        style={
-          {
-            '--resume-primary': theme.primaryColor,
-            fontFamily: theme.fontFamily,
-            '--resume-fs': fontScale(theme),
-            '--resume-sp': spacingScale(theme),
-          } as CSSProperties
-        }
-      >
-        <div style={{ padding: `${padYMM}mm ${padXMM}mm` }}>
-          <ReactMarkdown
-            remarkPlugins={[remarkResumeCols, remarkResumeIcons(iconMap)]}
-            rehypePlugins={[rehypeWrapH2Text]}
-            components={components}
-          >
-            {normalizeColMarkers(sampleMarkdown(lang))}
-          </ReactMarkdown>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/** 固定高度窗口 + 等比缩放，模拟 A4 纸预览 */
-function ResumePaper({
-  templateId,
-  zoom = 0.42,
-  className = '',
-}: {
-  templateId: string;
-  zoom?: number;
-  className?: string;
-}) {
-  return (
-    <div className={`overflow-hidden bg-white ${className}`}>
-      <div
-        className="origin-top-left"
-        style={{ transform: `scale(${zoom})`, width: `${100 / zoom}%` }}
-      >
-        <MiniResume templateId={templateId} />
-      </div>
-    </div>
-  );
-}
+/* 模板展示区的真实渲染组件见 @/pages/home/MiniResume（MiniResume/ResumePaper） */
 
 export function HomePage() {
   const tr = useTr();
+  const navigate = useNavigate();
   return (
     // -mt-20：抵消 Navbar 的全局 h-20 占位，让 Hero 从视口顶部开始严格占满一屏
     <div className="bg-white text-gray-900 -mt-20">
@@ -163,23 +68,39 @@ export function HomePage() {
               en: 'No sign-in required, ready to use; your resume data stays in your own browser. Multiple built-in templates with live preview, free icon and photo layout, AI polishing and keyword optimization, one-click export to high-quality PDF.',
             })}
           </p>
-          {/* 进入编辑器按钮：文案下方、三窗口上方，胶囊造型 */}
+          {/* 进入编辑器按钮：文案下方、三窗口上方，SpecularButton（WebGL 镜面高光描边），
+              主色实心胶囊 + 白色高光 + 深蓝边缘描边（primary-800），自动扫光常驻 */}
           <div
             className="fade-up flex justify-center pt-5"
             style={{ animationDelay: '0.24s' }}
           >
-            <Link
-              to="/editor"
-              className="btn-primary rounded-full text-base px-8 py-2.5 shadow-lg shadow-primary-600/25 hover:shadow-primary-600/40 hover:-translate-y-0.5"
+            <SpecularButton
+              size="lg"
+              radius={999}
+              tint="#2563EB"
+              tintOpacity={1}
+              textColor="#FFFFFF"
+              lineColor="#FFFFFF"
+              baseColor="#1E40AF"
+              intensity={2.2}
+              shineSize={22}
+              shineFade={45}
+              thickness={1.8}
+              speed={0.5}
+              followMouse
+              proximity={250}
+              autoAnimate
+              onClick={() => navigate('/editor')}
             >
               {tr({ zh: '进入编辑器', en: 'Open Editor' })}
-            </Link>
+            </SpecularButton>
           </div>
         </div>
 
         {/* 可操作的三窗口工作台（编辑器/预览/AI 聊天窗）：全宽展示，flex-1 吃掉 Hero 剩余
-            高度（父级 h 已锁定，百分比链有效）；<1024px 堆叠由 WorkspaceShowcase 断点接管 */}
-        <div className="flex-1 min-h-0 w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
+            高度但最高 720px（超高视口下不无限拉伸，留白由规格条 mt-auto 吸收）；
+            <1024px 堆叠由 WorkspaceShowcase 断点接管 */}
+        <div className="flex-1 min-h-0 max-h-[720px] w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
           <div className="h-full">
             <Suspense fallback={<div className="h-full rounded-2xl bg-gray-50 border border-gray-200 animate-pulse" />}>
               <WorkspaceShowcase />
@@ -187,8 +108,9 @@ export function HomePage() {
           </div>
         </div>
 
-        {/* 规格条：Hero 底部通栏收尾（shrink-0，数字指标紧凑化） */}
-        <div className="shrink-0 w-full border-y border-gray-200">
+        {/* 规格条：Hero 底部通栏收尾（shrink-0 + mt-auto 始终贴底——三窗口被 max-h 钳制时
+            吸收中间留白；白色半透明磨砂底，网格动效透出时保证数字可读性） */}
+        <div className="shrink-0 w-full mt-auto border-y border-gray-200 bg-white/30 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4">
             {SPECS.map((s, i) => (
               <div
@@ -265,33 +187,9 @@ export function HomePage() {
         <p className="text-gray-600 mb-10">
           {tr({ zh: '换模板不用改一个字。以下全部为编辑器内的真实渲染效果。', en: 'Switch templates without changing a word. Everything below is rendered live by the editor.' })}
         </p>
-        <div className="grid md:grid-cols-3 gap-5">
-          {TEMPLATE_SHOWCASE.map((t) => (
-            <div
-              key={t.id}
-              className={`${t.span === 2 ? 'md:col-span-2 ' : ''}card overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-300`}
-            >
-              <ResumePaper templateId={t.id} zoom={0.5} className="h-[300px] border-b border-gray-100" />
-              <div className="flex items-baseline justify-between px-5 py-4">
-                <div>
-                  <h3 className="font-semibold">{tr(t.name)}</h3>
-                  <p className="text-sm text-gray-500 mt-0.5">{tr(t.desc)}</p>
-                </div>
-                {/* 彩色胶囊标签：取模板默认主色着色 */}
-                <span
-                  className="font-mono text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 rounded-full border shrink-0"
-                  style={{
-                    color: getTemplateById(t.id).defaultTheme.primaryColor,
-                    borderColor: `color-mix(in srgb, ${getTemplateById(t.id).defaultTheme.primaryColor} 35%, transparent)`,
-                    backgroundColor: `color-mix(in srgb, ${getTemplateById(t.id).defaultTheme.primaryColor} 10%, transparent)`,
-                  }}
-                >
-                  {t.tag}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* 模板画廊：8 套模板真实渲染（与编辑器同管线）水平铺开、同屏可见多套，
+            滚轮/拖拽循环浏览，无截图、无降级分支 */}
+        <TemplateGallery />
       </section>
 
       {/* 主题与排版：主题面板特性 + 真实图标渲染 */}

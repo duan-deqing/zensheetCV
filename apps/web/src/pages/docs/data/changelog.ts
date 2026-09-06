@@ -155,6 +155,18 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.7.0',
+    date: '2026-09-07',
+    title: { zh: '首页改版：一屏工作台与真实渲染模板画廊', en: 'Homepage Revamp: One-Screen Workspace & Live-Rendered Template Gallery' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '首页 Hero 改为一屏工作台：编辑器 / 实时预览 / AI 聊天窗三个窗口直接使用编辑器页面真实模块（示例简历内容，可实际操作），随视口高度自适应，底部规格条以白色半透明磨砂条贴底收尾', en: 'The homepage hero becomes a one-screen workspace: editor, live preview and AI chat are the real editor modules (preloaded with a sample resume and fully operable), adapting to the viewport height, with the specs bar anchored at the bottom on a frosted translucent strip' },
+      { zh: '背景新增 ShapeGrid 网格动效：方格滚动 + 鼠标悬停高亮拖尾，偏好减弱动效的用户自动降级为静止网格', en: 'A ShapeGrid animated background: scrolling grid squares with hover highlight trails, automatically reduced to a static grid for reduced-motion users' },
+      { zh: '「进入编辑器」按钮改为 WebGL 镜面高光胶囊：主色实心 + 深蓝描边，白色光带常驻自动旋转并跟随光标，WebGL 不可用时自动降级为纯 CSS 按钮', en: 'The "Open Editor" button becomes a WebGL specular-highlight pill: solid primary color with a deep-blue edge, a white shine sweeping automatically and following the cursor, falling back to a plain CSS button when WebGL is unavailable' },
+      { zh: '「多套模板」展示区重做：8 套模板以与编辑器完全相同的渲染管线真实挂载（非截图），水平铺开一次可见多套，支持滚轮 / 拖拽无限循环浏览，不再依赖截图生成缩略图', en: 'The template showcase is rebuilt: all 8 templates are mounted live through the exact editor rendering pipeline (no screenshots), laid out horizontally so several are visible at once, browsable in an infinite loop via scroll wheel or drag' },
+    ],
+  },
+  {
     version: 'v0.6.0',
     date: '2026-09-06',
     title: { zh: 'WebView 提示弹窗化与手机端导出说明', en: 'WebView Hint Dialog & Mobile Export Notes' },
