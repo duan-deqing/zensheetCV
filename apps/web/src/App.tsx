@@ -5,6 +5,7 @@ import { ResumeProvider } from '@/store/ResumeContext';
 import { PreviewProvider } from '@/store/PreviewContext';
 import { UIProvider } from '@/store/UIContext';
 import { ToastProvider } from '@/store/ToastContext';
+import { Toast } from '@/components/Toast';
 import { AuthProvider } from '@/store/AuthContext';
 import { LangProvider } from '@/i18n/LangContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -55,6 +56,8 @@ function App() {
                     </Suspense>
                     {/* 全局用户信息/设置弹窗：编辑页 TopBar 与首页导航栏共用 */}
                     <UserModal />
+                    {/* 全局顶部中央操作提示胶囊（Markdown 导入 / 导出等） */}
+                    <Toast />
                   </PreviewProvider>
                 </ResumeProvider>
               </EditorProvider>

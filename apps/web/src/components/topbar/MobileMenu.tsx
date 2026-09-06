@@ -38,7 +38,7 @@ export function MobileMenu({ onClose, buttonStatus, onExportPDF, isExporting }: 
   const dispatch = useEditorDispatch();
   const { currentResume } = useResumeStore();
   const { updateResume } = useResume();
-  const { importFile, exportMd } = useMarkdownFileIO(show);
+  const { importFile, exportMd } = useMarkdownFileIO();
   const [saving, setSaving] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 

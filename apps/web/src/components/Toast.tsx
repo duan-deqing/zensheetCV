@@ -1,23 +1,25 @@
 import { useToastValue } from '@/store/ToastContext';
 
+/** 全局顶部中央胶囊提示：与模板库 / Coffee 致谢胶囊同款
+ *  （深色底 rounded-full，滑入 / 淡出动画，reduced-motion 自动跳过）。
+ *  Markdown 导入 / 导出等操作结果在此展示；不拦截点击 */
 export function Toast() {
-  const { toasts, removeToast } = useToastValue();
+  const { toasts } = useToastValue();
 
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2">
+    <div
+      className="fixed left-1/2 top-6 -translate-x-1/2 z-[110] flex flex-col items-center gap-2 pointer-events-none"
+      role="status"
+      aria-live="polite"
+    >
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all duration-300 ${
-            toast.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : toast.type === 'error'
-                ? 'bg-red-50 text-red-800 border border-red-200'
-                : 'bg-blue-50 text-blue-800 border border-blue-200'
-          }`}
-          onClick={() => removeToast(toast.id)}
+          className={`${
+            toast.exiting ? 'toast-pill-out' : 'toast-pill-in'
+          } px-5 py-2.5 rounded-full bg-gray-900/90 text-white text-[13px] font-medium shadow-lg whitespace-nowrap`}
         >
           {toast.message}
         </div>

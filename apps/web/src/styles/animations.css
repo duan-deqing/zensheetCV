@@ -11,45 +11,95 @@
 
 /* ---------- 通用弹窗：卡片入 + 遮罩入 ---------- */
 @keyframes modalCardIn {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes modalBackdropIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---------- 顶部胶囊提示：滑入 / 淡出（模板库 / 图标库 / 咖啡弹窗等） ---------- */
 @keyframes pillIn {
-  from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes pillOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
 }
 
 /* ---------- WebView 内「复制链接到浏览器」弹窗（复用通用卡片 / 遮罩动画） ---------- */
-.hint-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.hint-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.hint-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.hint-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
 
 /* ---------- 通用下拉菜单（ThemeConfigPanel / UserModal / ThemeDoc 模型选择等） ---------- */
 @keyframes dropdownIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes dropdownInUp {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.dropdown-pop { animation: dropdownIn 0.15s ease-out both; }
-.dropdown-pop.dropdown-down { animation: dropdownIn 0.15s ease-out both; }
-.dropdown-pop.dropdown-up { animation: dropdownInUp 0.15s ease-out both; }
+.dropdown-pop {
+  animation: dropdownIn 0.15s ease-out both;
+}
+.dropdown-pop.dropdown-down {
+  animation: dropdownIn 0.15s ease-out both;
+}
+.dropdown-pop.dropdown-up {
+  animation: dropdownInUp 0.15s ease-out both;
+}
 
 /* ---------- 折叠菜单（Navbar / TopBar 手机端） ---------- */
 @keyframes navMenuIn {
-  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .nav-menu-pop {
   animation: navMenuIn 0.18s var(--ease-spring) both;
@@ -58,112 +108,251 @@
 
 /* ---------- 文档抽屉：右侧滑入 / 滑出 + Tab 内容淡入 ---------- */
 @keyframes docsDrawerIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 @keyframes docsDrawerOut {
-  from { transform: translateX(0); }
-  to { transform: translateX(100%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 @keyframes docsTabIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.docs-drawer-panel { animation: docsDrawerIn 0.28s var(--ease-spring) both; }
-.docs-drawer-out { animation: docsDrawerOut 0.2s ease-in both; }
-.docs-drawer-tabpane { animation: docsTabIn 0.3s var(--ease-spring) both; }
+.docs-drawer-panel {
+  animation: docsDrawerIn 0.28s var(--ease-spring) both;
+}
+.docs-drawer-out {
+  animation: docsDrawerOut 0.2s ease-in both;
+}
+.docs-drawer-tabpane {
+  animation: docsTabIn 0.3s var(--ease-spring) both;
+}
 
 /* ---------- 编辑器页：主体进场 / 全屏预览 / AI 助手滑入滑出 ---------- */
 @keyframes editorFadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.editor-fade-up { animation: editorFadeUp 0.5s var(--ease-spring) both; }
+.editor-fade-up {
+  animation: editorFadeUp 0.5s var(--ease-spring) both;
+}
 
 @keyframes fullscreenIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.fullscreen-in { animation: fullscreenIn 0.35s var(--ease-spring) both; }
+.fullscreen-in {
+  animation: fullscreenIn 0.35s var(--ease-spring) both;
+}
 
 @keyframes aiWindowIn {
-  from { opacity: 0; transform: translateX(16px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes aiWindowOut {
-  from { opacity: 1; transform: translateX(0); }
-  to { opacity: 0; transform: translateX(16px); }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
 }
-.ai-window-in { animation: aiWindowIn 0.25s var(--ease-spring) both; }
-.ai-window-out { animation: aiWindowOut 0.18s ease-in both; }
+.ai-window-in {
+  animation: aiWindowIn 0.25s var(--ease-spring) both;
+}
+.ai-window-out {
+  animation: aiWindowOut 0.18s ease-in both;
+}
 
 /* ---------- 编辑器选中悬浮工具栏 ---------- */
 @keyframes selectionToolbarIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
-.selection-toolbar-in { animation: selectionToolbarIn 0.12s ease-out; }
+.selection-toolbar-in {
+  animation: selectionToolbarIn 0.12s ease-out;
+}
 
 /* ---------- 文档中心页：进场淡入上浮 + 滚动揭示 ---------- */
 @keyframes docsFadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.docs-enter { animation: docsFadeUp 0.6s var(--ease-spring) both; }
-.docs-enter-1 { animation-delay: 0.06s; }
-.docs-enter-2 { animation-delay: 0.14s; }
-.docs-enter-3 { animation-delay: 0.22s; }
+.docs-enter {
+  animation: docsFadeUp 0.6s var(--ease-spring) both;
+}
+.docs-enter-1 {
+  animation-delay: 0.06s;
+}
+.docs-enter-2 {
+  animation-delay: 0.14s;
+}
+.docs-enter-3 {
+  animation-delay: 0.22s;
+}
 .docs-reveal {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 0.55s var(--ease-spring), transform 0.55s var(--ease-spring);
+  transition:
+    opacity 0.55s var(--ease-spring),
+    transform 0.55s var(--ease-spring);
 }
-.docs-reveal.docs-reveal-in { opacity: 1; transform: none; }
+.docs-reveal.docs-reveal-in {
+  opacity: 1;
+  transform: none;
+}
 
 /* ---------- 首页 section 进场 ---------- */
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.fade-up { animation: fadeUp 0.6s var(--ease-spring) both; }
+.fade-up {
+  animation: fadeUp 0.6s var(--ease-spring) both;
+}
 
 /* ---------- 咖啡弹窗：卡片出入 / 遮罩出入 / 胶囊 / 收款码 ---------- */
 @keyframes coffeeModalOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to { opacity: 0; transform: translateY(10px) scale(0.97); }
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
 }
 @keyframes coffeeBackdropOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 @keyframes coffeeQrIn {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-.coffee-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.coffee-modal-out { animation: coffeeModalOut 0.18s ease-in both; }
-.coffee-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
-.coffee-backdrop-out { animation: coffeeBackdropOut 0.18s ease-in both; }
-.coffee-pill-in { animation: pillIn 0.28s var(--ease-spring) both; }
-.coffee-pill-out { animation: pillOut 0.3s ease-in both; }
-.coffee-qr-in { animation: coffeeQrIn 0.22s ease-out both; }
+.coffee-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.coffee-modal-out {
+  animation: coffeeModalOut 0.18s ease-in both;
+}
+.coffee-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
+.coffee-backdrop-out {
+  animation: coffeeBackdropOut 0.18s ease-in both;
+}
+.coffee-pill-in {
+  animation: pillIn 0.28s var(--ease-spring) both;
+}
+.coffee-pill-out {
+  animation: pillOut 0.3s ease-in both;
+}
+.coffee-qr-in {
+  animation: coffeeQrIn 0.22s ease-out both;
+}
 
 /* ---------- 主题配置面板：侧滑出入 + 调色盘弹层 ---------- */
 @keyframes themeSideIn {
-  from { opacity: 0; transform: translateX(16px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes themeSideOut {
-  from { opacity: 1; transform: translateX(0); }
-  to { opacity: 0; transform: translateX(16px); }
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(16px);
+  }
 }
 @keyframes colorPickerIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.theme-side-in { animation: themeSideIn 0.25s var(--ease-spring) both; }
-.theme-side-out { animation: themeSideOut 0.18s ease-in both; }
-.color-picker-pop { animation: colorPickerIn 0.16s ease-out; }
+.theme-side-in {
+  animation: themeSideIn 0.25s var(--ease-spring) both;
+}
+.theme-side-out {
+  animation: themeSideOut 0.18s ease-in both;
+}
+.color-picker-pop {
+  animation: colorPickerIn 0.16s ease-out;
+}
 
 /* 色相滑杆：胶囊彩虹轨道 + 白色圆点滑块 */
 .hue-slider {
@@ -172,7 +361,16 @@
   display: block;
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+  background: linear-gradient(
+    to right,
+    #ff0000,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0000ff,
+    #ff00ff,
+    #ff0000
+  );
   outline: none;
   cursor: pointer;
 }
@@ -182,7 +380,9 @@
   height: 16px;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.25);
 }
 .hue-slider::-moz-range-thumb {
   width: 16px;
@@ -190,58 +390,266 @@
   border: none;
   border-radius: 50%;
   background: #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 /* ---------- 图标库：内联图标基样式 + 复制提示 ---------- */
-.tp-icon { display: inline-flex; align-items: center; vertical-align: -0.125em; }
-.tp-icon svg { width: 1em; height: 1em; fill: currentColor; }
-@keyframes iconTipIn {
-  from { opacity: 0; transform: translateX(4px); }
-  to { opacity: 1; transform: translateX(0); }
+.tp-icon {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: -0.125em;
 }
-.icon-tip-in { animation: iconTipIn 0.15s ease-out both; }
+.tp-icon svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+@keyframes iconTipIn {
+  from {
+    opacity: 0;
+    transform: translateX(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.icon-tip-in {
+  animation: iconTipIn 0.15s ease-out both;
+}
 
 /* ---------- 图标库弹窗（复用通用卡片 / 遮罩 / 胶囊动画） ---------- */
-.icon-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.icon-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.icon-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.icon-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
 
 /* ---------- 照片弹窗 ---------- */
-.ph-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.ph-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.ph-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.ph-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
 
 /* ---------- 模板库弹窗（复用通用卡片 / 遮罩 / 胶囊动画） ---------- */
-.tpl-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.tpl-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
-.tpl-pill-in { animation: pillIn 0.28s var(--ease-spring) both; }
-.tpl-pill-out { animation: pillOut 0.3s ease-in both; }
+.tpl-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.tpl-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
+.tpl-pill-in {
+  animation: pillIn 0.28s var(--ease-spring) both;
+}
+.tpl-pill-out {
+  animation: pillOut 0.3s ease-in both;
+}
+
+/* ---------- 全局顶部胶囊提示（Toast，Markdown 导入 / 导出等操作结果） ---------- */
+.toast-pill-in {
+  animation: pillIn 0.28s var(--ease-spring) both;
+}
+.toast-pill-out {
+  animation: pillOut 0.3s ease-in both;
+}
+
+/* ---------- AI 助手按钮：跟随光标的辉光边框（React Bits BorderGlow 按钮化移植） ---------- */
+/* 注册角度属性后才能对光向做补间旋转；inherits 使伪元素 / 子层读到动画值 */
+@property --cursor-angle {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 45deg;
+}
+
+@keyframes glow-angle-spin {
+  from {
+    --cursor-angle: 0deg;
+  }
+  to {
+    --cursor-angle: 360deg;
+  }
+}
+
+.border-glow-btn {
+  --edge-proximity: 0;
+  --cursor-angle: 45deg;
+  --edge-sensitivity: 20;
+  --cone-spread: 25;
+  position: relative;
+  isolation: isolate;
+}
+
+/* 辉光层通用：描边亮弧（::before）+ 内侧柔光（.edge-light），均不超出按钮、不拦截点击 */
+.border-glow-btn::before,
+.border-glow-btn > .edge-light {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: opacity 0.25s ease-out;
+}
+
+/* 未悬停且非常亮：辉光缓慢隐去 */
+.border-glow-btn:not(:hover):not(.glow-active)::before,
+.border-glow-btn:not(:hover):not(.glow-active) > .edge-light {
+  opacity: 0;
+  transition: opacity 0.75s ease-in-out;
+}
+
+/* 亮弧描边：仅沿按钮边缘点亮一段三色渐变，不进入按钮内部。
+   圆环 = 1px 透明边框 + padding-box 白色遮罩 XOR 全域白色遮罩（经典渐变描边手法）；
+   角向 = conic 遮罩跟随 --cursor-angle，两层遮罩经 mask-composite 取交集 */
+.border-glow-btn::before {
+  inset: 0;
+  z-index: 1;
+  border: 1px solid transparent;
+  background: var(--glow-gradient, linear-gradient(120deg, #c084fc, #f472b6, #38bdf8)) border-box;
+  -webkit-mask:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black calc(var(--cone-spread) * 1%),
+      transparent calc((var(--cone-spread) + 15) * 1%),
+      transparent calc((100 - var(--cone-spread) - 15) * 1%),
+      black calc((100 - var(--cone-spread)) * 1%)
+    ),
+    linear-gradient(#fff 0 0),
+    linear-gradient(#fff 0 0) padding-box;
+  -webkit-mask-composite: source-in, xor, source-over;
+  mask:
+    conic-gradient(
+      from var(--cursor-angle) at center,
+      black calc(var(--cone-spread) * 1%),
+      transparent calc((var(--cone-spread) + 15) * 1%),
+      transparent calc((100 - var(--cone-spread) - 15) * 1%),
+      black calc((100 - var(--cone-spread)) * 1%)
+    ),
+    linear-gradient(#fff 0 0),
+    linear-gradient(#fff 0 0) padding-box;
+  mask-composite: intersect, exclude, add;
+  opacity: calc(
+    (var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity))
+  );
+}
+
+/* 内侧柔光：贴着按钮边缘向内晕开的柔光 bloom（多层 inset box-shadow 透明度阶梯），不超出按钮 */
+.border-glow-btn > .edge-light {
+  inset: 0;
+  z-index: 1;
+  -webkit-mask-image: conic-gradient(
+    from var(--cursor-angle) at center,
+    black 2.5%,
+    transparent 10%,
+    transparent 90%,
+    black 97.5%
+  );
+  mask-image: conic-gradient(
+    from var(--cursor-angle) at center,
+    black 2.5%,
+    transparent 10%,
+    transparent 90%,
+    black 97.5%
+  );
+  opacity: calc(
+    (var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity))
+  );
+}
+
+.border-glow-btn > .edge-light::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* 三色（紫/粉/天蓝）按透明度阶梯轮转分布，全部 inset 向内晕开，不超出按钮 */
+  box-shadow:
+    inset 0 0 1px 0 #c084fc99,
+    inset 0 0 3px 0 #f472b680,
+    inset 0 0 6px 0 #38bdf866,
+    inset 0 0 12px 0 #c084fc4d,
+    inset 0 0 20px 0 #f472b633,
+    inset 0 0 30px 0 #38bdf81a;
+}
+
+/* Animated intro：挂载后扫光一圈（一次性），随后交回悬停 / 常亮状态 */
+.border-glow-btn.sweep-intro::before,
+.border-glow-btn.sweep-intro > .edge-light {
+  opacity: 1;
+}
+.border-glow-btn.sweep-intro {
+  animation: glow-angle-spin 1.2s ease-out;
+}
+
+/* AI 窗口打开：辉光常亮 + 光向缓慢旋转（未注册 @property 的浏览器退化为静态亮弧） */
+.border-glow-btn.glow-active::before,
+.border-glow-btn.glow-active > .edge-light {
+  opacity: 1;
+}
+.border-glow-btn.glow-active {
+  animation: glow-angle-spin 7s linear infinite;
+}
 
 /* ---------- 用户设置弹窗 ---------- */
-.user-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.user-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.user-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.user-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
 
 /* ---------- 头像裁剪弹窗 ---------- */
-.avatar-modal-in { animation: modalCardIn 0.22s var(--ease-spring) both; }
-.avatar-backdrop-in { animation: modalBackdropIn 0.2s ease-out both; }
+.avatar-modal-in {
+  animation: modalCardIn 0.22s var(--ease-spring) both;
+}
+.avatar-backdrop-in {
+  animation: modalBackdropIn 0.2s ease-out both;
+}
 
 /* ---------- 编辑器顶栏：简历名称行内编辑 ---------- */
 @keyframes titleEditIn {
-  from { opacity: 0; transform: translateY(3px) scale(0.97); }
-  to { opacity: 1; transform: none; }
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 @keyframes titleEditOut {
-  from { opacity: 1; transform: none; }
-  to { opacity: 0; transform: translateY(3px) scale(0.97); }
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(3px) scale(0.97);
+  }
 }
-.title-edit-in { animation: titleEditIn 0.18s var(--ease-spring) both; }
-.title-edit-out { animation: titleEditOut 0.16s ease both; }
+.title-edit-in {
+  animation: titleEditIn 0.18s var(--ease-spring) both;
+}
+.title-edit-out {
+  animation: titleEditOut 0.16s ease both;
+}
 
 /* ---------- 全站悬停提示气泡 ---------- */
 @keyframes hoverTipIn {
-  from { opacity: 0; transform: translateX(-3px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
-.hover-tip-in { animation: hoverTipIn 0.12s ease-out both; }
+.hover-tip-in {
+  animation: hoverTipIn 0.12s ease-out both;
+}
 
 /* ---------- 减少动态效果：全部动画停用 ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -279,6 +687,8 @@
   .tpl-backdrop-in,
   .tpl-pill-in,
   .tpl-pill-out,
+  .toast-pill-in,
+  .toast-pill-out,
   .hint-modal-in,
   .hint-backdrop-in,
   .user-modal-in,
@@ -287,7 +697,9 @@
   .avatar-backdrop-in,
   .title-edit-in,
   .title-edit-out,
-  .hover-tip-in {
+  .hover-tip-in,
+  .border-glow-btn.sweep-intro,
+  .border-glow-btn.glow-active {
     animation: none;
   }
   .docs-reveal {

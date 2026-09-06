@@ -3,6 +3,7 @@ import { CoffeeIcon } from '@/components/CoffeeModal';
 import { useUI } from '@/store/UIContext';
 import { useTr } from '@/i18n/LangContext';
 import { FileMenu } from '@/components/topbar/FileMenu';
+import { BorderGlowButton } from '@/components/topbar/BorderGlow';
 import { LayoutIcon, SmileIcon, BookIcon, SparkleIcon } from '@/components/topbar/icons';
 
 /** 顶栏中部功能入口（桌面端 md 起直显）：文件 / 模板库 / 图标库 / 使用文档 / AI 助手 / Coffee。
@@ -46,21 +47,22 @@ export function FeatureButtons() {
           <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: '文档', en: 'Docs' })}</span>
         </button>
       </HoverTip>
-      {/* AI 助手入口：聊天窗口挤入预览右侧 */}
+      {/* AI 助手入口：聊天窗口挤入预览右侧；BorderGlow 三色辉光跟随光标，打开时常亮旋转 */}
       <HoverTip text={tr({ zh: 'AI 助手', en: 'AI Assistant' })}>
-        <button
-          type="button"
+        <BorderGlowButton
           onClick={toggleAIWindow}
           aria-pressed={aiWindowOpen}
+          glowActive={aiWindowOpen}
+          glowColors={['#c084fc', '#f472b6', '#38bdf8']}
           className={`px-2 lg:px-2.5 h-8 inline-flex items-center gap-1.5 text-[13px] rounded-full transition-colors whitespace-nowrap ${
             aiWindowOpen
-              ? 'text-primary-700 bg-primary-50'
+              ? 'text-gray-900 bg-gray-100'
               : 'text-gray-600 hover:text-primary-600 hover:bg-gray-100'
           }`}
         >
           <SparkleIcon />
           <span className="hidden lg:inline whitespace-nowrap">{tr({ zh: 'AI 助手', en: 'AI Assistant' })}</span>
-        </button>
+        </BorderGlowButton>
       </HoverTip>
       {/* 请作者喝杯咖啡：收款码弹窗 */}
       <HoverTip text={tr({ zh: '请作者喝杯咖啡', en: 'Buy Me a Coffee' })}>

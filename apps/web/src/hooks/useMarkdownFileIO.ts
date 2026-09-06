@@ -1,17 +1,16 @@
 import { useCallback } from 'react';
 import { useEditor, useEditorDispatch } from '@/store/EditorContext';
 import { useResumeStore } from '@/store/ResumeContext';
+import { useToastValue } from '@/store/ToastContext';
 import { useTr } from '@/i18n/LangContext';
-import type { StatusKind } from '@/components/ButtonStatus';
-
-type Notify = (kind: StatusKind, text: string) => void;
 
 /** Markdown 导入 / 导出：桌面 FileMenu 与手机折叠菜单共用同一套行为与提示文案。
- *  show 由调用方注入（桌面为 FileMenu 自身气泡，手机端为顶栏保存按钮旁的共享气泡） */
-export function useMarkdownFileIO(show: Notify) {
+ *  结果提示统一走全局顶部中央胶囊（Toast），与添加模板等操作提示同位置同款式 */
+export function useMarkdownFileIO() {
   const { markdown } = useEditor();
   const { currentResume } = useResumeStore();
   const dispatch = useEditorDispatch();
+  const { addToast } = useToastValue();
   const tr = useTr();
 
   /** 导入 Markdown：载入编辑器并标记未保存，由自动保存持久化 */
@@ -23,16 +22,16 @@ export function useMarkdownFileIO(show: Notify) {
       try {
         const text = await file.text();
         if (!text.trim()) {
-          show('error', tr({ zh: '文件内容为空', en: 'File is empty' }));
+          addToast(tr({ zh: '文件内容为空', en: 'File is empty' }), 'error');
           return;
         }
         dispatch({ type: 'SET_MARKDOWN', payload: text });
-        show('success', tr({ zh: '导入成功', en: 'Imported successfully' }));
+        addToast(tr({ zh: '导入成功', en: 'Imported successfully' }), 'success');
       } catch {
-        show('error', tr({ zh: '文件读取失败', en: 'Failed to read file' }));
+        addToast(tr({ zh: '文件读取失败', en: 'Failed to read file' }), 'error');
       }
     },
-    [dispatch, show, tr],
+    [dispatch, addToast, tr],
   );
 
   /** 导出当前 Markdown 为 .md 文件下载 */
@@ -44,8 +43,8 @@ export function useMarkdownFileIO(show: Notify) {
     a.download = `${(currentResume?.title || tr({ zh: '简历', en: 'Resume' })).replace(/[\\/:*?"<>|]/g, '_')}.md`;
     a.click();
     URL.revokeObjectURL(url);
-    show('success', tr({ zh: 'Markdown 导出成功', en: 'Markdown exported' }));
-  }, [markdown, currentResume, show, tr]);
+    addToast(tr({ zh: 'Markdown 导出成功', en: 'Markdown exported' }), 'success');
+  }, [markdown, currentResume, addToast, tr]);
 
   return { importFile, exportMd };
 }
