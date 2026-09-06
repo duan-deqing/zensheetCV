@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Login--free-v0.7.0-2563EB?style=flat-square" alt="Login-free Version" />
+  <img src="https://img.shields.io/badge/Login--free-v0.8.0-2563EB?style=flat-square" alt="Login-free Version" />
   <img src="https://img.shields.io/badge/Full--stack-v0.12.0-7C3AED?style=flat-square" alt="Full-stack Version" />
   <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" />
   <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React" />
@@ -195,7 +195,7 @@ The backend reads configuration from `apps/api/.env` via `pydantic-settings` (or
 | Variable                        | Description                                     | Default                                             | Required           |
 | ------------------------------- | ----------------------------------------------- | --------------------------------------------------- | ------------------ |
 | `APP_NAME`                      | Application name                                | `Zensheet API · 简历`                               | No                 |
-| `APP_VERSION`                   | Application version                             | `0.7.0`                                             | No                 |
+| `APP_VERSION`                   | Application version                             | `0.8.0`                                             | No                 |
 | `DEBUG`                         | Debug mode                                      | `True`                                              | No                 |
 | `DATABASE_URL`                  | Database connection string                      | `sqlite+aiosqlite:///./app.db`                      | No                 |
 | `SECRET_KEY`                    | JWT signing secret (must change in production)  | `change-me-in-production`                           | **Yes**            |

@@ -155,6 +155,19 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.8.0',
+    date: '2026-09-07',
+    title: { zh: 'AI Agent 智能改写与深度工作流', en: 'AI Agent Rewrites & Deep Workflows' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '新增结构化改写建议（确认式）：AI 涉及修改简历时按 resume-edits 协议输出结构化建议，逐条渲染为 diff 确认卡片（原文与替换对照），支持单条应用、全部应用与一键撤销本轮；应用后自动保存，预览实时联动；定位失败（找不到或多处命中）的条目标红注明原因，旧对话记录载入时自动补解析建议卡片', en: 'Structured edit suggestions (confirmation-based): when the AI proposes resume changes it emits suggestions via the resume-edits protocol, each rendered as a diff card (original vs replacement) with single apply, apply-all and one-click undo of the whole round; applying auto-saves and updates the preview live; entries that fail to locate (not found or ambiguous) are flagged in red with the reason, and legacy chat records are re-parsed into cards on load' },
+      { zh: '新增深度工作流：「全文润色」按诊断 → 起草 → 本地自查 → 修订四步流水线执行，仅失败的定位条目回炉重试；「JD 对齐」按关键词提取 → 覆盖率计算 → 缺口改写三步执行，内置诚实约束——只调整表述强调，绝不编造简历未提及的经历；每步执行状态与耗时实时展示', en: 'New deep workflows: "Polish resume" runs a four-step pipeline (diagnose → draft → local self-check → revise) where only failed-to-locate entries go back for a retry; "JD match" runs three steps (keyword extraction → coverage calc → gap rewrite) with an honesty constraint — rephrase and re-emphasize only, never fabricate experience; each step shows live status and timing' },
+      { zh: 'AI 聊天窗新增「Agent 模式」（实验）：开启后 AI 可调用工具自主多轮工作——读取简历全文或按节读取、查询渲染页数与当前模板，然后通过提议接口逐条提交修改建议（仍需在卡片上确认，AI 不直接改文档）；展开「AI 执行」可查看每轮工具调用明细；供应商不支持工具调用时自动降级为建议块模式，工具轮次超限自动总结收尾', en: 'The AI chat window gains an experimental "Agent mode": once enabled, the AI can call tools to work autonomously over multiple rounds — reading the full resume or a single section, querying rendered page count and current template — then submit edits one by one through a proposal tool (still confirmed on cards; the AI never edits directly); expand "AI RUN" for per-round tool call details; providers without tool-calling support automatically fall back to suggestion blocks, and hitting the round limit wraps up with a summary' },
+      { zh: 'AI 执行状态面板升级：普通聊天展示模型、上下文与服务连接四步，工作流与 Agent 模式切换为动态步骤列表（状态点 + 名称 + 摘要 + 耗时），错误详情可展开', en: 'The AI RUN status panel is upgraded: regular chat shows the static four steps (model, context, connection, streaming), while workflows and Agent mode switch to a dynamic step list (status dot, name, summary and timing) with expandable error details' },
+      { zh: 'AI 能力隐私边界保持不变：密钥仅存本地浏览器，所有请求浏览器直连供应商，不经任何服务器', en: 'The privacy boundary of AI features is unchanged: your API key stays in the local browser and every request goes directly from the browser to the provider — never through a server' },
+    ],
+  },
+  {
     version: 'v0.7.0',
     date: '2026-09-07',
     title: { zh: '首页改版、模板升级与编辑器体验优化', en: 'Homepage Revamp, Template Upgrades & Editor UX Polish' },
