@@ -1,107 +1,151 @@
-/** 全站共享的示例简历内容（人设：沈亦南 · 后端工程师）
+/** 全站共享的示例简历内容（人设：AI Agent 工程师）
    完整版用于首页 Hero、模板展示区与模板卡片预览，全站内容同源；
-   基本信息使用 :::left / :::mid / :::right 三栏语法，展示分栏排版能力
+   工作经历/项目经验/教育背景使用 :::left / :::mid / :::right 三栏语法，展示分栏排版能力
    英文版 SAMPLE_MARKDOWN_EN 与中文版结构/人设一致，供英文界面按语言选用
    ⚠ 同步警示：中英两份为手工对照的完整字符串（未结构化），
    修改任一版本的章节/条目时，必须同步另一份的对应内容与顺序 */
 
 export const SAMPLE_MARKDOWN = `# ZENSHEET
 
-icon:info AI · 2026 icon:github zensheet.dev
-
-icon:phone 139-0000-0000 · icon:email zensheet@mail.com
+icon:info 男/2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.com icon:github zensheetCV.dev
 
 ## 专业技能
 
-\`Python\` \`LLM\` \`Langchain\` \`RAG\` \`OpenAI\` \`LECL\` \`Docker\` \`SQLite\` 
+- **AI Agent & LLM**：精通 Prompt Engineering、RAG 架构与 Function Calling；具备多步推理、工具动态调度与状态机管理落地经验。
+- **大模型工程化**：熟练接入 OpenAI 兼容 API，精通 SSE 流式输出、JSON 结构化解析及异常兜底策略。
+- **基础设施**：熟悉 Milvus/Qdrant 等向量数据库；熟练掌握 Docker/K8s 及 CI/CD，具备大模型服务容器化部署与成本优化经验。
 
 ## 工作经历
 
-### 澜舟云科技 · 资深后端工程师
+:::left
+**澜舟云科技 · AI Agent 工程师**
+:::
 
-2025.06 - 至今
+:::right
+**2025.06 - 至今**
+:::
 
-- 主导交易网关重构，QPS 峰值承载提升 5 倍，P99 延迟降至 45ms
-- 设计多机房容灾方案，年度可用性达成 99.99%
-
-### 启明数联 · 后端工程师
-
-2015.07 - 2026.05
-
-- 从 0 搭建物联网数据接入平台，日均处理 2 亿条设备消息
-- 推动服务容器化迁移，部署效率提升 60%，资源成本下降 35%
+- 设计 RAG 检索链路，优化分块与混合检索（BM25+Vector），Top-3 召回率提升至 **92%**。
+- 优化推理网关，支持多供应商动态路由与降级，P99 延迟降低 **30%**，API 成本下降 **25%**。
 
 ## 项目经验
 
-### 开源项目 gobridge
+:::left
+**ZENSHEET 简历编辑器**
+:::
 
-2025.03 - 至今
+:::mid
+**全栈开发工程师**
+:::
 
-- 轻量级消息桥接框架，GitHub 3.2k Star，被 40+ 企业采用
+:::right
+**2026.08 – 至今**
+:::
+
+**技术栈**：\`OpenAI API\` \`Function Calling\` \`SSE\` \`Prompt工程\` \`React 18\` \`TypeScript\` \`IndexedDB\`
+
+**项目介绍**：内嵌 BYOK AI 助手的在线编辑器，浏览器直连大模型实现流式对话、结构化改写与 Agent 工具调用，数据纯本地存储。
+
+**核心职责**：
+
+- 构建 SSE 流式管道：实现增量渲染、中断控制、异常兜底与会话本地持久化。
+- 优化 Prompt 体系：精细化约束上下文长度，确保 JSON 结构化稳定输出。
+
+**项目成果**：
+
+- 兼容 DeepSeek/智谱等多供应商直连，无 CORS 场景优雅降级；全流程可视化，显著降低 Agent 不可控感。
 
 ## 教育背景
 
 :::left
-**东南大学**
+**ZENSHEET大学**
 :::
 
 :::mid
-软件工程
+**软件工程 · 本科**
 :::
 
 :::right
-**2021.09 - 2025.05**
+**2021.09 - 2025.06**
 :::
+
+- **学业表现**：GPA 3.8/4.0，连续两年获得校级一等奖学金。
+
+## 个人优势
+
+> 专注 AI Agent 与大模型落地，兼具扎实后端工程能力与 AI 产品嗅觉。追求代码简洁与架构优雅。
 `;
 
 /** 英文版示例简历：与 SAMPLE_MARKDOWN 同一人设与结构（公司/项目名意译），改动需与中文版逐条同步 */
 export const SAMPLE_MARKDOWN_EN = `# ZENSHEET
 
-icon:info AI · 2026 icon:github zensheet.dev
-
-icon:phone 139-0000-0000 · icon:email zensheet@mail.com
+icon:info Male / 2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.com icon:github zensheetCV.dev
 
 ## Professional Skills
 
-\`Python\` \`LLM\` \`Langchain\` \`RAG\` \`OpenAI\` \`LECL\` \`Docker\` \`SQLite\`
+- **AI Agent & LLM**: Proficient in Prompt Engineering, RAG architecture and Function Calling; hands-on experience with multi-step reasoning, dynamic tool orchestration and state-machine management.
+- **LLM Engineering**: Skilled at integrating OpenAI-compatible APIs; expert in SSE streaming output, JSON structured parsing and exception fallback strategies.
+- **Infrastructure**: Familiar with vector databases such as Milvus/Qdrant; proficient with Docker/K8s and CI/CD, with experience in containerized LLM service deployment and cost optimization.
 
 ## Work Experience
 
-### Lanboat Cloud · Senior Backend Engineer
+:::left
+**Lanboat Cloud · AI Agent Engineer**
+:::
 
-2025.06 - Present
+:::right
+**2025.06 - Present**
+:::
 
-- Led the re-architecture of the trading gateway, raising peak QPS capacity 5x and cutting P99 latency to 45ms
-- Designed a multi-datacenter failover solution, achieving 99.99% annual availability
-
-### Enlightenment Link · Backend Engineer
-
-2015.07 - 2026.05
-
-- Built an IoT data ingestion platform from scratch, processing 200M device messages daily
-- Drove the migration to containerized services, improving deployment efficiency by 60% and cutting resource costs by 35%
+- Designed the RAG retrieval pipeline with optimized chunking and hybrid retrieval (BM25+Vector), raising Top-3 recall to **92%**.
+- Optimized the inference gateway with multi-provider dynamic routing and fallback, cutting P99 latency by **30%** and API cost by **25%**.
 
 ## Project Experience
 
-### Open-source project gobridge
+:::left
+**ZENSHEET Resume Editor**
+:::
 
-2025.03 - Present
+:::mid
+**Full-stack Engineer**
+:::
 
-- Lightweight message-bridging framework, 3.2k GitHub stars, adopted by 40+ companies
+:::right
+**2026.08 – Present**
+:::
+
+**Tech Stack**: \`OpenAI API\` \`Function Calling\` \`SSE\` \`Prompt Engineering\` \`React 18\` \`TypeScript\` \`IndexedDB\`
+
+**Overview**: An online editor with a built-in BYOK AI assistant — the browser connects directly to LLMs for streaming chat, structured rewriting and Agent tool calling, with all data stored locally.
+
+**Key Contributions**:
+
+- Built the SSE streaming pipeline: incremental rendering, interruption control, exception fallback and local session persistence.
+- Refined the Prompt system: fine-grained context-length constraints to ensure stable JSON structured output.
+
+**Outcomes**:
+
+- Compatible with multiple providers (DeepSeek/Zhipu) via direct browser connections, degrading gracefully when CORS is unavailable; end-to-end visualization greatly reduces Agent unpredictability.
 
 ## Education
 
 :::left
-**Southeast University**
+**ZENSHEET University**
 :::
 
 :::mid
-Software Engineering
+**Software Engineering · Bachelor**
 :::
 
 :::right
-**2021.09 - 2025.05**
+**2021.09 - 2025.06**
 :::
+
+- **Academic Performance**: GPA 3.8/4.0, university first-class scholarship for two consecutive years.
+
+## Personal Strengths
+
+> Focused on bringing AI Agents and LLMs to production, with solid backend engineering skills and a sharp product sense for AI. Committed to clean code and elegant architecture.
 `;
 
 /** 按界面语言返回对应版本的示例简历内容 */
