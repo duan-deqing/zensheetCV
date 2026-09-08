@@ -155,6 +155,15 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.8.3',
+    date: '2026-09-08',
+    title: { zh: '移动端布局修复', en: 'Mobile Layout Fix' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '移动端 Hero 文案居中改用 max-lg:my-auto，仅在 <1024px 生效；桌面端超高视口下剩余留白恢复由规格条吸收，布局与此前版本一致', en: 'Mobile Hero copy centering now uses max-lg:my-auto and only applies below 1024px; on desktop ultra-tall viewports the leftover space is again absorbed by the spec bar, matching previous behavior' },
+    ],
+  },
+  {
     version: 'v0.8.2',
     date: '2026-09-08',
     title: { zh: '移动端首页优化', en: 'Mobile Homepage Refinement' },

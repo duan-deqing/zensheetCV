@@ -50,7 +50,7 @@ export function HomePage() {
           shape="square"
           hoverTrailAmount={5}
         />
-        <div className="my-auto w-full max-w-7xl mx-auto px-6 pt-24 lg:pt-28 text-center">
+        <div className="max-lg:my-auto w-full max-w-7xl mx-auto px-6 pt-24 lg:pt-28 text-center">
           <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
             &lt; ZENSHEET{tr({ zh: ' · 简历', en: ' · Resume' })} /&gt;
           </p>
@@ -102,7 +102,7 @@ export function HomePage() {
 
         {/* 可操作的三窗口工作台（编辑器/预览/AI 聊天窗）：全宽展示，flex-1 吃掉 Hero 剩余
             高度但最高 720px（超高视口下不无限拉伸，留白由规格条 mt-auto 吸收）；
-            仅 lg+ 挂载——手机/平板不渲染也不加载编辑器代码，文案区由 my-auto 垂直居中 */}
+            仅 lg+ 挂载——手机/平板不渲染也不加载编辑器代码，文案区由 max-lg:my-auto 垂直居中 */}
         {showWorkspace && (
           <div className="flex-1 min-h-0 max-h-[720px] w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
             <div className="h-full">
