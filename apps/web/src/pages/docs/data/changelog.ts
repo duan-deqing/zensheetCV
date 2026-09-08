@@ -155,6 +155,17 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.8.1',
+    date: '2026-09-08',
+    title: { zh: '示例简历焕新', en: 'Sample Resume Refresh' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '示例简历全面焕新为「AI Agent 工程师」人设：专业技能、工作经历（RAG 检索优化 / 推理网关多供应商路由）、项目经验、教育背景与个人优势五大板块，与站点的 AI 能力定位一致', en: 'The sample resume is fully refreshed with an "AI Agent Engineer" persona: five sections — skills, work experience (RAG retrieval tuning / multi-provider inference gateway), project experience, education and personal strengths — aligned with the site\'s AI capability positioning' },
+      { zh: '中英双语内容同步更换：英文模式下的示例简历、新建简历默认骨架、首页工作台演示与模板画廊预览同步更新', en: 'Bilingual content swapped in sync: the English-mode sample resume, new-resume default skeleton, homepage workspace demo and template gallery previews all update together' },
+      { zh: '排版示范升级：工作经历采用两栏布局，项目经验与教育背景采用三栏布局，继续展示 :::left / :::mid / :::right 分栏语法', en: 'Layout showcase upgraded: work experience uses two columns while project experience and education use three, continuing to demo the :::left / :::mid / :::right column syntax' },
+    ],
+  },
+  {
     version: 'v0.8.0',
     date: '2026-09-07',
     title: { zh: 'AI Agent 智能改写与深度工作流', en: 'AI Agent Rewrites & Deep Workflows' },
