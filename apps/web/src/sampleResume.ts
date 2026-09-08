@@ -12,8 +12,6 @@ icon:info 男/2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.com i
 ## 专业技能
 
 - **AI Agent & LLM**：精通 Prompt Engineering、RAG 架构与 Function Calling；具备多步推理、工具动态调度与状态机管理落地经验。
-- **大模型工程化**：熟练接入 OpenAI 兼容 API，精通 SSE 流式输出、JSON 结构化解析及异常兜底策略。
-- **基础设施**：熟悉 Milvus/Qdrant 等向量数据库；熟练掌握 Docker/K8s 及 CI/CD，具备大模型服务容器化部署与成本优化经验。
 
 ## 工作经历
 
@@ -26,7 +24,6 @@ icon:info 男/2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.com i
 :::
 
 - 设计 RAG 检索链路，优化分块与混合检索（BM25+Vector），Top-3 召回率提升至 **92%**。
-- 优化推理网关，支持多供应商动态路由与降级，P99 延迟降低 **30%**，API 成本下降 **25%**。
 
 ## 项目经验
 
@@ -49,7 +46,6 @@ icon:info 男/2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.com i
 **核心职责**：
 
 - 构建 SSE 流式管道：实现增量渲染、中断控制、异常兜底与会话本地持久化。
-- 优化 Prompt 体系：精细化约束上下文长度，确保 JSON 结构化稳定输出。
 
 **项目成果**：
 
@@ -84,8 +80,6 @@ icon:info Male / 2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.co
 ## Professional Skills
 
 - **AI Agent & LLM**: Proficient in Prompt Engineering, RAG architecture and Function Calling; hands-on experience with multi-step reasoning, dynamic tool orchestration and state-machine management.
-- **LLM Engineering**: Skilled at integrating OpenAI-compatible APIs; expert in SSE streaming output, JSON structured parsing and exception fallback strategies.
-- **Infrastructure**: Familiar with vector databases such as Milvus/Qdrant; proficient with Docker/K8s and CI/CD, with experience in containerized LLM service deployment and cost optimization.
 
 ## Work Experience
 
@@ -98,7 +92,6 @@ icon:info Male / 2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.co
 :::
 
 - Designed the RAG retrieval pipeline with optimized chunking and hybrid retrieval (BM25+Vector), raising Top-3 recall to **92%**.
-- Optimized the inference gateway with multi-provider dynamic routing and fallback, cutting P99 latency by **30%** and API cost by **25%**.
 
 ## Project Experience
 
@@ -121,7 +114,6 @@ icon:info Male / 2001.06 icon:phone 139-0000-0000 · icon:email zensheet@mail.co
 **Key Contributions**:
 
 - Built the SSE streaming pipeline: incremental rendering, interruption control, exception fallback and local session persistence.
-- Refined the Prompt system: fine-grained context-length constraints to ensure stable JSON structured output.
 
 **Outcomes**:
 
