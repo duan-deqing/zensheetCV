@@ -4,6 +4,7 @@ import { getIconMap } from '@/preview/resumeIcons';
 import { resumeIconsCss } from '@/preview/previewShared';
 import { DocsFooter } from '@/pages/docs/DocsFooter';
 import { useTr } from '@/i18n/LangContext';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import ShapeGrid from '@/pages/home/ShapeGrid';
 import SpecularButton from '@/pages/home/SpecularButton';
 import TemplateGallery from '@/pages/home/TemplateGallery';
@@ -29,6 +30,8 @@ const WorkspaceShowcase = lazy(() =>
 export function HomePage() {
   const tr = useTr();
   const navigate = useNavigate();
+  // 三窗口工作台仅桌面（lg+）挂载：手机/平板 Hero 只保留文案 + 按钮 + 规格条
+  const showWorkspace = useMediaQuery('(min-width: 1024px)');
   return (
     // -mt-20：抵消 Navbar 的全局 h-20 占位，让 Hero 从视口顶部开始严格占满一屏
     <div className="bg-white text-gray-900 -mt-20">
@@ -47,7 +50,7 @@ export function HomePage() {
           shape="square"
           hoverTrailAmount={5}
         />
-        <div className="w-full max-w-7xl mx-auto px-6 pt-24 lg:pt-28 text-center">
+        <div className="my-auto w-full max-w-7xl mx-auto px-6 pt-24 lg:pt-28 text-center">
           <p className="fade-up font-mono text-xs tracking-[0.18em] text-primary-600 mb-5">
             &lt; ZENSHEET{tr({ zh: ' · 简历', en: ' · Resume' })} /&gt;
           </p>
@@ -99,14 +102,16 @@ export function HomePage() {
 
         {/* 可操作的三窗口工作台（编辑器/预览/AI 聊天窗）：全宽展示，flex-1 吃掉 Hero 剩余
             高度但最高 720px（超高视口下不无限拉伸，留白由规格条 mt-auto 吸收）；
-            <1024px 堆叠由 WorkspaceShowcase 断点接管 */}
-        <div className="flex-1 min-h-0 max-h-[720px] w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
-          <div className="h-full">
-            <Suspense fallback={<div className="h-full rounded-2xl bg-gray-50 border border-gray-200 animate-pulse" />}>
-              <WorkspaceShowcase />
-            </Suspense>
+            仅 lg+ 挂载——手机/平板不渲染也不加载编辑器代码，文案区由 my-auto 垂直居中 */}
+        {showWorkspace && (
+          <div className="flex-1 min-h-0 max-h-[720px] w-full max-w-7xl mx-auto px-6 pt-6 pb-6">
+            <div className="h-full">
+              <Suspense fallback={<div className="h-full rounded-2xl bg-gray-50 border border-gray-200 animate-pulse" />}>
+                <WorkspaceShowcase />
+              </Suspense>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 规格条：Hero 底部通栏收尾（shrink-0 + mt-auto 始终贴底——三窗口被 max-h 钳制时
             吸收中间留白；白色半透明磨砂底，网格动效透出时保证数字可读性） */}

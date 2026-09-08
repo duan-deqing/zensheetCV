@@ -155,6 +155,17 @@ export const CHANGELOG: ChangelogEntry[] = [
 /** 免登录在线版（static 分支）：版本号独立计数，与全栈版互不影响 */
 export const STATIC_CHANGELOG: ChangelogEntry[] = [
   {
+    version: 'v0.8.2',
+    date: '2026-09-08',
+    title: { zh: '移动端首页优化', en: 'Mobile Homepage Refinement' },
+    tag: { zh: '免登录版', en: 'Login-free' },
+    items: [
+      { zh: '移动端与平板不再显示首页三窗口工作台：<1024px 视口完全不渲染演示窗口，首屏也不再加载编辑器代码，页面更轻快', en: 'The three-window workspace is no longer shown on phones and tablets: below 1024px the demo panes are not rendered at all and editor code is no longer loaded, keeping the first screen lighter' },
+      { zh: '移动端 Hero 改为文案垂直居中、规格条贴底的整屏布局，观感更平衡', en: 'The mobile Hero now centers the copy vertically with the spec bar pinned to the bottom for a balanced full-screen layout' },
+      { zh: '首页演示对话更新为与示例简历呼应的 RAG 检索链路润色示例，三窗口叙事更连贯', en: 'The homepage demo conversation now echoes the sample resume with a RAG retrieval bullet-polishing exchange, keeping the three-window story coherent' },
+    ],
+  },
+  {
     version: 'v0.8.1',
     date: '2026-09-08',
     title: { zh: '示例简历焕新', en: 'Sample Resume Refresh' },

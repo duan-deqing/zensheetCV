@@ -1079,8 +1079,8 @@ export function buildDemoMessages(tr: (b: Bi) => string): ChatMessage[] {
     {
       role: 'user',
       content: tr({
-        zh: '帮我把这条经历改得更有说服力：从 0 搭建物联网数据接入平台',
-        en: 'Make this bullet more compelling: built an IoT data ingestion platform from scratch',
+        zh: '帮我把这条经历改得更有说服力：负责 RAG 检索链路的优化',
+        en: 'Make this bullet more compelling: worked on RAG retrieval pipeline optimization',
       }),
       time: '10:24',
       name: tr({ zh: '我', en: 'Me' }),
@@ -1088,8 +1088,8 @@ export function buildDemoMessages(tr: (b: Bi) => string): ChatMessage[] {
     {
       role: 'assistant',
       content: tr({
-        zh: '补上规模与结果数字会更有说服力：\n\n- 从 0 搭建物联网数据接入平台，日均处理 **2 亿条**设备消息\n- 沉淀统一接入协议，新设备接入周期从 2 周缩短到 **3 天**',
-        en: 'Adding scale and concrete outcomes makes it stronger:\n\n- Built an IoT ingestion platform from scratch, processing **200M** device messages daily\n- Standardized the ingestion protocol, cutting new-device onboarding from 2 weeks to **3 days**',
+        zh: '补上方法与量化结果会更有说服力：\n\n- 设计 RAG 检索链路，优化分块与混合检索（BM25+Vector），Top-3 召回率提升至 **92%**\n- 一句话结构：方法在前、数字收尾，避免形容词堆砌',
+        en: 'Add the method and a quantified outcome:\n\n- Designed the RAG retrieval pipeline with chunking and hybrid search (BM25+Vector), lifting Top-3 recall to **92%**\n- Structure it as: method first, number last — skip the adjective padding',
       }),
       time: '10:24',
       name: tr({ zh: 'AI 助手', en: 'AI Assistant' }),
